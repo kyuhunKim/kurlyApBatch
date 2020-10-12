@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lgcns.wcs.kurly.repository.ToteScanRepository">
+   
+  <select id="selectToteScan" resultType="com.lgcns.wcs.kurly.dto.ToteScanData">
+  	/* [ToteScanMapper.xml] selectToteScan */
+    SELECT 
+    	TOTE_ID         AS toteId,
+		WAREHOUSE_KEY   AS warehouseKey,
+		PICKING_TYPE    AS pickingType,
+		ALLOC_TYPE    AS processType,
+		QPS_NUM     AS qpsUnitNo,
+		FAC_EQP_ID      AS facEqpId,
+		FAC_EQP_NM      AS facEqpName,
+		SUBSTR(TOTE_INITIAL_SCAN_YMD,1,8) AS toteScanDate,
+		SUBSTR(TOTE_INITIAL_SCAN_YMD,9,6) AS toteScanTime,
+		WIF_PICK_TOTE_HDR_SEQ   AS toteUniqueNo,
+		TO_CHAR(SYSDATE, 'YYYYMMDD') AS insertedDate,
+		TO_CHAR(SYSDATE, 'HH24MISS') AS insertedTime,
+		CREATED_USER AS insertedUser
+	FROM o_wcs.TB_WIF_PICK_TOTE_HDR
+	WHERE TOTE_INITIAL_SCAN_YN = 'Y'
+	  AND TOTE_SCAN_IF_YN = 'N'
+	ORDER BY WIF_PICK_TOTE_HDR_SEQ ASC
+  </select>
+  
+  <update id="updateToteScan" parameterType="Map">
+  /* [ToteScanMapper.xml] updateToteScan */
+  	UPDATE o_wcs.TB_WIF_PICK_TOTE_HDR
+		SET
+			TOTE_SCAN_IF_YN =  #{toteScanIfYn},
+			TOTE_SCAN_IF_DT =  SYSDATE,
+			TOTE_SCAN_IF_RET_CODE =  #{toteScanIfRetCode},
+			TOTE_SCAN_IF_RET_MESSAGE = #{toteScanIfRetMessage} 
+	WHERE WIF_PICK_TOTE_HDR_SEQ = #{toteUniqueNo}
+  </update>
+</mapper>

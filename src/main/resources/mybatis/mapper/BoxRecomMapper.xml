@@ -1,0 +1,603 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lgcns.wcs.kurly.repository.BoxRecomRepository">
+   
+  <select id="selectCellTypeList" resultType="com.lgcns.wcs.kurly.dto.box.CellTypeVO">
+  	/* [BoxRecomMapper.xml] selectCellTypeList */
+    SELECT 
+		COM_DTL_CD AS cellCd, 
+		COM_DTL_NM AS cellName,
+		ATTR01 AS warehouseKey,
+		ATTR02 AS cellWidth,
+		ATTR03 AS cellDepth,
+		ATTR04 AS cellHeight 
+	FROM o_wcs.TB_COM_CODE_MST
+	WHERE CO_CD = 'MK'
+	AND COM_HDR_CD ='CELL_TYPE_CD'
+	AND HDR_FLAG = 'N'
+	AND USE_YN = 'Y'
+	ORDER BY COM_DTL_CD ASC, ATTR01 ASC
+  </select>
+  
+  <select id="selectBoxTypeList" resultType="com.lgcns.wcs.kurly.dto.box.BoxTypeVO">
+  	/* [BoxRecomMapper.xml] selectBoxTypeList */
+    SELECT 
+		BOX_TYPE_CD  AS boxTypeCd, 
+		BOX_TYPE_NM  AS boxTypeName,
+		CNTR_CD      AS warehouseKey,
+		BOX_TYPE_GRP_CD  AS boxShape,
+		BOX_WTH_LEN  AS BoxWidth,
+		BOX_VERT_LEN  AS BoxDepth,
+		BOX_HGT_LEN  AS BoxHeight
+	FROM o_wcs.TB_COM_BOX_TYPE_MST
+	ORDER BY CNTR_CD ASC, BOX_TYPE_GRP_CD ASC
+  </select>
+  
+  <select id="selectSkuMasterList" resultType="com.lgcns.wcs.kurly.dto.box.SkuTypeVO">
+  	/* [BoxRecomMapper.xml] selectSkuMasterList */
+    SELECT 
+	    SM.OWNER     AS owner,
+	    SM.SKU_CODE  AS skuCode,
+	    SM.SKU_NAME  AS skuName,
+	    SM.LENGTH    AS skuDepth,
+	    SM.WIDTH     AS skuWidth,
+	    SM.HEIGHT    AS skuHeight
+	  FROM o_wcs.TB_COM_SKU_MST SM,
+	  ( SELECT
+	      DISTINCT 
+	      DT.SKU_CODE,  
+	      HD.OWNER_KEY  
+	    FROM o_wcs.TB_WIF_SHIPMENT_HDR HD,
+	       o_wcs.TB_WIF_SHIPMENT_DTL DT 
+	    WHERE HD.SHIP_ORDER_KEY = DT.SHIP_ORDER_KEY 
+	    AND HD.RECEIVE_INTF_YN = 'N'
+	    ) WS
+	   WHERE SM.SKU_CODE = WS.SKU_CODE
+	   AND SM.OWNER = WS.OWNER_KEY
+	  ORDER BY SM.OWNER ASC, SM.SKU_CODE ASC
+  </select>
+
+  <select id="selectOrdInfoList" resultType="com.lgcns.wcs.kurly.dto.box.OrdInfoVO">
+  	/* [BoxRecomMapper.xml] selectOrdInfoList */
+	SELECT
+		DISTINCT
+		HD.SHIP_ORDER_KEY  AS shipOrderKey,
+		HD.WAREHOUSE_KEY  AS warehouseKey,
+		HD.OWNER_KEY  AS ownerKey,
+		HD.ORDER_NO  AS orderNo
+	FROM o_wcs.TB_WIF_SHIPMENT_HDR HD,
+		 o_wcs.TB_WIF_SHIPMENT_DTL DT 
+	WHERE HD.SHIP_ORDER_KEY = DT.SHIP_ORDER_KEY 
+	AND HD.RECEIVE_INTF_YN = 'N'
+	ORDER BY HD.SHIP_ORDER_KEY ASC,
+		HD.WAREHOUSE_KEY ASC,
+		HD.OWNER_KEY ASC,
+		HD.ORDER_NO ASC
+  </select>
+  <select id="selectOrdLineList_bak" parameterType="Map" resultType="com.lgcns.wcs.kurly.dto.box.OrdLineVO">
+  	/* [BoxRecomMapper.xml] selectOrdLineList */
+	SELECT
+		HD.SHIP_ORDER_KEY  AS shipOrderKey,
+		HD.WAREHOUSE_KEY  AS warehouseKey,
+		HD.OWNER_KEY  AS ownerKey,
+		HD.ORDER_NO  AS orderNo,
+		DT.SKU_CODE  AS skuCode,
+		DT.LENGTH    AS skuDepth,
+		DT.WIDTH     AS skuWidth,
+		DT.HEIGHT    AS skuHeight,
+		DT.SHIP_ORDER_ITEM_SEQ  AS shipOrderItemSeq,
+		SUM(DT.QTY_SHIP_ORDER)  AS ordQty
+	FROM o_wcs.TB_WIF_SHIPMENT_HDR HD,
+		 o_wcs.TB_WIF_SHIPMENT_DTL DT 
+	WHERE HD.SHIP_ORDER_KEY = DT.SHIP_ORDER_KEY 
+	AND HD.RECEIVE_INTF_YN = 'N'
+	AND HD.SHIP_ORDER_KEY = #{shipOrderKey}
+	GROUP BY HD.SHIP_ORDER_KEY,
+		HD.WAREHOUSE_KEY,
+		HD.OWNER_KEY,
+		HD.ORDER_NO,
+		DT.SKU_CODE,
+		DT.SHIP_ORDER_ITEM_SEQ,
+		DT.LENGTH,
+		DT.WIDTH,
+		DT.HEIGHT
+	ORDER BY HD.SHIP_ORDER_KEY ASC,
+		HD.WAREHOUSE_KEY ASC,
+		HD.OWNER_KEY ASC,
+		HD.ORDER_NO ASC,
+		DT.SHIP_ORDER_ITEM_SEQ ASC,
+		DT.SKU_CODE ASC
+  </select>
+  <select id="selectOrdLineList" parameterType="Map" resultType="com.lgcns.wcs.kurly.dto.box.OrdLineVO">
+  	/* [BoxRecomMapper.xml] selectOrdLineList */
+	SELECT
+		HD.SHIP_ORDER_KEY  AS shipOrderKey,
+		HD.WAREHOUSE_KEY  AS warehouseKey,
+		HD.OWNER_KEY  AS ownerKey,
+		HD.ORDER_NO  AS orderNo,
+		DT.SHIP_ORDER_ITEM_SEQ  AS shipOrderItemSeq,
+		DT.SKU_CODE  AS skuCode,
+		SM.LENGTH    AS skuDepth,
+		SM.WIDTH     AS skuWidth,
+		SM.HEIGHT    AS skuHeight,
+		SUM(DT.QTY_SHIP_ORDER)  AS ordQty
+	FROM o_wcs.TB_WIF_SHIPMENT_HDR HD,
+		 o_wcs.TB_WIF_SHIPMENT_DTL DT,
+		 o_wcs.TB_COM_SKU_MST SM
+	WHERE HD.SHIP_ORDER_KEY = DT.SHIP_ORDER_KEY 
+	AND SM.SKU_CODE = DT.SKU_CODE
+	AND SM.OWNER = HD.OWNER_KEY
+	AND HD.RECEIVE_INTF_YN = 'N'
+	AND HD.SHIP_ORDER_KEY = #{shipOrderKey}
+	GROUP BY HD.SHIP_ORDER_KEY,
+		HD.WAREHOUSE_KEY,
+		HD.OWNER_KEY,
+		HD.ORDER_NO,
+		DT.SHIP_ORDER_ITEM_SEQ,
+		DT.SKU_CODE,
+		SM.LENGTH,
+		SM.WIDTH,
+		SM.HEIGHT
+	ORDER BY HD.SHIP_ORDER_KEY ASC,
+		HD.WAREHOUSE_KEY ASC,
+		HD.OWNER_KEY ASC,
+		HD.ORDER_NO ASC,
+		DT.SHIP_ORDER_ITEM_SEQ ASC,
+		DT.SKU_CODE ASC
+  </select>
+  
+  <select id="selectWifShipmentHdrList" resultType="com.lgcns.wcs.kurly.dto.box.WifShipmentVO">
+  	/* [BoxRecomMapper.xml] selectWifShipmentHdrList */
+	SELECT DISTINCT
+		  HD.SHIP_ORDER_KEY        AS  shipOrderKey      ,
+		  HD.WAREHOUSE_KEY         AS  warehouseKey      ,
+		  HD.SHIP_TYPE             AS  shipType          ,
+		  HD.DOC_STATUS            AS  docStatus         ,
+		  HD.DOC_DATE              AS  docDate           ,
+		  HD.MEMBER_GRADE          AS  memberGrade       ,
+		  HD.OWNER_KEY             AS  ownerKey          ,
+		  HD.REQ_SHIP_DATE         AS  reqShipDate       ,
+		  HD.SUPPLIER_CODE         AS  supplierCode      ,
+		  HD.CUSTOMER_NAME         AS  customerName      ,
+		  HD.ORDER_TYPE            AS  orderType         ,
+		  HD.TRANSPORT_TYPE        AS  transportType     ,
+		  HD.ORDER_NO              AS  orderNo           ,
+		  HD.INVOICE_NO            AS  invoiceNo         ,
+		  HD.COURIER_BOX_PASSWORD  AS  courierBoxPassword,
+		  HD.RECIPIENT_NAME        AS  recipientName     ,
+		  HD.RECIPIENT_TEL_NO      AS  recipientTelNo    ,
+		  HD.ROAD_ADDR             AS  roadAddr          ,
+		  HD.ROAD_ADDR_DETAIL      AS  roadAddrDetail    ,
+		  HD.CUSTOMER_ID           AS  customerId        ,
+		  HD.CUSTOMER_TEL_NO       AS  customerTelNo     ,
+		  HD.ZIP_CODE              AS  zipCode           ,
+		  HD.CUSTOMER_PHONE_NO     AS  customerPhoneNo   ,
+		  HD.NEW_ZIP_CODE          AS  newZipCode        ,
+		  HD.JIBUN_BASIC_ADDR      AS  jibunBasicAddr    ,
+		  HD.JIBUN_DETAIL_ADDR     AS  jibunDetailAddr   ,
+		  HD.REMARK                AS  remark            ,
+		  HD.BASE_ADDR_TYPE        AS  baseAddrType      ,
+		  HD.ORDER_ADDR_GUGUN      AS  orderAddrGugun    ,
+		  HD.ORDER_ADDR_DONG       AS  orderAddrDong     ,
+		  HD.COURIER_CODE          AS  courierCode       ,
+		  HD.NOTE                  AS  note              ,
+		  HD.CS_NOTICE             AS  csNotice          ,
+		  HD.CUSTOMER_MESSAGE      AS  customerMessage   ,
+		  HD.REGION_GROUP_CODE     AS  regionGroupCode   ,
+		  HD.REGION_CODE           AS  regionCode        ,
+		  HD.DELIVERY_ROUND        AS  deliveryRound     ,
+		  HD.ALLOC_SEQ             AS  allocSeq          ,
+		  HD.ORIGIN_INVOICE_NO     AS  originInvoiceNo   ,
+		  HD.CREATED_DATE          AS  createdDate       ,
+		  HD.CREATED_TIME          AS  createdTime       ,
+		  HD.CREATED_USER          AS  createdUser       ,
+		  HD.MODIFIED_DATE         AS  modifiedDate      ,
+		  HD.MODIFIED_TIME         AS  modifiedTime      ,
+		  HD.MODIFIED_USER         AS  modifiedUser      ,
+		  HD.ALLOC_TYPE            AS  alloc_Type                                 
+	FROM o_wcs.TB_WIF_SHIPMENT_HDR HD,
+		 o_wcs.TB_WIF_SHIPMENT_DTL DT
+	WHERE HD.SHIP_ORDER_KEY = DT.SHIP_ORDER_KEY
+	AND HD.OWNER_KEY = DT.OWNER
+	AND HD.RECEIVE_INTF_YN = 'N'
+	ORDER BY HD.SHIP_ORDER_KEY ASC, HD.WAREHOUSE_KEY ASC, HD.CREATED_DATE DESC, HD.CREATED_TIME DESC
+  </select>
+  
+  <select id="selectWifShipmentDtlList" parameterType="Map" resultType="com.lgcns.wcs.kurly.dto.box.WifShipmentDtlVO">
+  	/* [BoxRecomMapper.xml] selectWifShipmentDtlList */
+	SELECT 
+		  DT.SHIP_ORDER_KEY        AS  shipOrderKey     ,
+		  DT.SHIP_ORDER_ITEM_SEQ   AS  shipOrderItemSeq ,
+		  DT.ITEM_STATUS           AS  itemStatus       ,
+		  DT.SKU_CODE              AS  skuCode          ,
+		  DT.QTY_ORIGIN_ORDER      AS  qtyOriginOrder   ,
+		  DT.QTY_SHIP_ORDER        AS  qtyShipOrder     ,
+		  DT.QTY_PICKING           AS  qtyPicking       ,
+		  DT.QTY_ALLOCATED         AS  qtyAllocated     ,
+		  DT.QTY_PACKING           AS  qtyPacking       ,
+		  DT.QTY_SHIP_COMPLETED    AS  qtyShipCompleted ,
+		  DT.QTY_SHIP_CANCELLED    AS  qtyShipCancelled ,
+		  DT.QTY_BY_UOM            AS  qtyByUom         ,
+		  DT.MEASURE_KEY           AS  measureKey       ,
+		  DT.UOM_KEY               AS  uomKey           ,
+		  DT.UOM_QTY               AS  uomQty           ,
+		  DT.DEFAULT_UOM_KEY       AS  defaultUomKey    ,
+		  DT.DEFAULT_UOM_QTY       AS  defaultUomQty    ,
+		  DT.SKU_NAME              AS  skuName          ,
+		  DT.SKU_SUB_NAME          AS  skuSubName       ,
+		  DT.SKU_ALTER_CODE        AS  skuAlterCode     ,
+		  DT.SKU_GROUP_01          AS  skuGroup01       ,
+		  DT.SKU_GROUP_02          AS  skuGroup02       ,
+		  DT.SKU_GROUP_03          AS  skuGroup03       ,
+		  DT.SKU_GROUP_04          AS  skuGroup04       ,
+		  DT.SELLING_TYPE          AS  sellingType      ,
+		  DT.GROSS_WEIGHT          AS  grossWeight      ,
+		  DT.NET_WEIGHT            AS  netWeight        ,
+		  DT.WEIGHT_UNIT           AS  weightUnit       ,
+		  DT.LENGTH                AS  length           ,
+		  DT.WIDTH                 AS  width            ,
+		  DT.HEIGHT                AS  height           ,
+		  DT.CBM                   AS  cbm              ,
+		  DT.SKU_OPTION_NAME       AS  skuOptionName    ,
+		  DT.SKU_SHOPMALL_NAME     AS  skuShopmallName  ,
+		  DT.REMARK                AS  remark           ,
+		  DT.CREATED_DATE          AS  createdDate      ,
+		  DT.CREATED_TIME          AS  createdTime      ,
+		  DT.CREATED_USER          AS  createdUser      ,
+		  DT.MODIFIED_DATE         AS  modifiedDate     ,
+		  DT.MODIFIED_TIME         AS  modifiedTime     ,
+		  DT.MODIFIED_USER         AS  modifiedUser                   
+	FROM o_wcs.TB_WIF_SHIPMENT_HDR HD,
+		 o_wcs.TB_WIF_SHIPMENT_DTL DT
+	WHERE HD.SHIP_ORDER_KEY = DT.SHIP_ORDER_KEY
+	AND HD.OWNER_KEY = DT.OWNER
+	AND HD.RECEIVE_INTF_YN = 'N'
+	AND DT.SHIP_ORDER_KEY = #{shipOrderKey}
+	ORDER BY HD.SHIP_ORDER_KEY ASC, HD.WAREHOUSE_KEY ASC, HD.CREATED_DATE DESC, HD.CREATED_TIME DESC
+  </select>
+
+  <select id="getShipUidKey" resultType="int">
+  	/* [BoxRecomMapper.xml] getShipUidKey */
+		SELECT o_wcs.SEQ_ORD_SHIPMENT_HDR.NEXTVAL FROM DUAL
+  </select>
+  
+  <insert id="insertOrdShipmentHdr"  parameterType="Map">
+  	/* [BoxRecomMapper.xml] insertOrdShipmentHdr */
+	  INSERT INTO o_wcs.TB_ORD_SHIPMENT_HDR
+		(
+		  SHIP_UID_KEY          ,
+		  SHIP_ORDER_KEY        ,
+		  WAREHOUSE_KEY         ,
+		  SHIP_TYPE             ,
+		  DOC_STATUS            ,
+		  DOC_DATE              ,
+		  MEMBER_GRADE          ,
+		  OWNER_KEY             ,
+		  REQ_SHIP_DATE         ,
+		  SUPPLIER_CODE         ,
+		  CUSTOMER_NAME         ,
+		  ORDER_TYPE            ,
+		  TRANSPORT_TYPE        ,
+		  ORDER_NO              ,
+		  INVOICE_NO            ,
+		  COURIER_BOX_PASSWORD  ,
+		  RECIPIENT_NAME        ,
+		  RECIPIENT_TEL_NO      ,
+		  ROAD_ADDR             ,
+		  ROAD_ADDR_DETAIL      ,
+		  CUSTOMER_ID           ,
+		  CUSTOMER_TEL_NO       ,
+		  ZIP_CODE              ,
+		  CUSTOMER_PHONE_NO     ,
+		  NEW_ZIP_CODE          ,
+		  JIBUN_BASIC_ADDR      ,
+		  JIBUN_DETAIL_ADDR     ,
+		  REMARK                ,
+		  BASE_ADDR_TYPE        ,
+		  ORDER_ADDR_GUGUN      ,
+		  ORDER_ADDR_DONG       ,
+		  COURIER_CODE          ,
+		  NOTE                  ,
+		  CS_NOTICE             ,
+		  CUSTOMER_MESSAGE      ,
+		  REGION_GROUP_CODE     ,
+		  REGION_CODE           ,
+		  DELIVERY_ROUND        ,
+		  ALLOC_SEQ             ,
+		  ORIGIN_INVOICE_NO     ,
+		  CREATED_DATE          ,
+		  CREATED_TIME          ,
+		  CREATED_USER          ,
+		  MODIFIED_DATE         ,
+		  MODIFIED_TIME         ,
+		  MODIFIED_USER         ,
+		  ALLOC_TYPE             ,
+		PACK_BOX_SPLIT_YN ,
+		PACK_BOX_TYPE_RECOM   
+		)
+		SELECT 
+		      #{shipUidKey}, 
+		      HD.SHIP_ORDER_KEY        ,
+		      HD.WAREHOUSE_KEY         ,
+		      HD.SHIP_TYPE             ,
+		      HD.DOC_STATUS            ,
+		      HD.DOC_DATE              ,
+		      HD.MEMBER_GRADE          ,
+		      HD.OWNER_KEY             ,
+		      HD.REQ_SHIP_DATE         ,
+		      HD.SUPPLIER_CODE         ,
+		      HD.CUSTOMER_NAME         ,
+		      HD.ORDER_TYPE            ,
+		      HD.TRANSPORT_TYPE        ,
+		      HD.ORDER_NO              ,
+		      HD.INVOICE_NO            ,
+		      HD.COURIER_BOX_PASSWORD  ,
+		      HD.RECIPIENT_NAME        ,
+		      HD.RECIPIENT_TEL_NO      ,
+		      HD.ROAD_ADDR             ,
+		      HD.ROAD_ADDR_DETAIL      ,
+		      HD.CUSTOMER_ID           ,
+		      HD.CUSTOMER_TEL_NO       ,
+		      HD.ZIP_CODE              ,
+		      HD.CUSTOMER_PHONE_NO     ,
+		      HD.NEW_ZIP_CODE          ,
+		      HD.JIBUN_BASIC_ADDR      ,
+		      HD.JIBUN_DETAIL_ADDR     ,
+		      HD.REMARK                ,
+		      NVL( HD.BASE_ADDR_TYPE, ' ') AS BASE_ADDR_TYPE ,
+		      HD.ORDER_ADDR_GUGUN      ,
+		      HD.ORDER_ADDR_DONG       ,
+		      HD.COURIER_CODE          ,
+		      HD.NOTE                  ,
+		      HD.CS_NOTICE             ,
+		      HD.CUSTOMER_MESSAGE      ,
+		      HD.REGION_GROUP_CODE     ,
+		      HD.REGION_CODE           ,
+		      HD.DELIVERY_ROUND        ,
+		      HD.ALLOC_SEQ             ,
+		      HD.ORIGIN_INVOICE_NO     ,
+		      TO_CHAR(SYSDATE, 'YYYYMMDD') AS CREATED_DATE,
+		      TO_CHAR(SYSDATE, 'HH24MISS') AS CREATED_TIME,
+		      'BATCH' CREATED_USER          ,
+		      TO_CHAR(SYSDATE, 'YYYYMMDD') AS MODIFIED_DATE,
+		      TO_CHAR(SYSDATE, 'HH24MISS') AS MODIFIED_TIME,
+		      'BATCH' MODIFIED_USER         ,
+		      HD.ALLOC_TYPE             ,
+		      #{packBoxSplitYn}           ,
+		      #{packBoxTypeRecom}                              
+		  FROM o_wcs.TB_WIF_SHIPMENT_HDR HD
+		  WHERE HD.SHIP_ORDER_KEY = #{shipOrderKey}
+  </insert>
+    
+  <insert id="insertOrdShipmentDtl"  parameterType="Map">
+  	/* [BoxRecomMapper.xml] insertOrdShipmentDtl */
+  	INSERT INTO o_wcs.TB_ORD_SHIPMENT_DTL
+	(
+		SHIP_UID_KEY          ,
+		SHIP_UID_ITEM_SEQ     ,
+		SHIP_ORDER_KEY         ,
+		SHIP_ORDER_ITEM_SEQ    ,
+		ITEM_STATUS            ,
+		SKU_CODE               ,
+		QTY_ORIGIN_ORDER       ,
+		QTY_SHIP_ORDER         ,
+		QTY_QPS_ORDER         ,
+		QTY_QPS_PICKED         ,
+		QTY_QPS_ALLOCATED      ,
+		QTY_QPS_PACKED         ,
+		QTY_SHIP_COMPLETED     ,
+		QTY_SHIP_CANCELLED     ,
+		QTY_BY_UOM             ,
+		MEASURE_KEY            ,
+		UOM_KEY                ,
+		UOM_QTY                ,
+		DEFAULT_UOM_KEY        ,
+		DEFAULT_UOM_QTY        ,
+		SKU_NAME               ,
+		SKU_SUB_NAME           ,
+		SKU_ALTER_CODE         ,
+		SKU_GROUP_01           ,
+		SKU_GROUP_02           ,
+		SKU_GROUP_03           ,
+		SKU_GROUP_04           ,
+		SELLING_TYPE           ,
+		GROSS_WEIGHT           ,
+		NET_WEIGHT             ,
+		WEIGHT_UNIT            ,
+		LENGTH                 ,
+		WIDTH                  ,
+		HEIGHT                 ,
+		CBM                    ,
+		SKU_OPTION_NAME        ,
+		SKU_SHOPMALL_NAME      ,
+		REMARK                 ,
+		CREATED_DATE           ,
+		CREATED_TIME           ,
+		CREATED_USER           ,
+		MODIFIED_DATE          ,
+		MODIFIED_TIME          ,
+		MODIFIED_USER          ,
+		OWNER
+	)
+	SELECT 
+	      #{shipUidKey}, 
+	      #{shipUidItemSeq}, 
+	      DT.SHIP_ORDER_KEY         ,
+	      DT.SHIP_ORDER_ITEM_SEQ    ,
+	      DT.ITEM_STATUS            ,
+	      DT.SKU_CODE               ,
+	      DT.QTY_ORIGIN_ORDER       ,
+	      DT.QTY_SHIP_ORDER         ,
+	      #{qtyQpsOrder}            ,
+	      DT.QTY_PICKING            ,
+	      DT.QTY_ALLOCATED          ,
+	      DT.QTY_PACKING            ,
+	      DT.QTY_SHIP_COMPLETED     ,
+	      DT.QTY_SHIP_CANCELLED     ,
+	      DT.QTY_BY_UOM             ,
+	      DT.MEASURE_KEY            ,
+	      DT.UOM_KEY                ,
+	      DT.UOM_QTY                ,
+	      DT.DEFAULT_UOM_KEY        ,
+	      DT.DEFAULT_UOM_QTY        ,
+	      DT.SKU_NAME               ,
+	      DT.SKU_SUB_NAME           ,
+	      DT.SKU_ALTER_CODE         ,
+	      DT.SKU_GROUP_01           ,
+	      DT.SKU_GROUP_02           ,
+	      DT.SKU_GROUP_03           ,
+	      DT.SKU_GROUP_04           ,
+	      DT.SELLING_TYPE           ,
+	      DT.GROSS_WEIGHT           ,
+	      DT.NET_WEIGHT             ,
+	      DT.WEIGHT_UNIT            ,
+	      DT.LENGTH                 ,
+	      DT.WIDTH                  ,
+	      DT.HEIGHT                 ,
+	      DT.CBM                    ,
+	      DT.SKU_OPTION_NAME        ,
+	      DT.SKU_SHOPMALL_NAME      ,
+	      DT.REMARK                 ,
+	      TO_CHAR(SYSDATE, 'YYYYMMDD') AS CREATED_DATE,
+	      TO_CHAR(SYSDATE, 'HH24MISS') AS CREATED_TIME,
+	      'BATCH' CREATED_USER          ,
+	      TO_CHAR(SYSDATE, 'YYYYMMDD') AS MODIFIED_DATE,
+	      TO_CHAR(SYSDATE, 'HH24MISS') AS MODIFIED_TIME,
+	      'BATCH' MODIFIED_USER       ,
+	      #{owner}
+	  FROM o_wcs.TB_WIF_SHIPMENT_DTL DT
+	  WHERE DT.SHIP_ORDER_KEY = #{shipOrderKey}
+	    AND DT.SKU_CODE = #{skuCode}
+  </insert>
+  <update id="updateWifShipmentHdr" parameterType="Map">
+  	/* [BoxRecomMapper.xml] updateWifShipmentHdr */
+		UPDATE o_wcs.TB_WIF_SHIPMENT_HDR HD
+		SET
+			RECEIVE_INTF_YN = #{receiveIntfYn}     ,
+			RECEIVE_INTF_DT = SYSDATE              , 
+			RECEIVE_INTF_CODE = #{receiveIntfCode} ,
+			RECEIVE_INTF_MEMO = #{receiveIntfMemo} ,
+			MODIFIED_DATE = TO_CHAR(SYSDATE, 'YYYYMMDD') ,
+			MODIFIED_TIME = TO_CHAR(SYSDATE, 'HH24MISS') ,
+			MODIFIED_USER = 'BATCH'
+		WHERE HD.SHIP_ORDER_KEY = #{shipOrderKey}
+  </update>
+  
+  <insert id="insertOrdShipmentDtlAll"  parameterType="Map">
+  	/* [BoxRecomMapper.xml] insertOrdShipmentDtlAll */
+  	INSERT INTO o_wcs.TB_ORD_SHIPMENT_DTL
+	(
+		SHIP_UID_KEY          ,
+		SHIP_UID_ITEM_SEQ     ,
+		SHIP_ORDER_KEY         ,
+		SHIP_ORDER_ITEM_SEQ    ,
+		ITEM_STATUS            ,
+		SKU_CODE               ,
+		QTY_ORIGIN_ORDER       ,
+		QTY_SHIP_ORDER         ,
+		QTY_QPS_ORDER         ,
+		QTY_QPS_PICKED         ,
+		QTY_QPS_ALLOCATED      ,
+		QTY_QPS_PACKED         ,
+		QTY_SHIP_COMPLETED     ,
+		QTY_SHIP_CANCELLED     ,
+		QTY_BY_UOM             ,
+		MEASURE_KEY            ,
+		UOM_KEY                ,
+		UOM_QTY                ,
+		DEFAULT_UOM_KEY        ,
+		DEFAULT_UOM_QTY        ,
+		SKU_NAME               ,
+		SKU_SUB_NAME           ,
+		SKU_ALTER_CODE         ,
+		SKU_GROUP_01           ,
+		SKU_GROUP_02           ,
+		SKU_GROUP_03           ,
+		SKU_GROUP_04           ,
+		SELLING_TYPE           ,
+		GROSS_WEIGHT           ,
+		NET_WEIGHT             ,
+		WEIGHT_UNIT            ,
+		LENGTH                 ,
+		WIDTH                  ,
+		HEIGHT                 ,
+		CBM                    ,
+		SKU_OPTION_NAME        ,
+		SKU_SHOPMALL_NAME      ,
+		REMARK                 ,
+		CREATED_DATE           ,
+		CREATED_TIME           ,
+		CREATED_USER           ,
+		MODIFIED_DATE          ,
+		MODIFIED_TIME          ,
+		MODIFIED_USER          ,
+		OWNER
+	)
+	SELECT 
+	      #{shipUidKey}, 
+	      DT.SHIP_ORDER_ITEM_SEQ, 
+	      DT.SHIP_ORDER_KEY         ,
+	      DT.SHIP_ORDER_ITEM_SEQ    ,
+	      DT.ITEM_STATUS            ,
+	      DT.SKU_CODE               ,
+	      DT.QTY_ORIGIN_ORDER       ,
+	      DT.QTY_SHIP_ORDER         ,
+	      DT.QTY_SHIP_ORDER         ,
+	      DT.QTY_PICKING            ,
+	      DT.QTY_ALLOCATED          ,
+	      DT.QTY_PACKING            ,
+	      DT.QTY_SHIP_COMPLETED     ,
+	      DT.QTY_SHIP_CANCELLED     ,
+	      DT.QTY_BY_UOM             ,
+	      DT.MEASURE_KEY            ,
+	      DT.UOM_KEY                ,
+	      DT.UOM_QTY                ,
+	      DT.DEFAULT_UOM_KEY        ,
+	      DT.DEFAULT_UOM_QTY        ,
+	      DT.SKU_NAME               ,
+	      DT.SKU_SUB_NAME           ,
+	      DT.SKU_ALTER_CODE         ,
+	      DT.SKU_GROUP_01           ,
+	      DT.SKU_GROUP_02           ,
+	      DT.SKU_GROUP_03           ,
+	      DT.SKU_GROUP_04           ,
+	      DT.SELLING_TYPE           ,
+	      DT.GROSS_WEIGHT           ,
+	      DT.NET_WEIGHT             ,
+	      DT.WEIGHT_UNIT            ,
+	      DT.LENGTH                 ,
+	      DT.WIDTH                  ,
+	      DT.HEIGHT                 ,
+	      DT.CBM                    ,
+	      DT.SKU_OPTION_NAME        ,
+	      DT.SKU_SHOPMALL_NAME      ,
+	      DT.REMARK                 ,
+	      TO_CHAR(SYSDATE, 'YYYYMMDD') AS CREATED_DATE,
+	      TO_CHAR(SYSDATE, 'HH24MISS') AS CREATED_TIME,
+	      'BATCH' CREATED_USER          ,
+	      TO_CHAR(SYSDATE, 'YYYYMMDD') AS MODIFIED_DATE,
+	      TO_CHAR(SYSDATE, 'HH24MISS') AS MODIFIED_TIME,
+	      'BATCH' MODIFIED_USER       ,
+	      #{owner}
+	  FROM o_wcs.TB_WIF_SHIPMENT_DTL DT
+	  WHERE DT.SHIP_ORDER_KEY = #{shipOrderKey}
+  </insert>
+  
+  <select id="selectOrdShipmentCount"  parameterType="Map" resultType="int">
+  	/* [BoxRecomMapper.xml] selectOrdShipmentHdr */
+		SELECT 
+		      COUNT(SHIP_ORDER_KEY) AS CNT
+		  FROM o_wcs.TB_ORD_SHIPMENT_HDR HD
+		  WHERE HD.SHIP_ORDER_KEY = #{shipOrderKey}
+  </select>
+  
+  <select id="selectDate" resultType="String">
+  	/* [LogBatchExecMapper.xml] selectDate */
+    SELECT 
+		TO_CHAR(SYSDATE, 'YYYYMMDD HH24MISS') sdate
+	FROM DUAL
+  </select>
+</mapper>

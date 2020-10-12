@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lgcns.wcs.kurly.repository.InvoiceSortCompletRepository">
+   
+  <select id="selectInvoiceSortComplet" resultType="com.lgcns.wcs.kurly.dto.InvoiceSortCompletData">
+  	/* [InvoiceSortCompletMapper.xml] selectInvoiceSortComplet */
+    SELECT 
+		INVOICE_NO               AS invoiceNo,
+		SHIP_ORDER_KEY       AS shipOrderKey,
+		WAREHOUSE_KEY            AS warehouseKey,
+		ORIGIN_INVOICE_NO        AS originInvoiceNo,
+		SHIP_UID_KEY         AS shipUidWcs,
+		PACK_BOX_SPLIT_YN        AS packBoxSplitYn,
+		PACK_BOX_TYPE_RECOM      AS packBoxTypeRecom,
+		INVOICE_STATUS           AS invoiceStatus,
+		INVOICE_SORT_RSLT_CHUTE  AS invoiceSortRsltChute,
+		INVOICE_SORT_RSLT_MSG    AS invoiceSortRsltMsg,
+		SUBSTR(INVOICE_SORT_CMPT_YMD,1,8) AS sorterSortDate,
+		SUBSTR(INVOICE_SORT_CMPT_YMD,9,6) AS sorterSortTime,
+		TO_CHAR(SYSDATE, 'YYYYMMDD') AS insertedDate,
+		TO_CHAR(SYSDATE, 'HH24MISS') AS insertedTime,
+		MODIFIED_USER            AS insertedUser
+	FROM o_wcs.TB_DOC_INVOICE_HDR
+	WHERE INVOICE_STATUS = '90'
+	  AND INVOICE_SORT_INTF_YN = 'N'
+	ORDER BY INVOICE_NO ASC , SHIP_ORDER_KEY ASC 
+  </select>
+  
+  <update id="updateInvoiceSortComplet" parameterType="Map">
+  /* [InvoiceSortCompletMapper.xml] updateInvoiceSortComplet */
+  	UPDATE o_wcs.TB_DOC_INVOICE_HDR
+		SET
+			INVOICE_SORT_INTF_YN =  #{invoiceSortIntfYn},
+			INVOICE_SORT_INTF_DT =  SYSDATE,
+			INVOICE_SORT_INTF_CODE =  #{invoiceSortIntfCode},
+			INVOICE_SORT_INTF_MEMO = #{invoiceSortIntfMemo} ,
+			MODIFIED_DATE = TO_CHAR(SYSDATE, 'YYYYMMDD') ,
+			MODIFIED_TIME = TO_CHAR(SYSDATE, 'HH24MISS') ,
+			MODIFIED_USER = #{modifiedUser}
+	WHERE INVOICE_NO = #{invoiceNo}
+	  AND WAREHOUSE_KEY = #{warehouseKey}
+	  AND SHIP_ORDER_KEY = #{shipOrderKey}
+
+  </update>
+</mapper>

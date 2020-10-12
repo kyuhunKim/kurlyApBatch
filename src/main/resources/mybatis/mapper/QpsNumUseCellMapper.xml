@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lgcns.wcs.kurly.repository.QpsNumUseCellRepository">
+   
+  <select id="selectQpsNumUseCellList" resultType="com.lgcns.wcs.kurly.dto.QpsNumUseCellData">
+  	/* [QpsNumUseCellMapper.xml] selectQpsNumUseCellList */
+	SELECT
+		  WAREHOUSE_KEY AS warehouseKey
+		, SUM(QPSNUMUSECELL01) AS qpsNumUseCell01
+		, SUM(QPSNUMUSECELL02) AS qpsNumUseCell02
+		, SUM(DASNUMUSECELL) AS dasNumUseCell
+		, TO_CHAR(SYSDATE, 'YYYYMMDD') AS batchRunDate
+		, TO_CHAR(SYSDATE, 'HH24MISS') AS batchRunTime
+ 	FROM (
+ 		SELECT 
+ 			WS.WAREHOUSE_KEY
+			, CASE WHEN CM.LOCATION_TYPE IN ( 'QPS' ) 
+						AND CM.EQP_ID IN ( 'MQ01', 'MQ03', 'MQ05' ) 
+						AND CM.USE_YN = 'Y' 
+				THEN 1 
+				ELSE 0
+			  END  QPSNUMUSECELL01
+			, CASE WHEN CM.LOCATION_TYPE IN ( 'QPS' ) 
+						AND CM.EQP_ID IN ( 'MQ02', 'MQ04', 'MQ06' ) 
+						AND CM.USE_YN = 'Y' 
+				THEN 1 
+				ELSE 0
+			  END  QPSNUMUSECELL02   
+			, CASE WHEN CM.LOCATION_TYPE IN ( 'DAS' ) 
+						AND CM.USE_YN = 'Y' 
+				THEN 1 
+				ELSE 0
+			  END  DASNUMUSECELL           
+		FROM O_WCS.TB_COM_CELL_MST CM
+			JOIN O_WCS.TB_COM_WS_MST   WS 
+				ON ( CM.STATION_ID = WS.STATION_ID
+                      AND  CM.EQP_ID     = WS.EQP_ID   )
+	) T
+	GROUP BY WAREHOUSE_KEY 
+	ORDER BY WAREHOUSE_KEY ASC 
+  </select>
+  
+</mapper>

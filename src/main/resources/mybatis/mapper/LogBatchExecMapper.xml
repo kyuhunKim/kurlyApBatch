@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lgcns.wcs.kurly.repository.LogBatchExecRepository">
+   
+  <insert id="createLogBatchExec" parameterType="com.lgcns.wcs.kurly.dto.LogBatchExec">
+     <selectKey resultType="int" keyProperty="batchExecSeq" order="BEFORE">  
+       	SELECT o_wcs.SEQ_LOG_BATCH_EXEC.NEXTVAL FROM DUAL
+     </selectKey>
+  /* [LogBatchExecMapper.xml] createLogBatchExec */
+  	INSERT INTO o_wcs.TB_LOG_BATCH_EXEC (
+  		BATCH_EXEC_SEQ ,
+		LOG_YYYYMMDD ,
+		SERVER_IP ,
+		SERVER_HOST ,
+		WAREHOUSE_KEY ,
+		EXEC_METHOD ,
+		MESSAGE_LOG ,
+		SUCCESS_YN ,
+		EXECUTE_DIRECT_YN ,
+		EXECUTE_COUNT ,
+		START_DATE ,
+		END_DATE ,
+		INSERTED_DATE ,
+		INSERTED_TIME
+  	) VALUES (
+	    #{batchExecSeq},
+		TO_CHAR(SYSDATE, 'YYYYMMDD'),
+		#{serverIp},
+		#{serverHost},
+		#{warehouseKey},
+		#{execMethod},
+		#{messageLog},
+		#{successYn},
+		#{executeDirectYn},
+		#{executeCount},
+		#{startDate},
+		#{endDate},
+	    TO_CHAR(SYSDATE, 'YYYYMMDD') ,
+	    TO_CHAR(SYSDATE, 'HH24MISS')
+    ) 
+  </insert>
+  
+</mapper>

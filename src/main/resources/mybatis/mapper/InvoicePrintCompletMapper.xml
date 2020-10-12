@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lgcns.wcs.kurly.repository.InvoicePrintCompletRepository">
+   
+  <select id="selectInvoicePrintComplet" resultType="com.lgcns.wcs.kurly.dto.InvoicePrintCompletData">
+  	/* [InvoicePrintCompletMapper.xml] selectInvoicePrintComplet */
+    SELECT 
+		SHIP_ORDER_KEY    AS shipOrderKey,
+		INVOICE_NO            AS invoiceNo,
+		WAREHOUSE_KEY         AS warehouseKey,
+		ORIGIN_INVOICE_NO     AS originInvoiceNo,
+		SHIP_UID_KEY      AS shipUidWcs,
+		PACK_BOX_SPLIT_YN     AS packBoxSplitYn,
+		PACK_BOX_TYPE_RECOM   AS packBoxTypeRecom,
+		INVOICE_STATUS        AS invoiceStatus,
+		SUBSTR(INVOICE_NO_PRT_YMD,1,8)   AS qpsPrintDate,
+		SUBSTR(INVOICE_NO_PRT_YMD,9,6)   AS qpsPrintTime,
+		TO_CHAR(SYSDATE, 'YYYYMMDD') AS insertedDate,
+		TO_CHAR(SYSDATE, 'HH24MISS') AS insertedTime,
+		MODIFIED_USER         AS insertedUser
+	FROM o_wcs.TB_DOC_INVOICE_HDR
+	WHERE INVOICE_NO_PRT_YN = 'Y'
+	  AND INVOICE_PRINT_INTF_YN = 'N'
+	  AND INVOICE_PRINT_SYSTEM = 'WCS' 
+	ORDER BY SHIP_ORDER_KEY ASC , INVOICE_NO ASC
+  </select>
+  
+  <update id="updateInvoicePrintComplet" parameterType="Map">
+  /* [InvoicePrintCompletMapper.xml] updateInvoicePrintComplet */
+  	UPDATE o_wcs.TB_DOC_INVOICE_HDR
+		SET
+			INVOICE_PRINT_INTF_YN =  #{invoicePrintIntfYn},
+			INVOICE_PRINT_INTF_DT =  SYSDATE,
+			INVOICE_PRINT_INTF_CODE =  #{invoicePrintIntfCode},
+			INVOICE_PRINT_INTF_MEMO = #{invoicePrintIntfMemo} ,
+			MODIFIED_DATE = TO_CHAR(SYSDATE, 'YYYYMMDD') ,
+			MODIFIED_TIME = TO_CHAR(SYSDATE, 'HH24MISS') ,
+			MODIFIED_USER = #{modifiedUser}
+	WHERE INVOICE_NO = #{invoiceNo}
+	  AND WAREHOUSE_KEY = #{warehouseKey}
+	  AND SHIP_ORDER_KEY = #{shipOrderKey}
+  </update>
+</mapper>

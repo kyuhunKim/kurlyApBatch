@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lgcns.wcs.kurly.repository.LogApiStatusRepository">
+   
+  <insert id="createLogApiStatus" parameterType="com.lgcns.wcs.kurly.dto.LogApiStatus">
+    <selectKey resultType="int" keyProperty="apiStatusSeq" order="BEFORE">  
+       	SELECT o_wcs.SEQ_LOG_API_STATUS.NEXTVAL FROM DUAL
+    </selectKey>
+  /* [LogApiStatusMapper.xml] createLogApiStatus */
+  	INSERT INTO o_wcs.TB_LOG_API_STATUS (
+  		API_STATUS_SEQ ,
+		WAREHOUSE_KEY ,
+		API_YYYYMMDD ,
+		EXEC_METHOD ,
+		WORK_BATCH_NO ,
+		GROUP_NO ,
+		SHIP_UID_KEY ,
+		SHIP_UID_ITEM_SEQ ,
+		SHIP_ORDER_KEY ,
+		SHIP_ORDER_ITEM_SEQ ,
+		TOTE_ID ,
+		INVOICE_NO ,
+		STATUS ,
+		QTY_ORDER ,
+		QTY_COMPLETE ,
+		SKU_CODE ,
+		WCS_STATUS ,
+		API_URL ,
+		API_INFO ,
+		API_RUNTIME ,
+		INTF_YN ,
+		INTF_MEMO ,
+		INSERTED_DATE ,
+		INSERTED_TIME
+  	) VALUES (
+	    #{apiStatusSeq},
+	    #{warehouseKey},
+	    NVL(#{apiYyyymmdd}, TO_CHAR(SYSDATE, 'YYYYMMDD')),
+	    #{execMethod},
+	    #{workBatchNo},
+	    #{groupNo},
+	    #{shipUidWcs},
+	    #{shipUidSeq},
+	    #{shipOrderKey},
+	    #{shipOrderItemSeq},
+	    #{toteId},
+	    #{invoiceNo},
+	    #{status},
+	    #{qtyOrder},
+	    #{qtyComplete},
+	    #{skuCode},
+	    #{wcsStatus},
+	    #{apiUrl},
+	    #{apiInfo},
+	    #{apiRuntime},
+	    #{intfYn},
+	    #{intfMemo},
+	    TO_CHAR(SYSDATE, 'YYYYMMDD') ,
+	    TO_CHAR(SYSDATE, 'HH24MISS')
+    ) 
+  </insert>
+  
+</mapper>

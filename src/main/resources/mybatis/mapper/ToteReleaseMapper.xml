@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lgcns.wcs.kurly.repository.ToteReleaseRepository">
+   
+  <select id="selectToteRelease" resultType="com.lgcns.wcs.kurly.dto.ToteReleaseParamData">
+  	/* [ToteReleaseMapper.xml] selectToteRelease */
+    SELECT 
+    	TOTE_ID       AS toteId,
+		WAREHOUSE_KEY   AS warehouseKey,
+		'RELEASE'   AS releaseType,
+		NVL(SUBSTR(RELEASE_CMPT_YMD,1,8), TO_CHAR(SYSDATE, 'YYYYMMDD')) AS releaseDate,
+		NVL(SUBSTR(RELEASE_CMPT_YMD,9,6), TO_CHAR(SYSDATE, 'HH24MISS')) AS releaseTime,
+		RELEASE_CMPT_ID AS releaseUser,
+		WIF_PICK_TOTE_HDR_SEQ AS toteUniqueNo,
+		TO_CHAR(SYSDATE, 'YYYYMMDD') AS insertedDate,
+		TO_CHAR(SYSDATE, 'HH24MISS') AS insertedTime,
+		CREATED_USER AS insertedUser
+	FROM o_wcs.TB_WIF_PICK_TOTE_HDR
+	WHERE RELEASE_CMPT_YN = 'Y'
+	  AND TOTE_RELEASE_INTF_YN = 'N'
+	ORDER BY TOTE_ID ASC
+  </select>
+  
+  <update id="updateToteRelease" parameterType="Map">
+  /* [ToteReleaseMapper.xml] updateToteRelease */
+  	UPDATE o_wcs.TB_WIF_PICK_TOTE_HDR
+		SET
+			TOTE_RELEASE_INTF_YN =  #{toteReleaseIntfYn},
+			TOTE_RELEASE_INTF_DT =  SYSDATE,
+			TOTE_RELEASE_INTF_CODE =  #{toteReleaseIntfCode},
+			TOTE_RELEASE_INTF_MEMO = #{toteReleaseIntfMemo} 
+	WHERE WIF_PICK_TOTE_HDR_SEQ = #{toteUniqueNo}
+	
+  </update>
+  
+</mapper>
