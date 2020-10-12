@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lgcns.wcs.kurly.repository.OrdmadeNotfullyReplayRepository">
+   
+  <select id="selectOrdmadeNotfullyReplay" resultType="com.lgcns.wcs.kurly.dto.OrdmadeNotfullyReplayData">
+  	/* [OrdmadeNotfullyReplayMapper.xml] selectOrdmadeNotfullyReplay */
+    SELECT 
+		OD.SHIP_ORDER_KEY      AS shipOrderKey,
+		OD.SHIP_ORDER_ITEM_SEQ AS shipOrderItemSeq,
+		OD.WAREHOUSE_KEY      AS warehouseKey,
+		OD.SHIP_UID_KEY   AS shipUidWcs,
+		OD.SHIP_UID_ITEM_SEQ   AS shipUidSeq,
+		'SUPPLY'               AS pickingType,
+		OD.INVOICE_NO         AS invoiceNo,
+		OD.INVOICE_SEQ     AS invoiceSeq,
+		OD.GROUP_NO     AS groupNo,
+		OD.WORK_BATCH_NO      AS workBatchNo,
+		OD.SKU_CODE           AS skuCode,
+		OD.SKU_NAME           AS skuName,
+		OD.SKU_SUB_NAME       AS skuSubName,
+		( OD.QTY_NOTFULLY_REQPICK - OD.NOTFULLY_REQ_IF_REQPICK ) AS qtyNotfullyReqpick,
+		TO_CHAR(SYSDATE, 'YYYYMMDD') AS insertedDate,
+		TO_CHAR(SYSDATE, 'HH24MISS') AS insertedTime,
+		OH.CREATED_USER AS insertedUser
+ 	FROM   O_WCS.TB_QPS_ORDER_HDR OH 
+ 	JOIN   O_WCS.TB_QPS_ORDER_DTL OD ON ( OH.INVOICE_NO = OD.INVOICE_NO )  
+ 	WHERE  OD.ORDMADE_NOTFULLY_TYPE   IN ( 'NOTFULLY' ) 
+ 	  AND  OD.ORDMADE_NOTFULLY_REQ_YN = 'Y' 
+ 	  AND  OD.NOTFULLY_REQ_IF_YN      = 'N' 
+  </select>
+    
+  <update id="updateOrdmadeNotfullyReplay" parameterType="Map">
+    /* [OrdmadeNotfullyReplayMapper.xml] updateOrdmadeNotfullyReplay */
+  	UPDATE o_wcs.TB_QPS_ORDER_DTL
+		SET
+			NOTFULLY_REQ_IF_YN  = #{notfullyReqIfYn} ,
+			NOTFULLY_REQ_IF_YMD = TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS'),
+			NOTFULLY_REQ_IF_REQPICK = NOTFULLY_REQ_IF_REQPICK + TO_NUMBER(#{qtyNotfullyReqpick}),
+			NOTFULLY_REQ_IF_RET_CODE = #{notfullyReqIfRetCode},
+			NOTFULLY_REQ_IF_RET_MESSAGE = #{notfullyReqIfRetMessage},
+			MODIFIED_DATE = TO_CHAR(SYSDATE, 'YYYYMMDD') ,
+			MODIFIED_TIME = TO_CHAR(SYSDATE, 'HH24MISS') ,
+			MODIFIED_USER = #{modifiedUser}
+	WHERE INVOICE_NO = #{invoiceNo}
+	  AND INVOICE_SEQ = #{invoiceSeq}
+  </update>
+</mapper>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lgcns.wcs.kurly.repository.PackQpsCompletRepository">
+   
+  <select id="selectPackQpsComplet" resultType="com.lgcns.wcs.kurly.dto.PackQpsCompletData">
+  	/* [PackQpsCompletMapper.xml] selectPackQpsComplet */
+    SELECT   DISTINCT
+		OH.SHIP_ORDER_KEY   AS shipOrderKey,
+		OH.INVOICE_NO           AS invoiceNo,
+		OH.WAREHOUSE_KEY        AS warehouseKey,
+		OH.SHIP_UID_KEY     AS shipUidWcs,
+		OH.CELL_ID              AS cellId,
+		OH.ORIGIN_INVOICE_NO    AS originInvoiceNo,
+		OH.ORDMADE_SPLIT_YN     AS ordmadeSplitYn,
+		OH.PACK_BOX_SPLIT_YN    AS packBoxSplitYn,
+		OH.PACK_BOX_TYPE_RECOM  AS packBoxTypeRecom,
+    	OH.SHIP_ORDER_LAST_YN  AS shipOrderLastYn,
+		TO_CHAR(SYSDATE, 'YYYYMMDD') AS insertedDate,
+		TO_CHAR(SYSDATE, 'HH24MISS') AS insertedTime,
+		OH.MODIFIED_USER AS insertedUser
+	FROM o_wcs.TB_QPS_ORDER_HDR OH,
+		 o_wcs.TB_QPS_ORDER_DTL OD
+	WHERE OH.INVOICE_NO = OD.INVOICE_NO
+	  AND OH.PACK_QPS_CMPT_YN = 'Y'
+	  AND OH.PACK_CMPT_INTF_YN = 'N'
+	  AND OH.PICK_CMPT_INTF_YN = 'Y'
+	ORDER BY OH.SHIP_ORDER_KEY ASC, OH.INVOICE_NO ASC
+  </select>
+  
+  <select id="selectPackQpsCompletDetail"  parameterType="com.lgcns.wcs.kurly.dto.PackQpsCompletData" resultType="com.lgcns.wcs.kurly.dto.PackQpsCompletDetailData">
+  	/* [PackQpsCompletMapper.xml] selectPackQpsCompletDetail */
+    SELECT 
+		OD.SHIP_ORDER_ITEM_SEQ  AS shipOrderItemSeq,
+		OD.GROUP_NO    AS groupNo,
+		OD.WORK_BATCH_NO     AS workBatchNo,
+		OD.SHIP_UID_KEY  AS shipUidWcs,
+		OD.SHIP_UID_ITEM_SEQ  AS shipUidSeq,
+		OD.SKU_CODE          AS skuCode,
+		OD.SKU_NAME          AS skuName,
+		OD.SKU_SUB_NAME      AS skuSubName,
+		OD.QTY_QPS_PACKED    AS qtyQpsPacked,
+		SUBSTR(OH.PACK_QPS_CMPT_YMD,1,8)  AS qpsPackingDate,
+		SUBSTR(OH.PACK_QPS_CMPT_YMD,9,6)  AS qpsPackingTime,
+		OD.QPS_WORKER_NAME   AS qpsWorkerName
+	FROM o_wcs.TB_QPS_ORDER_HDR OH,
+		 o_wcs.TB_QPS_ORDER_DTL OD
+	WHERE OH.INVOICE_NO = OD.INVOICE_NO
+	  AND OD.INVOICE_NO = #{invoiceNo}
+	  AND OD.SHIP_ORDER_KEY = #{shipOrderKey}
+	ORDER BY OD.SHIP_ORDER_KEY ASC, OD.SHIP_ORDER_ITEM_SEQ ASC
+  </select>
+  
+  <update id="updatePackQpsComplet" parameterType="Map">
+  /* [PackQpsCompletMapper.xml] updatePackQpsComplet */
+  	UPDATE o_wcs.TB_QPS_ORDER_HDR
+		SET
+			PACK_CMPT_INTF_YN =  #{packCmptIntfYn},
+			PACK_CMPT_INTF_DT =  SYSDATE,
+			PACK_CMPT_INTF_CODE =  #{packCmptIntfCode},
+			PACK_CMPT_INTF_MEMO = #{packCmptIntfMemo} ,
+			MODIFIED_DATE = TO_CHAR(SYSDATE, 'YYYYMMDD') ,
+			MODIFIED_TIME = TO_CHAR(SYSDATE, 'HH24MISS') ,
+			MODIFIED_USER = #{modifiedUser}
+	WHERE INVOICE_NO = #{invoiceNo}
+	  AND SHIP_ORDER_KEY = #{shipOrderKey}
+  </update>
+</mapper>

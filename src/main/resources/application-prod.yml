@@ -1,0 +1,58 @@
+server:
+  port: 8081
+
+spring:
+  kafka:
+    brokers:
+      producer: localhost:9092
+      consumer: localhost:9092
+#      producer: b-2.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-1.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092
+#      consumer: b-2.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-1.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092
+    topics:
+      wcs-out:
+        destination:
+          tote-release:  MSG-WCS_AP_TOTE_RELEASE
+          tote-scan:  MSG-WCS_AP_TOTE_SCAN
+          tote-cellExceptTxn:  MSG-WCS_AP_TOTE_CELLEXCEPTTXN
+          ordmadeNotfullyReplay:  MSG-WCS_AP_ORDMADE_NOTFULLY_REPL_REQ
+          ordmadeNotfully:  MSG-WCS_AP_ORDMADE_NOTFULLY
+          pickQpsComplet:  MSG-WCS_AP_PICKING_QPS_COMP
+          packQpsComplet:  MSG-WCS_AP_PACKING_QPS_COMP
+          invoicePrintComplet:  MSG-WCS_AP_INVOICE_PRINT_COMP
+          invoiceSortComplet:  MSG-WCS_AP_SHIP_SORT_COMP
+          qpsNumUseCell:  MSG-WCS_AP_QPS_NUM_USECELL
+  
+  datasource:
+#   dev
+#    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+#    url: jdbc:log4jdbc:oracle:thin:@15.15.21.220:1521/wcsdev
+#    username : s_wcs
+#    password : smartAPP9
+#   real
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    url: jdbc:log4jdbc:oracle:thin:@10.12.43.111:1521:wcsprod
+    username : s_wcs
+    password : s_wcs
+    
+  batch:
+    job: 
+      enabled: false
+#      names : toteReleaseJob,toteScanJob,toteCellExceptTxnJob,ordmadeNotfullyReplayConfirmJob,ordmadeNotfullyReplayJob,ordmadeNotfullyJob,pickQpsCompletJob,packQpsCompletJob,invoicePrintCompletJob,invoiceSortCompletJob
+
+  task:
+    scheduling:
+      pool:
+        size: 13
+        
+spring.main.allow-bean-definition-overriding: true
+
+
+# mybatis 설정.
+mybatis:
+  mapper-locations: classpath:/mybatis/mapper/*.xml
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    com.memorynotfound: DEBUG

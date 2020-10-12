@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lgcns.wcs.kurly.repository.ToteCellExceptTxnRepository">
+   
+  <select id="selectToteCellExceptTxn" resultType="com.lgcns.wcs.kurly.dto.ToteCellExceptTxnData">
+  	/* [ToteCellExceptTxnMapper.xml] selectToteCellExceptTxn */
+    SELECT 
+		CELL_EXCEPT_SEQ  AS cellExceptSeq,
+		TOTE_ID        AS toteId,
+		TOTE_ID_SEQ    AS toteIdSeq,
+		WAREHOUSE_KEY  AS warehouseKey,
+		WMS_PICKING_DATE   AS wmsPickingDate,
+		'FIX'          AS pickingType,
+		ALLOC_TYPE   AS allocType,
+		EXCEPT_TXN_TYPE AS exceptTxnType,
+		GROUP_NO AS groupNo,
+		WORK_BATCH_NO  AS workBatchNo,
+		SKU_CODE       AS skuCode,
+		SKU_NAME       AS skuName,
+		SKU_SUB_NAME   AS skuSubName,
+		QTY_QPS_EXCEPT AS qtyQpsExcept,
+		TO_SKU_CODE    AS toSkuCode,
+		TO_SKU_NAME    AS toSkuName,
+		TO_SKU_SUB_NAME AS toSkuSubName,
+		FROM_SKU_CODE   AS fromSkuCode,
+		FROM_SKU_NAME   AS fromSkuName,
+		FROM_SKU_SUB_NAME AS fromSkuSubName,
+		PICK_BATCH_JOB AS pickBatchGroup,
+		TO_CHAR(SYSDATE, 'YYYYMMDD') AS insertedDate,
+		TO_CHAR(SYSDATE, 'HH24MISS') AS insertedTime,
+		MODIFIED_USER AS insertedUser
+	FROM o_wcs.TB_QPS_CELL_EXCEPT_TXN
+	WHERE EXCEPT_IF_YN = 'N'
+	ORDER BY CELL_EXCEPT_SEQ ASC
+  </select>
+  
+  <update id="updateToteCellExceptTxn" parameterType="Map">
+  /* [ToteCellExceptTxnMapper.xml] updateToteCellExceptTxn */
+  	UPDATE o_wcs.TB_QPS_CELL_EXCEPT_TXN
+		SET
+			EXCEPT_IF_YN =  #{exceptIfYn},
+			EXCEPT_IF_DT =  SYSDATE,
+			EXCEPT_IF_RET_CODE =  #{exceptIfRetCode},
+			EXCEPT_IF_RET_MESSAGE = #{exceptIfRetMessage} ,
+			MODIFIED_DATE = TO_CHAR(SYSDATE, 'YYYYMMDD') ,
+			MODIFIED_TIME = TO_CHAR(SYSDATE, 'HH24MISS') ,
+			MODIFIED_USER = #{modifiedUser}
+	WHERE TOTE_ID = #{toteId}
+	  AND TOTE_ID_SEQ = #{toteIdSeq}
+	  AND CELL_EXCEPT_SEQ = #{cellExceptSeq}
+  </update>
+
+</mapper>
