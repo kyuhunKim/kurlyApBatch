@@ -4,10 +4,8 @@ server:
 spring:
   kafka:
     brokers:
-      producer: localhost:9092
-      consumer: localhost:9092
-#      producer: b-2.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-1.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092
-#      consumer: b-2.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-1.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092
+      producer: b-1.prod-msk-wms-01.o1u6vb.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-2.prod-msk-wms-01.o1u6vb.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-3.prod-msk-wms-01.o1u6vb.c2.kafka.ap-northeast-2.amazonaws.com:9092
+      consumer: b-1.prod-msk-wms-01.o1u6vb.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-2.prod-msk-wms-01.o1u6vb.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-3.prod-msk-wms-01.o1u6vb.c2.kafka.ap-northeast-2.amazonaws.com:9092
     topics:
       wcs-out:
         destination:
@@ -37,7 +35,6 @@ spring:
   batch:
     job: 
       enabled: false
-#      names : toteReleaseJob,toteScanJob,toteCellExceptTxnJob,ordmadeNotfullyReplayConfirmJob,ordmadeNotfullyReplayJob,ordmadeNotfullyJob,pickQpsCompletJob,packQpsCompletJob,invoicePrintCompletJob,invoiceSortCompletJob
 
   task:
     scheduling:

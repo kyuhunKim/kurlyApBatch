@@ -4,10 +4,8 @@ server:
 spring:
   kafka:
     brokers:
-      producer: localhost:9092
-      consumer: localhost:9092
-#      producer: b-2.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-1.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092
-#      consumer: b-2.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-1.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092
+      producer: b-2.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-1.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092
+      consumer: b-2.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-1.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092
     topics:
       wcs-out:
         destination:
@@ -24,15 +22,15 @@ spring:
   
   datasource:
 #   dev
-#    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-#    url: jdbc:log4jdbc:oracle:thin:@15.15.21.220:1521/wcsdev
-#    username : s_wcs
-#    password : smartAPP9
-#   real
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-    url: jdbc:log4jdbc:oracle:thin:@10.12.43.111:1521:wcsprod
+    url: jdbc:log4jdbc:oracle:thin:@15.15.21.220:1521/wcsdev
     username : s_wcs
-    password : s_wcs
+    password : smartAPP9
+#   real
+#    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+#    url: jdbc:log4jdbc:oracle:thin:@10.12.43.111:1521:wcsprod
+#    username : s_wcs
+#    password : s_wcs
     
   batch:
     job: 
