@@ -1,0 +1,28 @@
+#https://docs.aws.amazon.com/ko_kr/codedeploy/latest/userguide/reference-appspec-file-structure-hooks.html#reference-appspec-file-structure-hooks-section-structure
+#
+version: 0.0 # 기본 버젼 정보 손대면 안됨
+os: linux
+#files: 파일을 추가 할때 사용
+#  - source: /
+#    destination: /var/www/html/WordPress
+hooks:
+  BeforeInstall: #배포 전 수행 작업
+    - location: scripts/before_install.sh
+      timeout: 300
+      runas: root
+  AfterInstall: #배포 후 수행 작업
+    - location: scripts/after_install.sh
+      timeout: 300
+      runas: root
+  ApplicationStart: #배포 후 어플리케이션 스타트
+    - location: scripts/start_server.sh
+      timeout: 300
+      runas: root
+#  ApplicationStop: #맨처음 어플리케이션 스탑 할때 
+#    - location: scripts/stop_server.sh
+#      timeout: 300
+#      runas: root
+  ValidateService:
+    - location: scripts/service_check.sh
+      timeout: 300
+      runas: root
