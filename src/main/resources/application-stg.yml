@@ -21,17 +21,29 @@ spring:
           qpsNumUseCell:  MSG-WCS_AP_QPS_NUM_USECELL
   
   datasource:
-#   dev
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-    url: jdbc:log4jdbc:oracle:thin:@15.15.21.220:1521/wcsdev
+    url: jdbc:log4jdbc:oracle:thin:@10.12.43.111:1521:wcsprod
     username : s_wcs
-    password : smartAPP9
-#   real
-#    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-#    url: jdbc:log4jdbc:oracle:thin:@10.12.43.111:1521:wcsprod
-#    username : s_wcs
-#    password : s_wcs
+    password : s_wcs
     
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 50
+      idle-timeout:  10000
+      connection-timeout: 10000
+      validation-timeout: 10000
+      maxLifetime: 580000
+      data-source-properties:
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        useServerPrepStmts: true
+        useLocalTransactionState: true
+        rewriteBatchedStatements: true
+        cacheResultSetMetadata: true
+        cacheServerConfiguration: true
+        maintainTimeStats: false
+        
   batch:
     job: 
       enabled: false

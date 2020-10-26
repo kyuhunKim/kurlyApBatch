@@ -10,6 +10,7 @@ import com.lgcns.wcs.kurly.dto.box.BoxTypeVO;
 import com.lgcns.wcs.kurly.dto.box.CellTypeVO;
 import com.lgcns.wcs.kurly.dto.box.OrdInfoVO;
 import com.lgcns.wcs.kurly.dto.box.OrdLineVO;
+import com.lgcns.wcs.kurly.dto.box.SearchVO;
 import com.lgcns.wcs.kurly.dto.box.SkuTypeVO;
 
 /**
@@ -40,4 +41,8 @@ public interface BoxRecomRepository  {
 	int selectOrdShipmentCount(Map<String, String> data) ;
 	
 	String selectDate() ;
+	
+	List<BoxTypeVO> selectBoxTypeMaxList();
+	int selectOrdInfoSearchCount();
+	List<OrdInfoVO> selectOrdInfoSearchList(SearchVO svo);
 }

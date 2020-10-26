@@ -10,12 +10,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.lgcns.wcs.kurly.dto.KurlyConstants;
 import com.lgcns.wcs.kurly.dto.box.BoxTypeVO;
 import com.lgcns.wcs.kurly.dto.box.CellTypeVO;
 import com.lgcns.wcs.kurly.dto.box.OrdInfoList;
 import com.lgcns.wcs.kurly.dto.box.OrdInfoVO;
 import com.lgcns.wcs.kurly.dto.box.OrdLineVO;
+import com.lgcns.wcs.kurly.dto.box.SearchVO;
 import com.lgcns.wcs.kurly.dto.box.SkuTypeMap;
 import com.lgcns.wcs.kurly.dto.box.SkuTypeVO;
 import com.lgcns.wcs.kurly.repository.BoxRecomRepository;
@@ -253,4 +253,21 @@ public class BoxRecomServiceImpl implements BoxRecomService {
 		resDate = boxRecomRepository.selectDate();
     	return resDate;
 	}	
+	
+	@Transactional(propagation=Propagation.REQUIRED)
+	public List<BoxTypeVO> selectBoxTypeMaxList() {
+		List<BoxTypeVO> resultData = boxRecomRepository.selectBoxTypeMaxList();
+		return resultData;
+	}
+	@Transactional(propagation=Propagation.REQUIRED)
+	public int selectOrdInfoSearchCount() {
+		int resultData = boxRecomRepository.selectOrdInfoSearchCount();
+		return resultData;
+	}
+	@Transactional(propagation=Propagation.REQUIRED)
+	public List<OrdInfoVO> selectOrdInfoSearchList(SearchVO svo) {
+		List<OrdInfoVO> resultData = boxRecomRepository.selectOrdInfoSearchList(svo);
+		return resultData;
+	}
+	
 }

@@ -63,7 +63,7 @@ public class ScheduleTask {
 	QpsNumUseCellBatch qpsNumUseCell;
 	
 
-	@Scheduled(fixedDelay = 500000)
+	@Scheduled(fixedDelay = 60000)
 	public void testTask() {
 		log.info("The current date (1) testTask: " + LocalDateTime.now());
 		String resDate = boxRecom.selectDate();
@@ -79,12 +79,12 @@ public class ScheduleTask {
 	}
 	
 //	@Scheduled(cron = "0 0/5 * * * *")
-	@Scheduled(fixedDelay = 100000, initialDelay = 10000)
-	public void BoxRecom() {
-		log.info("The current date (2) BoxRecom : " + LocalDateTime.now());
-		log.info("Current Thread : {}", Thread.currentThread().getName());
-		boxRecom.BoxRecomBatchTask();
-	}
+//	@Scheduled(fixedDelay = 100000, initialDelay = 10000)
+//	public void BoxRecom() {
+//		log.info("The current date (2) BoxRecom : " + LocalDateTime.now());
+//		log.info("Current Thread : {}", Thread.currentThread().getName());
+//		boxRecom.BoxRecomBatchTask();
+//	}
 //  //ok
 //	@Scheduled(cron = "0 0/5 * * * *")
 //	@Scheduled(fixedDelay = 100000)
@@ -93,7 +93,7 @@ public class ScheduleTask {
 //		tote.ToteReleaseTask();
 //	}
 //  //ok
-//	@Scheduled(cron = "0 32 * * * *")
+//	@Scheduled(fixedDelay = 100000)
 //	public void RegionMasterTask() {
 //		System.out.println("The current date (4) RegionMasterTask : " + LocalDateTime.now());
 //		regionMaster.RegionMasterTask();

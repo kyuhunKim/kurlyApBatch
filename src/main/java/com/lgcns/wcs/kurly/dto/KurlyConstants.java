@@ -9,6 +9,7 @@ public final class KurlyConstants {
     public static final String STATUS_Y = "Y";
     public static final String STATUS_N = "N";
     public static final String STATUS_E = "E";
+    public static final String STATUS_T = "T";
     
     public static final String STATUS_OK = "OK";
     public static final String STATUS_NG = "NG";

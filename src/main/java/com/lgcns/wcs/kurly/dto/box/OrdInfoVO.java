@@ -22,6 +22,8 @@ public class OrdInfoVO {
 	private double ordCBM;
 	private int splitSeqNum; //총 splitSeq 수
 	private String boxType = "";
+	private String boxSplitCheckYn = "Y";
+	private String allocType = "";
 	
 	public String getShipOrderKey() {
 		return shipOrderKey;
@@ -290,6 +292,22 @@ public class OrdInfoVO {
 	
 	public int getSplitNum(){
 		return splitSeqNum;
+	}
+
+	public String getBoxSplitCheckYn() {
+		return boxSplitCheckYn;
+	}
+
+	public void setBoxSplitCheckYn(String boxSplitCheckYn) {
+		this.boxSplitCheckYn = boxSplitCheckYn;
+	}
+
+	public String getAllocType() {
+		return allocType;
+	}
+
+	public void setAllocType(String allocType) {
+		this.allocType = allocType;
 	}
 	
 }

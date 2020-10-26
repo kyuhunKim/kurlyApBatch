@@ -9,6 +9,8 @@ public class BoxTypeVO {
 	private double BoxDepth;
 	private double BoxWidth;
 	private double BoxHeight;
+
+	private double fillRate;
 	
 	public String getWarehouseKey() {
 		return warehouseKey;
@@ -86,4 +88,10 @@ public class BoxTypeVO {
 		return this.BoxWidth * this.BoxHeight * this.BoxDepth;
 	}
 	
+	public double getFillRate() {
+		return fillRate;
+	}
+	public void setFillRate(double fillRate) {
+		this.fillRate = fillRate;
+	}
 }

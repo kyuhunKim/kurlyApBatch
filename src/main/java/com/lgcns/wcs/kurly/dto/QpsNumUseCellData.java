@@ -30,5 +30,12 @@ public class QpsNumUseCellData {
 	/*회사 코드
 	 * */
 	private String batchRunTime ;
+	
+	/*DAS 호기용 예비컬럼1
+	 * */
+	private String dasNumAttr1 = "";
+	/*DAS 호기용 예비컬럼2
+	 * */
+	private String dasNumAttr2 = "" ;
 
 }

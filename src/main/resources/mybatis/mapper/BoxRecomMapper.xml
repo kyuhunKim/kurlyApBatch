@@ -25,14 +25,25 @@
   <select id="selectBoxTypeList" resultType="com.lgcns.wcs.kurly.dto.box.BoxTypeVO">
   	/* [BoxRecomMapper.xml] selectBoxTypeList */
     SELECT 
-		BOX_TYPE_CD  AS boxTypeCd, 
-		BOX_TYPE_NM  AS boxTypeName,
-		CNTR_CD      AS warehouseKey,
-		BOX_TYPE_GRP_CD  AS boxShape,
-		BOX_WTH_LEN  AS BoxWidth,
-		BOX_VERT_LEN  AS BoxDepth,
-		BOX_HGT_LEN  AS BoxHeight
-	FROM o_wcs.TB_COM_BOX_TYPE_MST
+		B.BOX_TYPE_CD  AS boxTypeCd, 
+		B.BOX_TYPE_NM  AS boxTypeName,
+		B.CNTR_CD      AS warehouseKey,
+		B.BOX_TYPE_GRP_CD  AS boxShape,
+		B.BOX_WTH_LEN  AS BoxWidth,
+		B.BOX_VERT_LEN  AS BoxDepth,
+		B.BOX_HGT_LEN  AS BoxHeight,
+		C.fillRate
+	FROM o_wcs.TB_COM_BOX_TYPE_MST  B
+       ,(SELECT 
+    		COM_DTL_CD ,
+    		ATTR01/100 AS fillRate
+  		FROM o_wcs.TB_COM_CODE_MST
+  		WHERE CO_CD = 'MK'
+  		AND COM_HDR_CD ='BOX_PACKING_FACTOR'
+  		AND HDR_FLAG = 'N'
+  		AND USE_YN = 'Y'
+  		) C
+  WHERE B.CNTR_CD = C.COM_DTL_CD
 	ORDER BY CNTR_CD ASC, BOX_TYPE_GRP_CD ASC
   </select>
   
@@ -77,40 +88,49 @@
 		HD.OWNER_KEY ASC,
 		HD.ORDER_NO ASC
   </select>
-  <select id="selectOrdLineList_bak" parameterType="Map" resultType="com.lgcns.wcs.kurly.dto.box.OrdLineVO">
-  	/* [BoxRecomMapper.xml] selectOrdLineList */
+  
+  <select id="selectOrdInfoSearchCount"  resultType="int">
+  	/* [BoxRecomMapper.xml] selectOrdInfoSearchCount */
 	SELECT
-		HD.SHIP_ORDER_KEY  AS shipOrderKey,
-		HD.WAREHOUSE_KEY  AS warehouseKey,
-		HD.OWNER_KEY  AS ownerKey,
-		HD.ORDER_NO  AS orderNo,
-		DT.SKU_CODE  AS skuCode,
-		DT.LENGTH    AS skuDepth,
-		DT.WIDTH     AS skuWidth,
-		DT.HEIGHT    AS skuHeight,
-		DT.SHIP_ORDER_ITEM_SEQ  AS shipOrderItemSeq,
-		SUM(DT.QTY_SHIP_ORDER)  AS ordQty
+		COUNT(DISTINCT HD.SHIP_ORDER_KEY) AS cnt
 	FROM o_wcs.TB_WIF_SHIPMENT_HDR HD,
 		 o_wcs.TB_WIF_SHIPMENT_DTL DT 
 	WHERE HD.SHIP_ORDER_KEY = DT.SHIP_ORDER_KEY 
 	AND HD.RECEIVE_INTF_YN = 'N'
-	AND HD.SHIP_ORDER_KEY = #{shipOrderKey}
-	GROUP BY HD.SHIP_ORDER_KEY,
-		HD.WAREHOUSE_KEY,
-		HD.OWNER_KEY,
-		HD.ORDER_NO,
-		DT.SKU_CODE,
-		DT.SHIP_ORDER_ITEM_SEQ,
-		DT.LENGTH,
-		DT.WIDTH,
-		DT.HEIGHT
-	ORDER BY HD.SHIP_ORDER_KEY ASC,
-		HD.WAREHOUSE_KEY ASC,
-		HD.OWNER_KEY ASC,
-		HD.ORDER_NO ASC,
-		DT.SHIP_ORDER_ITEM_SEQ ASC,
-		DT.SKU_CODE ASC
   </select>
+  
+  
+  <select id="selectOrdInfoSearchList" parameterType="com.lgcns.wcs.kurly.dto.box.SearchVO" resultType="com.lgcns.wcs.kurly.dto.box.OrdInfoVO">
+  	/* [BoxRecomMapper.xml] selectOrdInfoSearchList */
+	SELECT  
+        * 
+      FROM (
+      	SELECT ROWNUM AS RNUM, A.* 
+          FROM
+            (
+             	SELECT
+					DISTINCT
+					HD.SHIP_ORDER_KEY  AS shipOrderKey,
+					HD.WAREHOUSE_KEY  AS warehouseKey,
+					HD.OWNER_KEY  AS ownerKey,
+					HD.ORDER_NO  AS orderNo,
+					HD.BOX_SPLIT_CHECK_YN  AS boxSplitCheckYn
+				FROM o_wcs.TB_WIF_SHIPMENT_HDR HD,
+					 o_wcs.TB_WIF_SHIPMENT_DTL DT 
+				WHERE HD.SHIP_ORDER_KEY = DT.SHIP_ORDER_KEY 
+				AND HD.RECEIVE_INTF_YN = 'N'
+				ORDER BY HD.SHIP_ORDER_KEY ASC,
+					HD.WAREHOUSE_KEY ASC,
+					HD.OWNER_KEY ASC,
+					HD.ORDER_NO ASC
+	<![CDATA[ 
+			 ) A 
+           WHERE ROWNUM <= #{endRowIndex} /* end */ 
+           ) 
+     WHERE RNUM > #{startRowIndex} /* start */ 
+     ]]> 
+  </select>
+  
   <select id="selectOrdLineList" parameterType="Map" resultType="com.lgcns.wcs.kurly.dto.box.OrdLineVO">
   	/* [BoxRecomMapper.xml] selectOrdLineList */
 	SELECT
@@ -314,9 +334,10 @@
 		  MODIFIED_DATE         ,
 		  MODIFIED_TIME         ,
 		  MODIFIED_USER         ,
-		  ALLOC_TYPE             ,
-		PACK_BOX_SPLIT_YN ,
-		PACK_BOX_TYPE_RECOM   
+		  ALLOC_TYPE            ,
+		  PACK_BOX_SPLIT_YN     ,
+		  PACK_BOX_TYPE_RECOM   ,
+		  SPECIAL_MGNT_CUST_YN 
 		)
 		SELECT 
 		      #{shipUidKey}, 
@@ -364,10 +385,11 @@
 		      'BATCH' CREATED_USER          ,
 		      TO_CHAR(SYSDATE, 'YYYYMMDD') AS MODIFIED_DATE,
 		      TO_CHAR(SYSDATE, 'HH24MISS') AS MODIFIED_TIME,
-		      'BATCH' MODIFIED_USER         ,
+		      'BATCH' MODIFIED_USER     ,
 		      HD.ALLOC_TYPE             ,
-		      #{packBoxSplitYn}           ,
-		      #{packBoxTypeRecom}                              
+		      #{packBoxSplitYn}         ,
+		      #{packBoxTypeRecom}       ,
+		      HD.BOX_SPLIT_CHECK_YN               
 		  FROM o_wcs.TB_WIF_SHIPMENT_HDR HD
 		  WHERE HD.SHIP_ORDER_KEY = #{shipOrderKey}
   </insert>
@@ -600,4 +622,31 @@
 		TO_CHAR(SYSDATE, 'YYYYMMDD HH24MISS') sdate
 	FROM DUAL
   </select>
+  
+  <select id="selectBoxTypeMaxList" resultType="com.lgcns.wcs.kurly.dto.box.BoxTypeVO">
+  	/* [BoxRecomMapper.xml] selectBoxTypeMaxList */
+	SELECT
+		T.BOX_TYPE_CD  AS boxTypeCd, 
+	    T.BOX_TYPE_NM  AS boxTypeName,
+	    T.CNTR_CD      AS warehouseKey,
+	    T.BOX_TYPE_GRP_CD  AS boxShape,
+	    T.BOX_WTH_LEN  AS BoxWidth,
+	    T.BOX_VERT_LEN  AS BoxDepth,
+	    T.BOX_HGT_LEN  AS BoxHeight
+	FROM (
+		SELECT 
+		    B.BOX_TYPE_CD  , 
+		    B.BOX_TYPE_NM  ,
+		    B.CNTR_CD      ,
+		    B.BOX_TYPE_GRP_CD  ,
+		    B.BOX_WTH_LEN  ,
+		    B.BOX_VERT_LEN  ,
+		    B.BOX_HGT_LEN  , 
+		    (BOX_WTH_LEN * BOX_VERT_LEN * BOX_HGT_LEN)  AS BoxCBM
+			, ROW_NUMBER() OVER(PARTITION BY CNTR_CD ORDER BY (BOX_WTH_LEN * BOX_VERT_LEN * BOX_HGT_LEN) DESC) as RowIdx
+		FROM o_wcs.TB_COM_BOX_TYPE_MST  B
+	) T
+	WHERE ROWIDX = 1
+  </select>
+  
 </mapper>

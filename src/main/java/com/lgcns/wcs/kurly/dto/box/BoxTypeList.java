@@ -55,12 +55,33 @@ public class BoxTypeList {
 			tempBoxType.setBoxDepth(boxTypeVO.getBoxDepth());
 			tempBoxType.setBoxHeight(boxTypeVO.getBoxHeight());
 			tempBoxType.setWarehouseKey(boxTypeVO.getWarehouseKey());
+			tempBoxType.setFillRate(boxTypeVO.getFillRate());
 			addBoxType(tempBoxType);
 		}
 
 		return this.boxTypeMaster.size();
 	}
+
+	public String getMaxBox(List<BoxTypeVO> boxTypeList, String wareHouseKey)
+	{
+		String boxTypeCD = "";
+		//wareHouseKey 없을 경우 "" 으로 리턴
+		if(wareHouseKey == null || wareHouseKey.equals("")) {
+			return "";
+		}
 		
+		for(BoxTypeVO boxTypeVO : boxTypeList )
+		{
+			//wareHouseKey 동일값일때만 처리
+			if(wareHouseKey.equals(boxTypeVO.getWarehouseKey())) {
+				boxTypeCD = boxTypeVO.getBoxTypeCD();
+				break;
+			}
+		}
+
+		return boxTypeCD;
+	}
+	
 	public int sampleInitBoxMaster()
 	{
 		BoxTypeVO tempBoxType;
