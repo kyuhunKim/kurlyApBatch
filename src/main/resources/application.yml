@@ -13,7 +13,7 @@ spring:
         destination:
           tote-release:  MSG-WCS_AP_TOTE_RELEASE
           tote-scan:  MSG-WCS_AP_TOTE_SCAN
-          tote-cellExceptTxn:  MSG-WCS_AP_TOTE_CELLEXCEPTTXN
+          tote-cellExceptTxn:  MSG-WCS_AP_TOTE_CELL_EXCEPTION
           ordmadeNotfullyReplay:  MSG-WCS_AP_ORDMADE_NOTFULLY_REPL_REQ
           ordmadeNotfully:  MSG-WCS_AP_ORDMADE_NOTFULLY
           pickQpsComplet:  MSG-WCS_AP_PICKING_QPS_COMP

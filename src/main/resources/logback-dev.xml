@@ -9,7 +9,7 @@
  
     <!--파일에 로그를 남깁니다.-->
     <appender name="File" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_DIR}/${FILE_NAME}.log</file>
+        <file>${LOG_DIR}/archived/${FILE_NAME}.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <Pattern>%d{yyyy-MM-dd HH:mm:ss} [%-3level] %logger{36} - %msg%n</Pattern>
             <charset>UTF-8</charset>
@@ -23,7 +23,7 @@
 
         <!-- 파일을 덮어쓰는 정책 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-            <FileNamePattern>${LOG_DIR}/${FILE_NAME}.%i.log.zip</FileNamePattern>
+            <FileNamePattern>${LOG_DIR}/archived/${FILE_NAME}.%i.log.zip</FileNamePattern>
             <!--
                 10MB단위로 로그 압축 파일이 생성된다. (1 ~ 10)
                 10개가 넘어가면 오래된순으로 덮어쓰기 됩니다.
@@ -35,7 +35,7 @@
             <fileNamePattern>${LOG_DIR}/${FILE_NAME}.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
-    </appender>  
+    </appender>   
    
     <!--에러 일 경우 파일에 로그를 남깁니다--> 
     <appender name="Error" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -83,7 +83,7 @@
     
     <logger name="org.mybatis" level="DEBUG" additivity="false">
         <appender-ref ref="Console"/>
-        <appender-ref ref="RollingFile"/>
+        <appender-ref ref="File"/>
         <appender-ref ref="Error"/>
     </logger>
 	<root level="INFO">
