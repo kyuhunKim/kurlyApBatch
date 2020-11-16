@@ -32,7 +32,7 @@ public interface BoxRecomRepository  {
 	
 	int insertOrdShipmentHdr(Map<String, String> data) ;
 	int insertOrdShipmentDtl(Map<String, String> data) ;
-	int getShipUidKey();
+	String getShipUidKey();
 
 	int updateWifShipmentHdr(Map<String, String> data) ;
 	

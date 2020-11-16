@@ -26,6 +26,7 @@ import com.lgcns.wcs.kurly.dto.box.SearchVO;
 import com.lgcns.wcs.kurly.service.BoxRecomService;
 import com.lgcns.wcs.kurly.service.LogApiStatusService;
 import com.lgcns.wcs.kurly.service.LogBatchExecService;
+import com.lgcns.wcs.kurly.util.StringUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -56,7 +57,11 @@ public class BoxRecomBatch  {
     public void BoxRecomBatchTask() {
     	log.info("=================BoxRecomBatch start===============");
     	log.info("The current date  : " + LocalDateTime.now());
-    	long start = System.currentTimeMillis();
+    	long apiRunTimeStart = 0;
+		long apiRunTimeEnd   = 0;
+		String apiRunTime    = "";
+		
+    	apiRunTimeStart = System.currentTimeMillis();
     	
 		String result = "sucess";
 		String resultMessage = "";
@@ -64,12 +69,18 @@ public class BoxRecomBatch  {
     	Date startDate = Calendar.getInstance().getTime();
     	try
     	{
-    		//상품정보 조회 -- 분할대상 오더들의 모든 상품을 조회
-//    		List<SkuTypeVO> skuTypeList = boxRecomService.selectSkuMasterList();
-//    		SkuTypeMap skuMaster = new SkuTypeMap();
-//    		int skuCnt = skuMaster.getInit(skuTypeList);
-//    		log.info("생성된 SKU 수: " + skuCnt);
 
+    		/*
+    	     * 이형상품은 오더분할 대상에서 제외 데이타 처리안하고 Y,N 이 아닌 T값으로 update
+    	     * 오더분할된 경우 packBoxsplitYn 'Y'
+    	     * 박스가 없을 경우 온도대에 해당하는 maxBox로 설정
+    	     * 박스분할이 필요 없는 경우 max box로 설정(오더박스분할여부확인 'N'일 경우)
+    	     * 
+    	     * 2020.11.10 인터페이스 받은 모든 오더를 TB_ORD_SHIPMENT_HDR,,DTL 테이블에 생성
+    	     * allocType : S, QDAS || memberGrade 가 0003 || MANUAL_PROC_YN : Y 인 경우 분할하지 않음
+    	     * 오더분할 하지 않아도 박스추천 로직은 실행해서 추천된 박스가 없을 경우 온도대별 maxBox 값으로 설정
+    	     * */
+    		
     		//박스정보 조회
     		List<BoxTypeVO> boxTypeList = boxRecomService.selectBoxTypeList();
     		BoxTypeList boxMaster = new BoxTypeList();
@@ -84,24 +95,26 @@ public class BoxRecomBatch  {
     		CellTypeList cellList = new CellTypeList();
     		int cellCnt = cellList.getInitCellType(cellTypeList);
     		log.info("생성된 셀 종류 수: " + cellCnt);
-
-    		//order 정보 조회
-    		OrdInfoList ordList = new OrdInfoList();
     		
     		int totalRow = boxRecomService.selectOrdInfoSearchCount() ;
     		int startRowIndex = 0;
     		int endRowIndex = 0;
-    		int pagePerRecord = 1000;
+    		int pagePerRecord = 10000;
     		int pageCount = totalRow/pagePerRecord;
+    		int remCount = totalRow%pagePerRecord;
     		
     		if(totalRow > 0 && pageCount < pagePerRecord) {
     			pageCount = 1;
     		}
+    		if(pageCount > 1 && remCount>0) {
+    			pageCount = pageCount + 1;
+    		}
+    		
     		log.info(">>>totalRow : " + totalRow);
     		log.info(">>>pageCount : " + pageCount);
     		
     		SearchVO svo = new SearchVO();
-    		for(int s=0; s<=pageCount;s++) 
+    		for(int s=0; s<pageCount;s++) 
     		{
     			svo = new SearchVO();
 //    			startRowIndex = startRowIndex;
@@ -119,7 +132,9 @@ public class BoxRecomBatch  {
 	    		
 	//    		List<OrdInfoVO> selectList = boxRecomService.selectOrdInfoList();
 	//    		log.info(">>>selectList : " + selectList.size());
-	    		
+
+	    		//order 정보 조회
+	    		OrdInfoList ordList = new OrdInfoList();
 	    		
 	    		for(OrdInfoVO itOrd : selectList)
 	    		{
@@ -159,41 +174,65 @@ public class BoxRecomBatch  {
 	    			
 	    			try
 	    	    	{
-	    				//해당 shipOrderKey 가 TB_ORD_SHIPMENT_HDR 존재하는지 확인 , 있을경우 오류남
-	    				Map<String, String> CntParam = new HashMap<String, String>();
-	    				CntParam.put("shipOrderKey", itOrd.getShipOrderKey());
-	    				
-	    				int hdrCnt = boxRecomService.selectOrdShipmentCount(CntParam);
-	    				if(hdrCnt>0) {
-	        				log.info( " This shipOrderKey is existenceis TB_ORD_SHIPMENT_HDR Table ["+itOrd.getShipOrderKey()+"]");
-	    					continue;
-	    				}
+//	    				//해당 shipOrderKey 가 TB_ORD_SHIPMENT_HDR 존재하는지 확인 , 있을경우 오류남
+//	    				Map<String, String> CntParam = new HashMap<String, String>();
+//	    				CntParam.put("shipOrderKey", itOrd.getShipOrderKey());
+//	    				
+//	    				int hdrCnt = boxRecomService.selectOrdShipmentCount(CntParam);
+//	    				if(hdrCnt>0) {
+//	        				log.info( " This shipOrderKey is existenceis TB_ORD_SHIPMENT_HDR Table ["+itOrd.getShipOrderKey()+"]");
+//	    					continue;
+//	    				}
 	    				
 	    				//오더박스분할여부확인(Y:오더분할가능, N:오더분할불가능)
 	    				//오더분할부가능일 경우 오더분할 없이 처리
-	    	    		if(KurlyConstants.STATUS_N.equals(itOrd.getBoxSplitCheckYn())) {
-	        				
-	    	    			int shipUidKey = 0;
-		    				String t_packBoxTypeRecom = "";
+	    	    		if(KurlyConstants.STATUS_N.equals(itOrd.getBoxSplitCheckYn()) ) {
+
+	    	    			//분할하지 않음
+ 		    				OrdInfoVO tempOrd = new OrdInfoVO();
+		    				for(OrdLineVO itOrderLine : itOrd.getOrdList() )
+		    				{
+		    					tempOrd.addOrdLine(itOrderLine);
+		    					tempOrd.setOrderNo(itOrd.getOrderNo());
+		    					tempOrd.setShipOrderKey(itOrd.getShipOrderKey());
+		    					tempOrd.setWarehouseKey(itOrd.getWarehouseKey());
+		    				}
+		    				
+		    				if(tempOrd == null) {
+		        				r_ifYn = KurlyConstants.STATUS_N;
+		    					continue;
+		    				}
+		    				//분할하지 않아도 박스추천은 실행
+		    				//box 추천 실행
+		    				new BoxRecommendApp(tempOrd, boxMaster);
+
+		    				log.info( "------------------------------------------" );
+		    				log.info( "S boxType : " + tempOrd.getBoxType()  );
+		    				log.info( "------------------------------------------" );
+		    				
+	    	    			String shipUidKey = "";
+		    				String t_packBoxTypeRecom = tempOrd.getBoxType();
 		    				String t_packBoxSplitYn = KurlyConstants.STATUS_N;
-		    				//박스추천없이 해당 온도대의 제일 큰 박스로 설정함
-		    				t_packBoxTypeRecom = boxMaster.getMaxBox(boxTypeMaxList, itOrd.getWarehouseKey());
+		    				//추천박스가 없을 경우 제일큰 박스 추천
+		    				if("NoBox".equals(t_packBoxTypeRecom)) {
+		    					t_packBoxTypeRecom = boxMaster.getMaxBox(boxTypeMaxList, itOrd.getWarehouseKey());
+		    				} 
 		    				
 		    				Map<String, String> param = new HashMap<String, String>();
 		    				param.put("shipOrderKey", itOrd.getShipOrderKey());
 		    				param.put("packBoxTypeRecom", t_packBoxTypeRecom);  //추천패킹박스타입
 		    				param.put("packBoxSplitYn", t_packBoxSplitYn);  
-	
 		    				log.info( "----------param " + param + "------------------------ " );
+		    				
 		    				shipUidKey = boxRecomService.insertOrdShipmentHdr(param);
 		    				
 	        				//split 안된값으로 셋팅
 		    	    		Map<String, String> dParam = new HashMap<String, String>();
 		    				dParam.put("shipOrderKey", itOrd.getShipOrderKey());
-		    				dParam.put("shipUidKey", ""+shipUidKey);
+		    				dParam.put("shipUidKey", shipUidKey);
 		    				dParam.put("owner", ""+itOrd.getOwnerKey());
-		
 		    				log.info( "----------dParam " + dParam + "------------------------ " );
+		    				
 		    				boxRecomService.insertOrdShipmentDtlAll(dParam);
 		        			
 	        			} else {
@@ -205,7 +244,30 @@ public class BoxRecomBatch  {
 	            			//처리안함. update 확인필요
 	            			if(rSplit == -1) {
 	            				log.info( " runOrdSplit fail ["+itOrd.getShipOrderKey()+"]" );
-		        				r_ifYn = KurlyConstants.STATUS_T;
+	            				
+	            				String shipUidKey = "";
+			    				String t_packBoxTypeRecom = "";
+			    				String t_packBoxSplitYn = KurlyConstants.STATUS_N;
+			    				//추천박스가 없을 경우 제일큰 박스 추천
+			    				t_packBoxTypeRecom = boxMaster.getMaxBox(boxTypeMaxList, itOrd.getWarehouseKey());
+			    				
+			    				Map<String, String> param = new HashMap<String, String>();
+			    				param.put("shipOrderKey", itOrd.getShipOrderKey());
+			    				param.put("packBoxTypeRecom", t_packBoxTypeRecom);  //추천패킹박스타입
+			    				param.put("packBoxSplitYn", t_packBoxSplitYn);  
+			    				log.info( "----------param " + param + "------------------------ " );
+			    				
+			    				shipUidKey = boxRecomService.insertOrdShipmentHdr(param);
+			    				
+		        				//split 안된값으로 셋팅
+			    	    		Map<String, String> dParam = new HashMap<String, String>();
+			    				dParam.put("shipOrderKey", itOrd.getShipOrderKey());
+			    				dParam.put("shipUidKey", ""+shipUidKey);
+			    				dParam.put("owner", ""+itOrd.getOwnerKey());
+			    				log.info( "----------dParam " + dParam + "------------------------ " );
+			    				
+			    				boxRecomService.insertOrdShipmentDtlAll(dParam);
+			    				
 	            				continue;
 	            			}
 	            			
@@ -221,27 +283,31 @@ public class BoxRecomBatch  {
 	    	    						tempOrd.addOrdLine(itOrderLine);
 	    	    						tempOrd.setOrderNo(itOrd.getOrderNo() + "_" + i);
 	    	    						tempOrd.setShipOrderKey(itOrd.getShipOrderKey());
+	    		    					tempOrd.setWarehouseKey(itOrd.getWarehouseKey());
 	    	    					}
 	    	    				}
 	    	    				
 	    	    				if(tempOrd != null) {
 	    	        			
-		    	    				//box 추천 실행
+	    	    					//box 추천 실행
 		    	    				new BoxRecommendApp(tempOrd, boxMaster);
 		
 		    	    				log.info( "------------------------------------------" );
 		    	    				log.info( "boxType : " + tempOrd.getBoxType()  );
 		    	    				log.info( "------------------------------------------" );
 		
-		    	    				int shipUidKey = 0;
+		    	    				String shipUidKey = "";
 		    	    				String t_packBoxTypeRecom = tempOrd.getBoxType();
-		    	    				String t_packBoxSplitYn = KurlyConstants.STATUS_N;
+		    	    				String t_packBoxSplitYn = KurlyConstants.STATUS_Y;
+		    	    				
 		    	    				if("NoBox".equals(t_packBoxTypeRecom)) {
 		    	    					t_packBoxTypeRecom = boxMaster.getMaxBox(boxTypeMaxList, itOrd.getWarehouseKey());
 		    	    				} 
 		    	    				//오더분할 된경우만 'Y'
 		    	    				if(splitSeqNum>1) {
 		    	    					t_packBoxSplitYn = KurlyConstants.STATUS_Y;
+		    	    				} else {
+		    	    					t_packBoxSplitYn = KurlyConstants.STATUS_N;
 		    	    				}
 		    	    				
 		    	    				Map<String, String> param = new HashMap<String, String>();
@@ -293,9 +359,11 @@ public class BoxRecomBatch  {
 	        			
 	    	    		
 	    	    	} //finally end
+	    			
+	        		executeCount++;
+	        		
 	    		}	//for end
 
-        		executeCount++;
     		}	
     	
     	} catch (Exception e) {
@@ -305,10 +373,10 @@ public class BoxRecomBatch  {
 			e.printStackTrace();
     	} finally {
 
-        	long end = System.currentTimeMillis();
-        	long diffTime = ( end - start );  //m
+    		apiRunTimeEnd = System.currentTimeMillis();
+			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
 
-        	log.info("================= diffTime(ms) : "+ diffTime);
+        	log.info("================= apiRunTime(ms) : "+ apiRunTime);
 
 	    	//배치 로그 정보 insert
         	LogBatchExec logBatchExec = new LogBatchExec();
@@ -316,7 +384,7 @@ public class BoxRecomBatch  {
         	logBatchExec.setExecMethod(KurlyConstants.METHOD_BOXRECOM);
         	if("sucess".equals(result)) {
             	logBatchExec.setSuccessYn(KurlyConstants.STATUS_Y);
-            	logBatchExec.setMessageLog("");	
+            	logBatchExec.setMessageLog(KurlyConstants.METHOD_BOXRECOM +" Sucess("+apiRunTime+"ms)");
         	} else {
             	logBatchExec.setSuccessYn(KurlyConstants.STATUS_N);
             	logBatchExec.setMessageLog(resultMessage);

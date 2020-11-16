@@ -18,7 +18,7 @@ public final class KurlyConstants {
     
   	//센터
     public static final String DEFAULT_WAREHOUSEKEY = "0000";
-    public static final String DEFAULT_CENTERCODE = "SJM2";
+    public static final String DEFAULT_REGION_CENTERCODE = "SJM2";
 
 	/**
      * 토트 마스터 초기화(Release) 정보 연계

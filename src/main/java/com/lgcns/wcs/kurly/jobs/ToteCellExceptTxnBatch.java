@@ -33,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
  * @작성일 : 2020. 07. 14.
  * @작성자 : jooni
  * @변경이력 : 2020. 07. 14. 최초작성
+ * 			2020. 11. 12. RunTime 로직 수정
  * @Method 설명 : 토트 문제 처리용 피킹정보 연계  (WCS => WMS)
  */
 @Slf4j
@@ -73,13 +74,13 @@ public class ToteCellExceptTxnBatch {
     		List<ToteCellExceptTxnSelectData> listToteCellExceptTxnSelect = toteCellExceptTxnService.selectToteCellExceptTxn();
 	    	
 	    	//조회 건수 
-	    	executeCount = listToteCellExceptTxnSelect.size();
+//	    	executeCount = listToteCellExceptTxnSelect.size();
 	    	log.info("toteCellExceptTxn size ==> "+ listToteCellExceptTxnSelect.size());
 	    	
 	    	for(ToteCellExceptTxnSelectData toteCellExceptTxnSelectData : listToteCellExceptTxnSelect ) {
 
-	    		long apiRunTimeStartFor = 0;
-	    		apiRunTimeStartFor = System.currentTimeMillis();
+	    		//건당 시간 체크용
+	    		long apiRunTimeStartFor = System.currentTimeMillis();
 	        	
     			String r_ifYn = KurlyConstants.STATUS_N;
     			DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
@@ -159,7 +160,7 @@ public class ToteCellExceptTxnBatch {
 	    		} catch (Exception ex) {	
 	    			log.info("== send error == " + toteCellExceptTxnSelectData.getToteId());  
 	    			retMessage = ex.getMessage().substring(0, 90);
-//	    			throw new Exception("", e);
+    				r_ifYn = KurlyConstants.STATUS_N;
 	    		} finally {
 	    			log.info("====finally createLogApiStatus===============1");
 	    			
@@ -218,7 +219,7 @@ public class ToteCellExceptTxnBatch {
 			    	if(KurlyConstants.STATUS_N.equals(r_ifYn)) {
 			    		logApiStatus.setIntfMemo(retMessage);
 			    	} else {
-			    		logApiStatus.setIntfMemo("");
+			    		logApiStatus.setIntfMemo(KurlyConstants.STATUS_OK);
 			    	}
 
 					apiRunTimeEnd = System.currentTimeMillis();
@@ -230,7 +231,7 @@ public class ToteCellExceptTxnBatch {
 	    			log.info("====finally createLogApiStatus===============2");
 			    	
 	    		}
-
+	    		executeCount++;
 	    	}
     	
     	} catch (Exception e) {
@@ -252,7 +253,7 @@ public class ToteCellExceptTxnBatch {
         	logBatchExec.setExecMethod(KurlyConstants.METHOD_TOTECELLEXCEPTTXN);
         	if("sucess".equals(result)) {
             	logBatchExec.setSuccessYn(KurlyConstants.STATUS_Y);
-            	logBatchExec.setMessageLog("");	
+            	logBatchExec.setMessageLog(KurlyConstants.METHOD_TOTECELLEXCEPTTXN +" Sucess("+apiRunTime+"ms)");
         	} else {
             	logBatchExec.setSuccessYn(KurlyConstants.STATUS_N);
             	logBatchExec.setMessageLog(resultMessage);

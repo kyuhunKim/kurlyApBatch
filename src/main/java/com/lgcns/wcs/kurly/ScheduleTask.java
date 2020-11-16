@@ -63,23 +63,23 @@ public class ScheduleTask {
 	QpsNumUseCellBatch qpsNumUseCell;
 	
 
-	@Scheduled(fixedDelay = 60000)
+	@Scheduled(fixedDelay = 600000)
 	public void testTask() {
 		log.info("The current date (1) testTask: " + LocalDateTime.now());
 		String resDate = boxRecom.selectDate();
 		log.info("The current date (1) resDate: " + resDate);
-		String serverHostName = "";
-		String serverIp = "";
-
-		serverHostName = HttpUtil.getHostName();
-		serverIp = HttpUtil.getLocalIp();
-		log.info("The current date (1) serverHostName: " + serverHostName);
-		log.info("The current date (1) serverIp: " + serverIp);
+//		String serverHostName = "";
+//		String serverIp = "";
+//
+//		serverHostName = HttpUtil.getHostName();
+//		serverIp = HttpUtil.getLocalIp();
+//		log.info("The current date (1) serverHostName: " + serverHostName);
+//		log.info("The current date (1) serverIp: " + serverIp);
 		log.info("Current Thread : {}", Thread.currentThread().getName());
 	}
 	
 //	@Scheduled(cron = "0 0/5 * * * *")
-//	@Scheduled(fixedDelay = 100000, initialDelay = 10000)
+//	@Scheduled(fixedDelay = 300000, initialDelay = 10000)
 //	public void BoxRecom() {
 //		log.info("The current date (2) BoxRecom : " + LocalDateTime.now());
 //		log.info("Current Thread : {}", Thread.currentThread().getName());

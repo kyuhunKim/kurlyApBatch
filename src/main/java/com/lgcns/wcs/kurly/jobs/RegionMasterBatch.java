@@ -41,7 +41,11 @@ public class RegionMasterBatch  {
     public void RegionMasterTask()  {
     	log.info("=================RegionMasterBatch start===============");
     	log.info("The current date  : " + LocalDateTime.now());
-    	long start = System.currentTimeMillis();
+    	long apiRunTimeStart = 0;
+		long apiRunTimeEnd   = 0;
+		String apiRunTime    = "";
+		
+		apiRunTimeStart = System.currentTimeMillis();
     	
 		String result = "sucess";
 		String resultMessage = "";
@@ -52,9 +56,6 @@ public class RegionMasterBatch  {
     		String retData = regionMasterService.insertRegionMaster();
 
     		log.info("====finally createLogApiStatus===============1");
-
-			long endFor = System.currentTimeMillis(); 
-			long diffTimeFor = ( endFor - start ); //ms
 
 			//로그 정보 insert
 			LogApiStatus logApiStatus = new LogApiStatus();
@@ -86,11 +87,15 @@ public class RegionMasterBatch  {
 	    	logApiStatus.setApiUrl(KurlyConstants.METHOD_REGIONMASTER);
 	    	
 	    	logApiStatus.setApiInfo(retData);
-	    	logApiStatus.setApiRuntime(diffTimeFor+"");
 	    	
 	    	logApiStatus.setIntfYn("Y") ; //'Y': 전송완료, 'N': 미전송
 	    	
-	    	logApiStatus.setIntfMemo("");
+	    	logApiStatus.setIntfMemo(KurlyConstants.STATUS_OK);
+
+    		apiRunTimeEnd = System.currentTimeMillis();
+			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
+			
+			logApiStatus.setApiRuntime(apiRunTime);
 	    	
 	    	logApiStatusService.createLogApiStatus(logApiStatus);
 			log.info("====finally createLogApiStatus===============2");
@@ -99,13 +104,12 @@ public class RegionMasterBatch  {
     		result = "error";
 			log.error( " === ToteScanBatch  error" +e );
 			resultMessage = e.toString();
-//			throw new Exception(e);
     	} finally {
 
-        	long end = System.currentTimeMillis();
-        	long diffTime = ( end - start );  //m
+    		apiRunTimeEnd = System.currentTimeMillis();
+			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
 
-        	log.info("================= diffTime(ms) : "+ diffTime);
+        	log.info("================= apiRunTime(ms) : "+ apiRunTime);
 
 	    	//배치 로그 정보 insert
         	LogBatchExec logBatchExec = new LogBatchExec();
@@ -113,7 +117,7 @@ public class RegionMasterBatch  {
         	logBatchExec.setExecMethod(KurlyConstants.METHOD_REGIONMASTER);
         	if("sucess".equals(result)) {
             	logBatchExec.setSuccessYn(KurlyConstants.STATUS_Y);
-            	logBatchExec.setMessageLog("");	
+            	logBatchExec.setMessageLog(KurlyConstants.METHOD_REGIONMASTER +" Sucess("+apiRunTime+"ms)");
         	} else {
             	logBatchExec.setSuccessYn(KurlyConstants.STATUS_N);
             	logBatchExec.setMessageLog(resultMessage);

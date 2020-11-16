@@ -34,25 +34,27 @@ public interface BoxRecomService {
 	
 	public List<OrdInfoVO> selectOrdInfoList();
 	
-	public int insertOrdShipmentHdr(Map<String, String> data)  throws Exception;
+	public String insertOrdShipmentHdr(Map<String, String> data)  throws Exception;
 
 	public void insertOrdShipmentDtl(Map<String, String> data)  throws Exception;
 	
 	public OrdInfoList selectOrdList(SkuTypeMap skuMaster) ;
 	
-	public int getShipUidKey();
+	public String getShipUidKey();
 	
 	public void updateWifShipmentHdr(Map<String, String> data) ;
 	
 	public void insertOrdShipmentDtlAll(Map<String, String> data) throws Exception ;
 	
-	public void insertOrdShipmentDtl(OrdInfoVO tempOrd, int shipUidKey, int splitSeqNum) throws Exception ;
+	public void insertOrdShipmentDtl(OrdInfoVO tempOrd, String shipUidKey, int splitSeqNum) throws Exception ;
 	
 	public int selectOrdShipmentCount(Map<String, String> data);
 	
 	public String selectDate() ;
 	
 	public List<BoxTypeVO> selectBoxTypeMaxList() ;
+	
 	public int selectOrdInfoSearchCount() ;
+	
 	public List<OrdInfoVO> selectOrdInfoSearchList(SearchVO svo) ;
 }

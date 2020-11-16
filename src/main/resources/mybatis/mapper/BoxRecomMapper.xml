@@ -22,7 +22,7 @@
 	ORDER BY COM_DTL_CD ASC, ATTR01 ASC
   </select>
   
-  <select id="selectBoxTypeList" resultType="com.lgcns.wcs.kurly.dto.box.BoxTypeVO">
+  <select id="selectBoxTypeList_bak" resultType="com.lgcns.wcs.kurly.dto.box.BoxTypeVO">
   	/* [BoxRecomMapper.xml] selectBoxTypeList */
     SELECT 
 		B.BOX_TYPE_CD  AS boxTypeCd, 
@@ -45,6 +45,29 @@
   		) C
   WHERE B.CNTR_CD = C.COM_DTL_CD
 	ORDER BY CNTR_CD ASC, BOX_TYPE_GRP_CD ASC
+  </select>
+  
+  <select id="selectBoxTypeList" resultType="com.lgcns.wcs.kurly.dto.box.BoxTypeVO">
+    /* [BoxRecomMapper.xml] selectBoxTypeList */
+    SELECT 
+		BH.BOX_RECOM_CBM  AS logicCd,
+		BH.CNTR_CD        AS warehouseKey,
+		''                AS boxShape,
+		BD.BOX_TYPE_CD    AS boxTypeCd, 
+		BD.BOX_TYPE_NM    AS boxTypeName,
+		BD.BOX_WTH_LEN    AS boxWidth,
+		BD.BOX_VERT_LEN   AS boxDepth,
+		BD.BOX_HGT_LEN    AS boxHeight,
+		BD.BOX_CBM_MIN    AS boxMinCBM,
+		BD.BOX_CBM_MAX    AS boxMaxCBM
+	FROM O_WCS.TB_COM_BOX_PLAN_HDR BH ,
+		 O_WCS.TB_COM_BOX_PLAN_DTL BD
+	WHERE BH.CO_CD = BD.CO_CD
+	  AND BH.CNTR_CD = BD.CNTR_CD
+	  AND BH.CBM_PLAN_CD = BD.CBM_PLAN_CD
+	  AND BH.USE_YN = 'Y'
+	  AND BH.APPLY_YN = 'Y'
+	ORDER BY BH.BOX_RECOM_CBM ASC, BH.CNTR_CD ASC, BD.BOX_CBM_MIN ASC
   </select>
   
   <select id="selectSkuMasterList" resultType="com.lgcns.wcs.kurly.dto.box.SkuTypeVO">
@@ -78,7 +101,8 @@
 		HD.SHIP_ORDER_KEY  AS shipOrderKey,
 		HD.WAREHOUSE_KEY  AS warehouseKey,
 		HD.OWNER_KEY  AS ownerKey,
-		HD.ORDER_NO  AS orderNo
+		HD.ORDER_NO  AS orderNo,
+		HD.BOX_SPLIT_CHECK_YN  AS boxSplitCheckYn
 	FROM o_wcs.TB_WIF_SHIPMENT_HDR HD,
 		 o_wcs.TB_WIF_SHIPMENT_DTL DT 
 	WHERE HD.SHIP_ORDER_KEY = DT.SHIP_ORDER_KEY 
@@ -102,6 +126,7 @@
   
   <select id="selectOrdInfoSearchList" parameterType="com.lgcns.wcs.kurly.dto.box.SearchVO" resultType="com.lgcns.wcs.kurly.dto.box.OrdInfoVO">
   	/* [BoxRecomMapper.xml] selectOrdInfoSearchList */
+	<![CDATA[ 
 	SELECT  
         * 
       FROM (
@@ -123,7 +148,6 @@
 					HD.WAREHOUSE_KEY ASC,
 					HD.OWNER_KEY ASC,
 					HD.ORDER_NO ASC
-	<![CDATA[ 
 			 ) A 
            WHERE ROWNUM <= #{endRowIndex} /* end */ 
            ) 
@@ -217,7 +241,9 @@
 		  HD.MODIFIED_DATE         AS  modifiedDate      ,
 		  HD.MODIFIED_TIME         AS  modifiedTime      ,
 		  HD.MODIFIED_USER         AS  modifiedUser      ,
-		  HD.ALLOC_TYPE            AS  alloc_Type                                 
+		  HD.ALLOC_TYPE            AS  alloc_Type        ,
+		  HD.BOX_SPLIT_CHECK_YN    AS  boxSplitCheckYn   ,
+		  HD.MANUAL_PROC_YN        AS  manualProcYn                          
 	FROM o_wcs.TB_WIF_SHIPMENT_HDR HD,
 		 o_wcs.TB_WIF_SHIPMENT_DTL DT
 	WHERE HD.SHIP_ORDER_KEY = DT.SHIP_ORDER_KEY
@@ -279,7 +305,7 @@
 	ORDER BY HD.SHIP_ORDER_KEY ASC, HD.WAREHOUSE_KEY ASC, HD.CREATED_DATE DESC, HD.CREATED_TIME DESC
   </select>
 
-  <select id="getShipUidKey" resultType="int">
+  <select id="getShipUidKey" resultType="String">
   	/* [BoxRecomMapper.xml] getShipUidKey */
 		SELECT o_wcs.SEQ_ORD_SHIPMENT_HDR.NEXTVAL FROM DUAL
   </select>
@@ -337,7 +363,8 @@
 		  ALLOC_TYPE            ,
 		  PACK_BOX_SPLIT_YN     ,
 		  PACK_BOX_TYPE_RECOM   ,
-		  SPECIAL_MGNT_CUST_YN 
+		  SPECIAL_MGNT_CUST_YN  ,
+		  MANUAL_PROC_YN
 		)
 		SELECT 
 		      #{shipUidKey}, 
@@ -389,7 +416,9 @@
 		      HD.ALLOC_TYPE             ,
 		      #{packBoxSplitYn}         ,
 		      #{packBoxTypeRecom}       ,
-		      HD.BOX_SPLIT_CHECK_YN               
+		      (CASE WHEN HD.MEMBER_GRADE = '0003' 
+		      		THEN 'Y' ELSE 'N' END) AS SPECIAL_MGNT_CUST_YN    ,
+		      HD.MANUAL_PROC_YN       
 		  FROM o_wcs.TB_WIF_SHIPMENT_HDR HD
 		  WHERE HD.SHIP_ORDER_KEY = #{shipOrderKey}
   </insert>
@@ -442,11 +471,15 @@
 		MODIFIED_DATE          ,
 		MODIFIED_TIME          ,
 		MODIFIED_USER          ,
-		OWNER
+		OWNER               ,
+		GROUP_NO            ,
+		WORK_BATCH_NO       ,
+		QPS_NUM             ,
+		WMS_BATCH_YMD
 	)
 	SELECT 
 	      #{shipUidKey}, 
-	      #{shipUidItemSeq}, 
+	      LPAD(#{shipUidItemSeq}, 6, '0') , 
 	      DT.SHIP_ORDER_KEY         ,
 	      DT.SHIP_ORDER_ITEM_SEQ    ,
 	      DT.ITEM_STATUS            ,
@@ -489,7 +522,11 @@
 	      TO_CHAR(SYSDATE, 'YYYYMMDD') AS MODIFIED_DATE,
 	      TO_CHAR(SYSDATE, 'HH24MISS') AS MODIFIED_TIME,
 	      'BATCH' MODIFIED_USER       ,
-	      #{owner}
+	      #{owner}               ,
+		  DT.GROUP_NO            ,
+		  DT.WORK_BATCH_NO       ,
+		  DT.QPS_NUM             ,
+		  DT.WMS_BATCH_YMD
 	  FROM o_wcs.TB_WIF_SHIPMENT_DTL DT
 	  WHERE DT.SHIP_ORDER_KEY = #{shipOrderKey}
 	    AND DT.SKU_CODE = #{skuCode}
@@ -556,7 +593,11 @@
 		MODIFIED_DATE          ,
 		MODIFIED_TIME          ,
 		MODIFIED_USER          ,
-		OWNER
+		OWNER               ,
+		GROUP_NO            ,
+		WORK_BATCH_NO       ,
+		QPS_NUM             ,
+		WMS_BATCH_YMD
 	)
 	SELECT 
 	      #{shipUidKey}, 
@@ -603,7 +644,11 @@
 	      TO_CHAR(SYSDATE, 'YYYYMMDD') AS MODIFIED_DATE,
 	      TO_CHAR(SYSDATE, 'HH24MISS') AS MODIFIED_TIME,
 	      'BATCH' MODIFIED_USER       ,
-	      #{owner}
+	      #{owner}               ,
+		  DT.GROUP_NO            ,
+		  DT.WORK_BATCH_NO       ,
+		  DT.QPS_NUM             ,
+		  DT.WMS_BATCH_YMD
 	  FROM o_wcs.TB_WIF_SHIPMENT_DTL DT
 	  WHERE DT.SHIP_ORDER_KEY = #{shipOrderKey}
   </insert>
@@ -623,7 +668,7 @@
 	FROM DUAL
   </select>
   
-  <select id="selectBoxTypeMaxList" resultType="com.lgcns.wcs.kurly.dto.box.BoxTypeVO">
+  <select id="selectBoxTypeMaxList_bak" resultType="com.lgcns.wcs.kurly.dto.box.BoxTypeVO">
   	/* [BoxRecomMapper.xml] selectBoxTypeMaxList */
 	SELECT
 		T.BOX_TYPE_CD  AS boxTypeCd, 
@@ -645,6 +690,42 @@
 		    (BOX_WTH_LEN * BOX_VERT_LEN * BOX_HGT_LEN)  AS BoxCBM
 			, ROW_NUMBER() OVER(PARTITION BY CNTR_CD ORDER BY (BOX_WTH_LEN * BOX_VERT_LEN * BOX_HGT_LEN) DESC) as RowIdx
 		FROM o_wcs.TB_COM_BOX_TYPE_MST  B
+	) T
+	WHERE ROWIDX = 1
+  </select>
+  
+  <select id="selectBoxTypeMaxList" resultType="com.lgcns.wcs.kurly.dto.box.BoxTypeVO">
+  	/* [BoxRecomMapper.xml] selectBoxTypeMaxList */
+	SELECT
+		T.BOX_RECOM_CBM  AS logicCd,
+		T.CNTR_CD   AS warehouseKey,
+		''  AS boxShape,
+		T.BOX_TYPE_CD  AS boxTypeCd, 
+		T.BOX_TYPE_NM  AS boxTypeName,
+		T.BOX_WTH_LEN  AS BoxWidth,
+		T.BOX_VERT_LEN AS BoxDepth,
+		T.BOX_HGT_LEN AS BoxHeight,
+		T.BOX_CBM_MIN AS boxMinCBM,
+		T.BOX_CBM_MAX AS boxMaxCBM
+	FROM (
+		SELECT 
+		    BH.BOX_RECOM_CBM ,
+		    BH.CNTR_CD  ,
+		    BD.BOX_TYPE_CD  , 
+		    BD.BOX_TYPE_NM  ,
+		    BD.BOX_WTH_LEN  ,
+		    BD.BOX_VERT_LEN ,
+		    BD.BOX_HGT_LEN ,
+		    BD.BOX_CBM_MIN ,
+		    BD.BOX_CBM_MAX ,
+		    ROW_NUMBER() OVER(PARTITION BY BH.CNTR_CD ORDER BY BD.BOX_CBM_MAX DESC) as RowIdx
+		FROM O_WCS.TB_COM_BOX_PLAN_HDR BH ,
+			 O_WCS.TB_COM_BOX_PLAN_DTL BD
+		WHERE BH.CO_CD = BD.CO_CD
+		  AND BH.CNTR_CD = BD.CNTR_CD
+		  AND BH.CBM_PLAN_CD = BD.CBM_PLAN_CD
+		  AND BH.USE_YN = 'Y'
+		  AND BH.APPLY_YN = 'Y'
 	) T
 	WHERE ROWIDX = 1
   </select>

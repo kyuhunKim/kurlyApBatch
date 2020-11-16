@@ -21,6 +21,7 @@ import com.lgcns.wcs.kurly.producer.KurlyWcsToWmsProducer;
 import com.lgcns.wcs.kurly.service.InvoicePrintCompletService;
 import com.lgcns.wcs.kurly.service.LogApiStatusService;
 import com.lgcns.wcs.kurly.service.LogBatchExecService;
+import com.lgcns.wcs.kurly.util.StringUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
  * @작성일 : 2020. 07. 16.
  * @작성자 : jooni
  * @변경이력 : 2020. 07. 16. 최초작성
+ * 			2020. 11. 12. RunTime 로직 수정
  * @Method 설명 : WCS 운송장 발행 정보  (WCS => WMS)
  */
 @Slf4j
@@ -51,7 +53,12 @@ public class InvoicePrintCompletBatch  {
     public void InvoicePrintCompletTask() {
     	log.info("=================InvoicePrintCompletBatch start===============");
     	log.info("The current date  : " + LocalDateTime.now());
-    	long start = System.currentTimeMillis();
+
+		long apiRunTimeStart = 0;
+		long apiRunTimeEnd   = 0;
+		String apiRunTime    = "";
+		
+    	apiRunTimeStart = System.currentTimeMillis();
     	
 		String result = "sucess";
 		String resultMessage = "";
@@ -64,12 +71,13 @@ public class InvoicePrintCompletBatch  {
     		List<InvoicePrintCompletData> listInvoicePrintComplet = invoicePrintCompletService.selectInvoicePrintComplet();
 	    	
 	    	//조회 건수 
-	    	executeCount = listInvoicePrintComplet.size();
+//	    	executeCount = listInvoicePrintComplet.size();
 	    	log.info("invoicePrintComplet size ==> "+ listInvoicePrintComplet.size());
 	    	
 	    	for(InvoicePrintCompletData invoicePrintCompletData : listInvoicePrintComplet ) {
 
-				long startFor = System.currentTimeMillis();
+	    		//1건당 시간 체크용
+	    		long apiRunTimeStartFor = System.currentTimeMillis();
 
     			String r_ifYn = KurlyConstants.STATUS_N;
     			DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
@@ -95,7 +103,7 @@ public class InvoicePrintCompletBatch  {
 	    				r_ifYn = KurlyConstants.STATUS_N;
 	    			}
 	    			
-	    			log.info("=================updateInvoicePrintComplet===============1");
+	    			log.info("======= updateInvoicePrintComplet wcsProducerSend ======");
 			    	//인터페이스 처리내역 update
 	    			String r_invoiceNo = invoicePrintCompletData.getInvoiceNo();
 	    			String r_warehouseKey = invoicePrintCompletData.getWarehouseKey();
@@ -123,12 +131,14 @@ public class InvoicePrintCompletBatch  {
 	    		} catch (Exception ex) {	
 	    			log.info("== send error == " + invoicePrintCompletData.getInvoiceNo());  
 	    			retMessage = ex.getMessage().substring(0, 90);
-//	    			throw new Exception("", e);
+    				r_ifYn = KurlyConstants.STATUS_N;
 	    		} finally {
 	    			log.info("====finally createLogApiStatus===============1");
-	    			
-					long endFor = System.currentTimeMillis(); 
-					long diffTimeFor = ( endFor - startFor ); //ms
+
+	    			apiRunTimeEnd = System.currentTimeMillis();
+	    			apiRunTime = StringUtil.formatInterval(apiRunTimeStartFor, apiRunTimeEnd) ;
+
+	            	log.info("================= apiRunTime(ms) : "+ apiRunTime);
 
 					//전송로그 정보 insert
 			    	LogApiStatus logApiStatus = new LogApiStatus();
@@ -162,13 +172,14 @@ public class InvoicePrintCompletBatch  {
 			    	
 			    	logApiStatus.setApiUrl(KurlyConstants.METHOD_INVOICEPRINTCOMPLET);
 			    	logApiStatus.setApiInfo(invoicePrintCompletData.toString());
-			    	logApiStatus.setApiRuntime(diffTimeFor+"");
+			    	logApiStatus.setApiRuntime(apiRunTime);
 			    	
 			    	logApiStatus.setIntfYn(r_ifYn) ; //'Y': 전송완료, 'N': 미전송
+			    	//전송상태 및 DB 오류 체크
 			    	if(KurlyConstants.STATUS_N.equals(r_ifYn)) {
 			    		logApiStatus.setIntfMemo(retMessage);
 			    	} else {
-			    		logApiStatus.setIntfMemo("");
+			    		logApiStatus.setIntfMemo(KurlyConstants.STATUS_OK);
 			    	}
 			    	
 			    	//로그정보 적재
@@ -176,7 +187,7 @@ public class InvoicePrintCompletBatch  {
 	    			log.info("====finally createLogApiStatus===============2");
 			    	
 	    		}
-
+	    		executeCount++;
 	    	}
     	
     	} catch (Exception e) {
@@ -186,11 +197,10 @@ public class InvoicePrintCompletBatch  {
 //			throw new Exception(e);
     	} finally {
 
-        	long end = System.currentTimeMillis();
-        	long diffTime = ( end - start );  //m
+			apiRunTimeEnd = System.currentTimeMillis();
+			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
 
-        	log.info("================= diffTime(ms) : "+ diffTime);
-        	
+        	log.info("================= apiRunTime(ms) : "+ apiRunTime);
 
 	    	//배치 로그 정보 insert
         	LogBatchExec logBatchExec = new LogBatchExec();
@@ -198,7 +208,7 @@ public class InvoicePrintCompletBatch  {
         	logBatchExec.setExecMethod(KurlyConstants.METHOD_INVOICEPRINTCOMPLET);
         	if("sucess".equals(result)) {
             	logBatchExec.setSuccessYn(KurlyConstants.STATUS_Y);
-            	logBatchExec.setMessageLog("");	
+            	logBatchExec.setMessageLog(KurlyConstants.METHOD_INVOICEPRINTCOMPLET+" Sucess("+apiRunTime+"ms)");	
         	} else {
             	logBatchExec.setSuccessYn(KurlyConstants.STATUS_N);
             	logBatchExec.setMessageLog(resultMessage);
@@ -207,7 +217,6 @@ public class InvoicePrintCompletBatch  {
         	logBatchExec.setExecuteCount(executeCount);
         	logBatchExec.setStartDate(startDate);
         	
-    		
 	    	//로그정보 적재
         	logBatchExecService.createLogBatchExec(logBatchExec);
 	    	

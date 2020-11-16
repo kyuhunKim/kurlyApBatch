@@ -23,6 +23,7 @@ import com.lgcns.wcs.kurly.producer.KurlyWcsToWmsProducer;
 import com.lgcns.wcs.kurly.service.LogApiStatusService;
 import com.lgcns.wcs.kurly.service.LogBatchExecService;
 import com.lgcns.wcs.kurly.service.PickQpsCompletService;
+import com.lgcns.wcs.kurly.util.StringUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,6 +33,8 @@ import lombok.extern.slf4j.Slf4j;
  * @작성일 : 2020. 07. 16.
  * @작성자 : jooni
  * @변경이력 : 2020. 07. 16. 최초작성
+ * 			2020. 11. 09. 쿼리  수정
+ * 			2020. 11. 12. RunTime 로직 수정
  * @Method 설명 : WCS 오더 피킹 완료 정보  (WCS => WMS)
  */
 @Slf4j
@@ -53,7 +56,11 @@ public class PickQpsCompletBatch  {
     public void PickQpsCompletTask()  {
     	log.info("=================PickQpsCompletBatch start===============");
     	log.info("The current date  : " + LocalDateTime.now());
-    	long start = System.currentTimeMillis();
+    	long apiRunTimeStart = 0;
+		long apiRunTimeEnd   = 0;
+		String apiRunTime    = "";
+		
+		apiRunTimeStart = System.currentTimeMillis();
     	
 		String result = "sucess";
 		String resultMessage = "";
@@ -65,18 +72,19 @@ public class PickQpsCompletBatch  {
     		List<PickQpsCompletData> listPickQpsComplet = pickQpsCompletService.selectPickQpsComplet();
     		
 	    	//조회 건수 
-	    	executeCount = listPickQpsComplet.size();
+//	    	executeCount = listPickQpsComplet.size();
 	    	log.info("listPickQpsComplet size ==> "+ listPickQpsComplet.size());
 	    	
 	    	List<PickQpsCompletDetailData> detailList = new ArrayList<PickQpsCompletDetailData>();
     		
 	    	for(PickQpsCompletData pickQpsCompletData : listPickQpsComplet ) {
+
+	    		//건당 시간 체크용
+	    		long apiRunTimeStartFor = System.currentTimeMillis();
 	    		
 	    		detailList = pickQpsCompletService.selectPickQpsCompletDetail(pickQpsCompletData);
 	    		pickQpsCompletData.setDtlCnt(detailList.size());
 	    		pickQpsCompletData.setDetail(detailList);
-	    		
-				long startFor = System.currentTimeMillis();
 
     			String r_ifYn = KurlyConstants.STATUS_N;
     			DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
@@ -102,10 +110,10 @@ public class PickQpsCompletBatch  {
 	    				r_ifYn = KurlyConstants.STATUS_N;
 	    			}
 	    			
-	    			log.info("=================updatePickQpsComplet===============1");
 			    	//인터페이스 처리내역 update
 	    			String r_invoiceNo = pickQpsCompletData.getInvoiceNo();
 	    			String r_shipOrderKey = pickQpsCompletData.getShipOrderKey();
+	    			String r_invoiceUidKey = pickQpsCompletData.getInvoiceUidKey();
 	    			
 					Map<String, String> updateMap = new HashMap<String, String>();
 					
@@ -120,22 +128,21 @@ public class PickQpsCompletBatch  {
 					}
 					    
 					updateMap.put("modifiedUser",KurlyConstants.DEFAULT_USERID);
-					updateMap.put("invoiceNo",r_invoiceNo);
-					updateMap.put("shipOrderKey",r_shipOrderKey);
-
+//					updateMap.put("invoiceNo",r_invoiceNo);
+//					updateMap.put("shipOrderKey",r_shipOrderKey);
+					updateMap.put("invoiceUidKey",r_invoiceUidKey);
+					
 					pickQpsCompletService.updatePickQpsComplet(updateMap);
-
-			    	log.info("=================updatePickQpsComplet===============2");
 			    	
 	    		} catch (Exception ex) {	
 	    			log.info("== send error == " + pickQpsCompletData.getInvoiceNo());  
 	    			retMessage = ex.getMessage().substring(0, 90);
-//	    			throw new Exception("", e);
+    				r_ifYn = KurlyConstants.STATUS_N;
 	    		} finally {
 	    			log.info("====finally createLogApiStatus===============1");
 
-					long endFor = System.currentTimeMillis(); 
-					long diffTimeFor = ( endFor - startFor ); //ms
+	    			apiRunTimeEnd = System.currentTimeMillis();
+	    			apiRunTime = StringUtil.formatInterval(apiRunTimeStartFor, apiRunTimeEnd) ;
 
 					//전송로그 정보 insert
 			    	LogApiStatus logApiStatus = new LogApiStatus();
@@ -169,13 +176,13 @@ public class PickQpsCompletBatch  {
 
 			    	logApiStatus.setApiUrl(KurlyConstants.METHOD_PICKQPSCOMPLET);
 			    	logApiStatus.setApiInfo(pickQpsCompletData.toString());
-			    	logApiStatus.setApiRuntime(diffTimeFor+"");
+			    	logApiStatus.setApiRuntime(apiRunTime);
 
 			    	logApiStatus.setIntfYn(r_ifYn) ; //'Y': 전송완료, 'N': 미전송
 			    	if(KurlyConstants.STATUS_N.equals(r_ifYn)) {
 			    		logApiStatus.setIntfMemo(retMessage);
 			    	} else {
-			    		logApiStatus.setIntfMemo("");
+			    		logApiStatus.setIntfMemo(KurlyConstants.STATUS_OK);
 			    	}
 			    	
 			    	//로그정보 적재
@@ -183,7 +190,7 @@ public class PickQpsCompletBatch  {
 	    			log.info("====finally createLogApiStatus===============2");
 			    	
 	    		}
-
+	    		executeCount++;
 	    	}
     	} catch (Exception e) {
     		result = "error";
@@ -191,10 +198,10 @@ public class PickQpsCompletBatch  {
 			resultMessage = e.toString();
     	} finally {
 
-        	long end = System.currentTimeMillis();
-        	long diffTime = ( end - start );  //m
+    		apiRunTimeEnd = System.currentTimeMillis();
+			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
 
-        	log.info("================= diffTime(ms) : "+ diffTime);
+        	log.info("================= apiRunTime(ms) : "+ apiRunTime);
         	
 	    	//배치 로그 정보 insert
         	LogBatchExec logBatchExec = new LogBatchExec();
@@ -202,7 +209,7 @@ public class PickQpsCompletBatch  {
         	logBatchExec.setExecMethod(KurlyConstants.METHOD_PICKQPSCOMPLET);
         	if("sucess".equals(result)) {
             	logBatchExec.setSuccessYn(KurlyConstants.STATUS_Y);
-            	logBatchExec.setMessageLog("");	
+            	logBatchExec.setMessageLog(KurlyConstants.METHOD_PICKQPSCOMPLET +" Sucess("+apiRunTime+"ms)");	
         	} else {
             	logBatchExec.setSuccessYn(KurlyConstants.STATUS_N);
             	logBatchExec.setMessageLog(resultMessage);

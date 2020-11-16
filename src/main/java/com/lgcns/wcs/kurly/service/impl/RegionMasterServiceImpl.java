@@ -48,9 +48,9 @@ public class RegionMasterServiceImpl implements RegionMasterService {
 		    	for(RegionMasterDetailData master : reqData.getData() ) {
 		    		
 //		    		if(vvv > 1) break;  //테스트용
-		    		log.info("dddd='{}'", master.toString());
+		    		log.info("master='{}'", master.toString());
 		    		
-		    		if(KurlyConstants.DEFAULT_CENTERCODE.equals(master.getCenter_code())) {
+		    		if(KurlyConstants.DEFAULT_REGION_CENTERCODE.equals(master.getCenter_code())) {
 		    			
 		    			RegionMasterData rMaster = new RegionMasterData();
 		    			rMaster.setCoCd("MK");
@@ -69,6 +69,9 @@ public class RegionMasterServiceImpl implements RegionMasterService {
 		    			vvv++;	
 		    		}
 		    	}
+
+	    		log.info("insert Data count = "+ vvv);
+	    		
 			}
 			
 		} catch(Exception e) {

@@ -12,22 +12,22 @@ import lombok.Data;
 @Data
 @Alias("QpsNumUseCell")
 public class QpsNumUseCellData {
-	/*회사 코드
+	/*센터
 	 * */
 	private String warehouseKey ;
-	/*회사 코드
+	/*QPS 1호기 가용셀수
 	 * */
 	private int qpsNumUseCell01 ;
-	/*회사 코드
+	/*QPS 2호기 가용셀수
 	 * */
 	private int qpsNumUseCell02 ;
-	/*회사 코드
+	/*DAS 오더처리 가용셀수
 	 * */
 	private int dasNumUseCell ;
-	/*회사 코드
+	/*가용셀수배치수행일자
 	 * */
 	private String batchRunDate ;
-	/*회사 코드
+	/*가용셀수배치수행시간
 	 * */
 	private String batchRunTime ;
 	
@@ -37,5 +37,9 @@ public class QpsNumUseCellData {
 	/*DAS 호기용 예비컬럼2
 	 * */
 	private String dasNumAttr2 = "" ;
+	/*DAS셀그룹번호(DAS출고시활용)
+	 * */
+	private String dasCellGroupId ;
+
 
 }

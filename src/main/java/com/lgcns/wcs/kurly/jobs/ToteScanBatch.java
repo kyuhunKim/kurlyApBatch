@@ -21,6 +21,7 @@ import com.lgcns.wcs.kurly.producer.KurlyWcsToWmsProducer;
 import com.lgcns.wcs.kurly.service.LogApiStatusService;
 import com.lgcns.wcs.kurly.service.LogBatchExecService;
 import com.lgcns.wcs.kurly.service.ToteScanService;
+import com.lgcns.wcs.kurly.util.StringUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
  * @작성일 : 2020. 07. 14.
  * @작성자 : jooni
  * @변경이력 : 2020. 07. 14. 최초작성
+ * 			2020. 11. 12. RunTime 로직 수정
  * @Method 설명 : WCS 토트 자동화 설비 투입 정보 (마스터)  (WCS => WMS)
  */
 @Slf4j
@@ -51,7 +53,11 @@ public class ToteScanBatch  {
     public void ToteScanTask()  {
     	log.info("=================ToteScanBatch start===============");
     	log.info("The current date  : " + LocalDateTime.now());
-    	long start = System.currentTimeMillis();
+    	long apiRunTimeStart = 0;
+		long apiRunTimeEnd   = 0;
+		String apiRunTime    = "";
+		
+		apiRunTimeStart = System.currentTimeMillis();
     	
 		String result = "sucess";
 		String resultMessage = "";
@@ -62,12 +68,13 @@ public class ToteScanBatch  {
     		List<ToteScanData> listToteScan = toteScanService.selectToteScan();
 
 	    	//조회 건수 
-	    	executeCount = listToteScan.size();
+//	    	executeCount = listToteScan.size();
 	    	
         	log.info("toteScan size ==> "+ listToteScan.size());
         	
         	for(ToteScanData toteScanData : listToteScan ) {
-        		long startFor = System.currentTimeMillis();
+        		//건당 시간 체크용
+	    		long apiRunTimeStartFor = System.currentTimeMillis();
 
     			String r_ifYn = KurlyConstants.STATUS_N;
     			DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
@@ -112,13 +119,13 @@ public class ToteScanBatch  {
 	    		} catch (Exception ex) {	
 	    			log.info("== send error == " + toteScanData.getToteId());  
 	    			retMessage = ex.getMessage().substring(0, 90);
+    				r_ifYn = KurlyConstants.STATUS_N;
 	    			ex.printStackTrace();
-//	    			throw new Exception("", e);
 	    		} finally {
 	    			log.info("====finally createLogApiStatus===============1");
 
-					long endFor = System.currentTimeMillis(); 
-					long diffTimeFor = ( endFor - startFor ); //ms
+	    			apiRunTimeEnd = System.currentTimeMillis();
+	    			apiRunTime = StringUtil.formatInterval(apiRunTimeStartFor, apiRunTimeEnd) ;
 
 					//로그 정보 insert
 			    	LogApiStatus logApiStatus = new LogApiStatus();
@@ -152,19 +159,20 @@ public class ToteScanBatch  {
 			    	
 			    	logApiStatus.setApiUrl(KurlyConstants.METHOD_TOTESCAN);
 			    	logApiStatus.setApiInfo(toteScanData.toString());
-			    	logApiStatus.setApiRuntime(diffTimeFor+"");
+			    	logApiStatus.setApiRuntime(apiRunTime);
 			    	
 			    	logApiStatus.setIntfYn(r_ifYn) ; //'Y': 전송완료, 'N': 미전송
 			    	if(KurlyConstants.STATUS_N.equals(r_ifYn)) {
 			    		logApiStatus.setIntfMemo(retMessage);
 			    	} else {
-			    		logApiStatus.setIntfMemo("");
+			    		logApiStatus.setIntfMemo(KurlyConstants.STATUS_OK);
 			    	}
 			    	
 			    	logApiStatusService.createLogApiStatus(logApiStatus);
 	    			log.info("====finally createLogApiStatus===============2");
 			    	
 	    		}
+	    		executeCount++;
         	}	
         	
     	} catch (Exception e) {
@@ -174,10 +182,10 @@ public class ToteScanBatch  {
 //			throw new Exception(e);
     	} finally {
 
-        	long end = System.currentTimeMillis();
-        	long diffTime = ( end - start );  //m
+    		apiRunTimeEnd = System.currentTimeMillis();
+			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
 
-        	log.info("================= diffTime(ms) : "+ diffTime);
+        	log.info("================= apiRunTime(ms) : "+ apiRunTime);
 
 	    	//배치 로그 정보 insert
         	LogBatchExec logBatchExec = new LogBatchExec();
@@ -185,7 +193,7 @@ public class ToteScanBatch  {
         	logBatchExec.setExecMethod(KurlyConstants.METHOD_TOTESCAN);
         	if("sucess".equals(result)) {
             	logBatchExec.setSuccessYn(KurlyConstants.STATUS_Y);
-            	logBatchExec.setMessageLog("");	
+            	logBatchExec.setMessageLog(KurlyConstants.METHOD_TOTESCAN +" Sucess("+apiRunTime+"ms)");
         	} else {
             	logBatchExec.setSuccessYn(KurlyConstants.STATUS_N);
             	logBatchExec.setMessageLog(resultMessage);

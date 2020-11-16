@@ -55,7 +55,9 @@ public class BoxTypeList {
 			tempBoxType.setBoxDepth(boxTypeVO.getBoxDepth());
 			tempBoxType.setBoxHeight(boxTypeVO.getBoxHeight());
 			tempBoxType.setWarehouseKey(boxTypeVO.getWarehouseKey());
-			tempBoxType.setFillRate(boxTypeVO.getFillRate());
+			tempBoxType.setLogicCd(boxTypeVO.getLogicCd());
+			tempBoxType.setBoxMinCBM(boxTypeVO.getBoxMinCBM());
+			tempBoxType.setBoxMaxCBM(boxTypeVO.getBoxMaxCBM());
 			addBoxType(tempBoxType);
 		}
 
@@ -94,6 +96,10 @@ public class BoxTypeList {
 		tempBoxType.setBoxWidth(220.0);
 		tempBoxType.setBoxDepth(160.0);
 		tempBoxType.setBoxHeight(150.5);
+		tempBoxType.setWarehouseKey("GGM1");
+		tempBoxType.setLogicCd("1");
+		tempBoxType.setBoxMinCBM(0);
+		tempBoxType.setBoxMaxCBM(4092000);
 		addBoxType(tempBoxType);
 		
 		//7호 박스
@@ -104,6 +110,10 @@ public class BoxTypeList {
 		tempBoxType.setBoxWidth(270.0);
 		tempBoxType.setBoxDepth(180.0);
 		tempBoxType.setBoxHeight(180.0);
+		tempBoxType.setWarehouseKey("GGM1");
+		tempBoxType.setLogicCd("1");
+		tempBoxType.setBoxMinCBM(4092000);
+		tempBoxType.setBoxMaxCBM(6561000);
 		addBoxType(tempBoxType);
 		
 		//11호 박스
@@ -114,6 +124,10 @@ public class BoxTypeList {
 		tempBoxType.setBoxWidth(290.0);
 		tempBoxType.setBoxDepth(310.0);
 		tempBoxType.setBoxHeight(150.5);
+		tempBoxType.setWarehouseKey("GGM1");
+		tempBoxType.setLogicCd("1");
+		tempBoxType.setBoxMinCBM(6561000);
+		tempBoxType.setBoxMaxCBM(10450875);
 		addBoxType(tempBoxType);
 		
 		//16호 박스
@@ -124,6 +138,10 @@ public class BoxTypeList {
 		tempBoxType.setBoxWidth(350.0);
 		tempBoxType.setBoxDepth(250.5);
 		tempBoxType.setBoxHeight(230.0);
+		tempBoxType.setWarehouseKey("GGM1");
+		tempBoxType.setLogicCd("1");
+		tempBoxType.setBoxMinCBM(10450875);
+		tempBoxType.setBoxMaxCBM(16422000);
 		addBoxType(tempBoxType);
 		
 		
@@ -135,6 +153,10 @@ public class BoxTypeList {
 		tempBoxType.setBoxWidth(450.0);
 		tempBoxType.setBoxDepth(330.0);
 		tempBoxType.setBoxHeight(270.5);
+		tempBoxType.setWarehouseKey("GGM1");
+		tempBoxType.setLogicCd("1");
+		tempBoxType.setBoxMinCBM(16422000);
+		tempBoxType.setBoxMaxCBM(32670000);
 		addBoxType(tempBoxType);
 		
 		//완전큰박스
@@ -145,6 +167,10 @@ public class BoxTypeList {
 		tempBoxType.setBoxWidth(750.0);
 		tempBoxType.setBoxDepth(530.0);
 		tempBoxType.setBoxHeight(470.5);
+		tempBoxType.setWarehouseKey("GGM1");
+		tempBoxType.setLogicCd("1");
+		tempBoxType.setBoxMinCBM(32670000);
+		tempBoxType.setBoxMaxCBM(186825000);
 		addBoxType(tempBoxType);
 		
 		return this.boxTypeMaster.size();

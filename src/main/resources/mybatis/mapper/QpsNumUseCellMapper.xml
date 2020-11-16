@@ -12,6 +12,9 @@
 		, SUM(QPSNUMUSECELL01) AS qpsNumUseCell01
 		, SUM(QPSNUMUSECELL02) AS qpsNumUseCell02
 		, SUM(DASNUMUSECELL) AS dasNumUseCell
+		, '' AS dasCellGroupId
+		, '' AS dasNumAttr1
+		, '' AS dasNumAttr2
 		, TO_CHAR(SYSDATE, 'YYYYMMDD') AS batchRunDate
 		, TO_CHAR(SYSDATE, 'HH24MISS') AS batchRunTime
  	FROM (

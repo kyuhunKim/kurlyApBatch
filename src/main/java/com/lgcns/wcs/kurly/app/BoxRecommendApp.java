@@ -9,55 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 
 public class BoxRecommendApp {
 
-	public BoxRecommendApp(OrdInfoVO ordList, BoxTypeList boxTypeMaster, double fillRate)
-	{
-
-		double minCBM = 999999999;
-		String minBoxType = "";
-		
-		//step 1. 가능 박스 리스트 작성 & box추천.
-		int ch = 1;
-		int ableBoxNum = 0;
-		double cbmSum;
-		for(BoxTypeVO itBoxType : boxTypeMaster.getBoxMaster())
-		{
-			ch = 1;
-			cbmSum = 0;
-			for(OrdLineVO itOrdLine : ordList.getOrdList())
-			{
-				//WarehouseKey 같을 경우만 실행
-				if(!itBoxType.getWarehouseKey().equals(itOrdLine.getWarehouseKey())) {
-					continue;
-				}
-				cbmSum += itOrdLine.getOrdLineCBM();
-				if(itBoxType.checkBox(itOrdLine.getFirst(), 
-						              itOrdLine.getSecond(), 
-						              itOrdLine.getThird()))
-				{
-					ch = 0;
-				}
-			}
-			if(ch == 0 && itBoxType.getBoxCBM() * fillRate > cbmSum)
-			{
-				if(minCBM > itBoxType.getBoxCBM())
-				{
-					minCBM = itBoxType.getBoxCBM();
-					minBoxType = itBoxType.getBoxTypeCD();
-				}
-				ableBoxNum ++ ;
-			}
-		}
-		if(ableBoxNum == 0)
-		{
-			ordList.setBoxType("NoBox");
-		}
-		else
-		{
-			ordList.setBoxType(minBoxType);
-		}
-	}
-
-
 	public BoxRecommendApp(OrdInfoVO ordList, BoxTypeList boxTypeMaster)
 	{
 
@@ -65,35 +16,57 @@ public class BoxRecommendApp {
 		String minBoxType = "";
 		
 		//step 1. 가능 박스 리스트 작성 & box추천.
+		//박스CBM추천기준(LEN_CBM_MAX:길이체크,CBM_MIN_MAX:CBM체크)
 		int ch = 1;
 		int ableBoxNum = 0;
-		double cbmSum;
 		for(BoxTypeVO itBoxType : boxTypeMaster.getBoxMaster())
 		{
+			System.out.println(ordList.getWarehouseKey() + ", " + itBoxType.getWarehouseKey());
+			
+			//Warehouse check.
+			if(!ordList.getWarehouseKey().equals(itBoxType.getWarehouseKey()))
+				continue;
+			
+//			System.out.println("222222"+ordList.getWarehouseKey() + ", " + itBoxType.getWarehouseKey());
+			
 			ch = 1;
-			cbmSum = 0;
-			for(OrdLineVO itOrdLine : ordList.getOrdList())
+			if(itBoxType.getLogicCd().compareTo("LEN_CBM_MAX") == 0)
 			{
-				//WarehouseKey 같을 경우만 실행
-				if(!itBoxType.getWarehouseKey().equals(itOrdLine.getWarehouseKey())) {
-					continue;
-				}
-				cbmSum += itOrdLine.getOrdLineCBM();
-				if(itBoxType.checkBox(itOrdLine.getFirst(), 
-						              itOrdLine.getSecond(), 
-						              itOrdLine.getThird()))
+				for(OrdLineVO itOrdLine : ordList.getOrdList())
 				{
-					ch = 0;
+					//warehouse 체크 해서.. continue
+					//logic 을 1로 갈지, 2로 갈지를 선택
+					if(itBoxType.checkBox(itOrdLine.getFirst(), 
+							              itOrdLine.getSecond(), 
+							              itOrdLine.getThird()))
+					{
+						ch = 0;
+					}
+				}
+				
+				//System.out.println(ch + ", " + itBoxType.getBoxCBM() + ", " + fillRate + ", " + itBoxType.getBoxCBM() * fillRate + ", " + ordList.getOrdCBM());
+				if(ch == 0 && itBoxType.getBoxMaxCBM() > ordList.getOrdCBM())
+				{
+					if(minCBM > itBoxType.getBoxMaxCBM())
+					{
+						minCBM = itBoxType.getBoxMaxCBM();
+						minBoxType = itBoxType.getBoxTypeCD();
+					}
+					ableBoxNum ++ ;
 				}
 			}
-			if(ch == 0 && itBoxType.getBoxCBM() * itBoxType.getFillRate() > cbmSum)
+			else
 			{
-				if(minCBM > itBoxType.getBoxCBM())
+				//2번 로직, minCBm, MaxCBM
+				if(ordList.getOrdCBM() >= itBoxType.getBoxMinCBM() && ordList.getOrdCBM() <= itBoxType.getBoxMaxCBM())
 				{
-					minCBM = itBoxType.getBoxCBM();
-					minBoxType = itBoxType.getBoxTypeCD();
+					if(minCBM > itBoxType.getBoxCBM())
+					{
+						minCBM = itBoxType.getBoxCBM();
+						minBoxType = itBoxType.getBoxTypeCD();
+					}
+					ableBoxNum ++ ;
 				}
-				ableBoxNum ++ ;
 			}
 		}
 		if(ableBoxNum == 0)

@@ -95,40 +95,28 @@ public class BoxRecomServiceImpl implements BoxRecomService {
 
 	/**
 	 * 
-	 * @Method Name : selectOrdLineList
+	 * @Method Name : selectOrdInfoList
 	 * @작성일 : 2020. 08. 10.
 	 * @작성자 : jooni
 	 * @변경이력 : 2020. 08. 10. 최초작성
-	 * @Method 설명 : cell type 조회
+	 * @Method 설명 : ordList 조회
 	 */
 	@Transactional(propagation=Propagation.REQUIRED)
 	public List<OrdInfoVO> selectOrdInfoList() {
 		
 		List<OrdInfoVO> ordList = boxRecomRepository.selectOrdInfoList();
-//		for(OrdInfoVO ordInfoVO : ordList) {
-//
-//			Map<String, String> param = new HashMap<String, String>();
-//			param.put("orderNo", ordInfoVO.getOrderNo());
-//			
-//			List<OrdLineVO> ordLines = boxRecomRepository.selectOrdLineList(param);
-//			ordInfoVO.setOrdLines(ordLines);
-////			if(ordLines != null) {
-////
-////				double ordCBM = 0;
-////				for(OrdLineVO itOrdLine : ordLines)
-////				{
-////					ordInfoVO.addOrdLine(itOrdLine.getSkuCode(), itOrdLine.getOrdQty());
-////					itOrdLine.setOrdLine(skuMaster, itOrdLine.getSkuCode(), itOrdLine.getOrdQty());
-////					ordCBM += itOrdLine.getOrdLineCBM();	
-////				}
-////				ordInfoVO.setOrdCBM(ordCBM);
-////			}
-//			
-//		}
-		
+	
 		return ordList;
 	}
-	
+
+	/**
+	 * 
+	 * @Method Name : selectOrdList
+	 * @작성일 : 2020. 08. 10.
+	 * @작성자 : jooni
+	 * @변경이력 : 2020. 08. 10. 최초작성
+	 * @Method 설명 : ordList 조회
+	 */
 	@Transactional(propagation=Propagation.REQUIRED)
 	public OrdInfoList selectOrdList(SkuTypeMap skuMaster) {
 
@@ -162,40 +150,88 @@ public class BoxRecomServiceImpl implements BoxRecomService {
 		return ordList;
 	}
 	
-	
+
+	/**
+	 * 
+	 * @Method Name : insertOrdShipmentHdr
+	 * @작성일 : 2020. 10. 22.
+	 * @작성자 : jooni
+	 * @변경이력 : 2020. 10. 22. 최초작성
+	 * @Method 설명 : OrdShipmentHdr insert
+	 */
 	@Transactional(propagation=Propagation.REQUIRED, rollbackFor= Throwable.class)
-	public int insertOrdShipmentHdr(Map<String, String> data) throws Exception {
-		int shipUidKey = this.getShipUidKey();
-		data.put("shipUidKey", ""+shipUidKey);
+	public String insertOrdShipmentHdr(Map<String, String> data) throws Exception {
+		String shipUidKey = this.getShipUidKey();
+		data.put("shipUidKey", shipUidKey);
 		
 		boxRecomRepository.insertOrdShipmentHdr(data);
 		
 		return shipUidKey;
 	}
 
+	/**
+	 * 
+	 * @Method Name : insertOrdShipmentDtl
+	 * @작성일 : 2020. 10. 22.
+	 * @작성자 : jooni
+	 * @변경이력 : 2020. 10. 22. 최초작성
+	 * @Method 설명 : OrdShipmentDtl insert
+	 */
 	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Throwable.class)
 	public void insertOrdShipmentDtl(Map<String, String> data) throws Exception {
 		boxRecomRepository.insertOrdShipmentDtl(data);
 	}
 
+	/**
+	 * 
+	 * @Method Name : getShipUidKey
+	 * @작성일 : 2020. 10. 22.
+	 * @작성자 : jooni
+	 * @변경이력 : 2020. 10. 22. 최초작성
+	 * @Method 설명 : ShipUidKey 조회
+	 */
 	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=SQLException.class)
-	public int getShipUidKey() {
-		int resultData = boxRecomRepository.getShipUidKey();
+	public String getShipUidKey() {
+		String resultData = boxRecomRepository.getShipUidKey();
 		return resultData;
 	}
-	
+
+	/**
+	 * 
+	 * @Method Name : updateWifShipmentHdr
+	 * @작성일 : 2020. 10. 22.
+	 * @작성자 : jooni
+	 * @변경이력 : 2020. 10. 22. 최초작성
+	 * @Method 설명 : WifShipmentHdr update
+	 */
 	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Throwable.class)
 	public void updateWifShipmentHdr(Map<String, String> data)  {
 		boxRecomRepository.updateWifShipmentHdr(data);
 	}
 
+	/**
+	 * 
+	 * @Method Name : insertOrdShipmentDtlAll
+	 * @작성일 : 2020. 10. 22.
+	 * @작성자 : jooni
+	 * @변경이력 : 2020. 10. 22. 최초작성
+	 * @Method 설명 : OrdShipmentDtl all update
+	 */
 	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Throwable.class)
 	public void insertOrdShipmentDtlAll(Map<String, String> data) throws Exception {
 		boxRecomRepository.insertOrdShipmentDtlAll(data);
 	}
-	
+
+	/**
+	 * 
+	 * @Method Name : insertOrdShipmentDtl
+	 * @작성일 : 2020. 10. 22.
+	 * @작성자 : jooni
+	 * @변경이력 : 2020. 10. 22. 최초작성
+	 * @Method 설명 : OrdShipmentDtl insert
+	 */
 	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Throwable.class)
-	public void insertOrdShipmentDtl(OrdInfoVO tempOrd, int shipUidKey, int splitSeqNum) throws Exception {
+	public void insertOrdShipmentDtl(OrdInfoVO tempOrd, String shipUidKey, int splitSeqNum) throws Exception {
 
 		int f_shipUidItemSeq = 1;
 		String v_shipUidItemSeq = "";
@@ -207,18 +243,7 @@ public class BoxRecomServiceImpl implements BoxRecomService {
 			} else {
 				v_shipUidItemSeq = ""+f_shipUidItemSeq;
 			}
-			
-			log.info( "ordNo : " + tempOrd.getOrderNo() + ", "+
-			 "Sku : " + itOrdLine.getSkuCode() + ", "+
-			 "WarehouseKey : " + itOrdLine.getWarehouseKey() + ", "+
-			 "ordQty : " + itOrdLine.getOrdQty() + ", "+
-			 "splitSeq : " + itOrdLine.getSplitSeq() + ", "+
-			 "ordCBM : " + itOrdLine.getOrdLineCBM() + ", "+
-			 "shipOrderKey : " + itOrdLine.getShipOrderKey() + ", "+
-			 "shipUidKey : " + shipUidKey + ", "+
-	    	 "shipUidItemSeq : " + v_shipUidItemSeq + ", "+
-	    	 "owner : " + itOrdLine.getOwnerKey()  );
-			
+						
 			Map<String, String> dParam = new HashMap<String, String>();
 			dParam.put("shipOrderKey", tempOrd.getShipOrderKey());
 			dParam.put("shipUidKey", ""+shipUidKey);
@@ -226,13 +251,7 @@ public class BoxRecomServiceImpl implements BoxRecomService {
 			dParam.put("skuCode", itOrdLine.getSkuCode());
 			dParam.put("qtyQpsOrder", ""+itOrdLine.getOrdQty());
 
-			//##test
-			if("MF0000041067".equals(itOrdLine.getSkuCode())) {
-				dParam.put("owner", "ownerownerowner");
-			}
-			else {
-				dParam.put("owner", ""+itOrdLine.getOwnerKey());
-			}
+			dParam.put("owner", ""+itOrdLine.getOwnerKey());
 			
 			log.info( "----------dParam " + dParam + "------------------------ " );
 			boxRecomRepository.insertOrdShipmentDtl(dParam);
@@ -241,29 +260,72 @@ public class BoxRecomServiceImpl implements BoxRecomService {
 		}
 		
 	}
+
+	/**
+	 * 
+	 * @Method Name : selectOrdShipmentCount
+	 * @작성일 : 2020. 10. 22.
+	 * @작성자 : jooni
+	 * @변경이력 : 2020. 10. 22. 최초작성
+	 * @Method 설명 : OrdShipmentCount select
+	 */
 	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Throwable.class)
 	public int selectOrdShipmentCount(Map<String, String> data){
 		int count = boxRecomRepository.selectOrdShipmentCount(data);
 		return count;
 	}
-	
+
+	/**
+	 * 
+	 * @Method Name : selectDate
+	 * @작성일 : 2020. 10. 22.
+	 * @작성자 : jooni
+	 * @변경이력 : 2020. 10. 22. 최초작성
+	 * @Method 설명 : Date select
+	 */
 	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Throwable.class)
 	public String selectDate() {
 		String resDate = ""; 
 		resDate = boxRecomRepository.selectDate();
     	return resDate;
 	}	
-	
+
+	/**
+	 * 
+	 * @Method Name : selectBoxTypeMaxList
+	 * @작성일 : 2020. 10. 22.
+	 * @작성자 : jooni
+	 * @변경이력 : 2020. 10. 22. 최초작성
+	 * @Method 설명 : BoxTypeMaxList select
+	 */
 	@Transactional(propagation=Propagation.REQUIRED)
 	public List<BoxTypeVO> selectBoxTypeMaxList() {
 		List<BoxTypeVO> resultData = boxRecomRepository.selectBoxTypeMaxList();
 		return resultData;
 	}
+
+	/**
+	 * 
+	 * @Method Name : selectOrdInfoSearchCount
+	 * @작성일 : 2020. 10. 22.
+	 * @작성자 : jooni
+	 * @변경이력 : 2020. 10. 22. 최초작성
+	 * @Method 설명 : OrdInfoSearchCount select
+	 */
 	@Transactional(propagation=Propagation.REQUIRED)
 	public int selectOrdInfoSearchCount() {
 		int resultData = boxRecomRepository.selectOrdInfoSearchCount();
 		return resultData;
 	}
+
+	/**
+	 * 
+	 * @Method Name : selectOrdInfoSearchList
+	 * @작성일 : 2020. 10. 22.
+	 * @작성자 : jooni
+	 * @변경이력 : 2020. 10. 22. 최초작성
+	 * @Method 설명 : OrdInfoSearchList select
+	 */
 	@Transactional(propagation=Propagation.REQUIRED)
 	public List<OrdInfoVO> selectOrdInfoSearchList(SearchVO svo) {
 		List<OrdInfoVO> resultData = boxRecomRepository.selectOrdInfoSearchList(svo);

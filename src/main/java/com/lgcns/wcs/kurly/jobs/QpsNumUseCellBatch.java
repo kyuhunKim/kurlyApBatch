@@ -19,6 +19,7 @@ import com.lgcns.wcs.kurly.producer.KurlyWcsToWmsProducer;
 import com.lgcns.wcs.kurly.service.LogApiStatusService;
 import com.lgcns.wcs.kurly.service.LogBatchExecService;
 import com.lgcns.wcs.kurly.service.QpsNumUseCellService;
+import com.lgcns.wcs.kurly.util.StringUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
  * @작성일 : 2020. 08. 25.
  * @작성자 : jooni
  * @변경이력 : 2020. 08. 25. 최초작성
+ * 			2020. 11. 12. RunTime 로직 수정
  * @Method 설명 : QPS 호기별 가용셀 정보
  */
 @Slf4j
@@ -49,7 +51,11 @@ public class QpsNumUseCellBatch  {
     public void QpsNumUseCellTask()  {
     	log.info("=================QpsNumUseCellBatch start===============");
     	log.info("The current date  : " + LocalDateTime.now());
-    	long start = System.currentTimeMillis();
+    	long apiRunTimeStart = 0;
+		long apiRunTimeEnd   = 0;
+		String apiRunTime    = "";
+		
+		apiRunTimeStart = System.currentTimeMillis();
     	
 		String result = "sucess";
 		String resultMessage = "";
@@ -59,12 +65,13 @@ public class QpsNumUseCellBatch  {
     		List<QpsNumUseCellData> qpsNumUseCellList = qpsNumUseCellService.selectQpsNumUseCellList();
 
 	    	//조회 건수 
-	    	executeCount = qpsNumUseCellList.size();
+//	    	executeCount = qpsNumUseCellList.size();
 	    	
         	log.info("qpsNumUseCellList size ==> "+ qpsNumUseCellList.size());
         	
         	for(QpsNumUseCellData qpsNumUseCellData : qpsNumUseCellList ) {
-        		long startFor = System.currentTimeMillis();
+        		//건당 시간 체크용
+	    		long apiRunTimeStartFor = System.currentTimeMillis();
 
     			String r_ifYn = KurlyConstants.STATUS_N;
     			DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
@@ -91,12 +98,12 @@ public class QpsNumUseCellBatch  {
 	    			log.info("== send error == " + qpsNumUseCellData.getWarehouseKey());  
 	    			retMessage = ex.getMessage().substring(0, 90);
 	    			ex.printStackTrace();
-//	    			throw new Exception("", e);
+    				r_ifYn = KurlyConstants.STATUS_N;
 	    		} finally {
 	    			log.info("====finally createLogApiStatus===============");
 
-					long endFor = System.currentTimeMillis(); 
-					long diffTimeFor = ( endFor - startFor ); //ms
+	    			apiRunTimeEnd = System.currentTimeMillis();
+	    			apiRunTime = StringUtil.formatInterval(apiRunTimeStartFor, apiRunTimeEnd) ;
 
 					//로그 정보 insert
 			    	LogApiStatus logApiStatus = new LogApiStatus();
@@ -130,19 +137,20 @@ public class QpsNumUseCellBatch  {
 			    	
 			    	logApiStatus.setApiUrl(KurlyConstants.METHOD_QPSNUMUSECELL);
 			    	logApiStatus.setApiInfo(qpsNumUseCellData.toString());
-			    	logApiStatus.setApiRuntime(diffTimeFor+"");
+			    	logApiStatus.setApiRuntime(apiRunTime);
 			    	
 			    	logApiStatus.setIntfYn(r_ifYn) ; //'Y': 전송완료, 'N': 미전송
 			    	if(KurlyConstants.STATUS_N.equals(r_ifYn)) {
 			    		logApiStatus.setIntfMemo(retMessage);
 			    	} else {
-			    		logApiStatus.setIntfMemo("");
+			    		logApiStatus.setIntfMemo(KurlyConstants.STATUS_OK);
 			    	}
 			    	
 			    	logApiStatusService.createLogApiStatus(logApiStatus);
 	    			log.info("====finally createLogApiStatus===============");
 			    	
 	    		}
+	    		executeCount++;
         	}	
         	
     	} catch (Exception e) {
@@ -152,18 +160,18 @@ public class QpsNumUseCellBatch  {
 //			throw new Exception(e);
     	} finally {
 
-        	long end = System.currentTimeMillis();
-        	long diffTime = ( end - start );  //m
+    		apiRunTimeEnd = System.currentTimeMillis();
+			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
 
-        	log.info("================= diffTime(ms) : "+ diffTime);
+			log.info("================= apiRunTime(ms) : "+ apiRunTime);
 
 	    	//배치 로그 정보 insert
         	LogBatchExec logBatchExec = new LogBatchExec();
 	    	
-        	logBatchExec.setExecMethod(KurlyConstants.METHOD_TOTESCAN);
+        	logBatchExec.setExecMethod(KurlyConstants.METHOD_QPSNUMUSECELL);
         	if("sucess".equals(result)) {
             	logBatchExec.setSuccessYn(KurlyConstants.STATUS_Y);
-            	logBatchExec.setMessageLog("");	
+            	logBatchExec.setMessageLog(KurlyConstants.METHOD_QPSNUMUSECELL +" Sucess("+apiRunTime+"ms)");	
         	} else {
             	logBatchExec.setSuccessYn(KurlyConstants.STATUS_N);
             	logBatchExec.setMessageLog(resultMessage);

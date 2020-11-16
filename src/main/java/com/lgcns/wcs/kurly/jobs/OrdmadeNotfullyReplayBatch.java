@@ -21,6 +21,7 @@ import com.lgcns.wcs.kurly.producer.KurlyWcsToWmsProducer;
 import com.lgcns.wcs.kurly.service.LogApiStatusService;
 import com.lgcns.wcs.kurly.service.LogBatchExecService;
 import com.lgcns.wcs.kurly.service.OrdmadeNotfullyReplayService;
+import com.lgcns.wcs.kurly.util.StringUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
  * @작성일 : 2020. 07. 16.
  * @작성자 : jooni
  * @변경이력 : 2020. 07. 16. 최초작성
+ * 			2020. 11. 12. RunTime 로직 수정
  * @Method 설명 : WCS 미출오더 상품보충용 추가피킹정보 연계  (WCS => WMS)
  */
 @Slf4j
@@ -51,7 +53,11 @@ public class OrdmadeNotfullyReplayBatch {
     public void OrdmadeNotfullyReplayTask() {
     	log.info("=================OrdmadeNotfullyReplayBatch start===============");
     	log.info("The current date  : " + LocalDateTime.now());
-    	long start = System.currentTimeMillis();
+    	long apiRunTimeStart = 0;
+		long apiRunTimeEnd   = 0;
+		String apiRunTime    = "";
+		
+		apiRunTimeStart = System.currentTimeMillis();
     	
 		String result = "sucess";
 		String resultMessage = "";
@@ -63,11 +69,12 @@ public class OrdmadeNotfullyReplayBatch {
     		List<OrdmadeNotfullyReplayData> listOrdmadeNotfullyReplay = ordmadeNotfullyReplayService.selectOrdmadeNotfullyReplay();
 
 	    	//조회 건수 
-	    	executeCount = listOrdmadeNotfullyReplay.size();
+//	    	executeCount = listOrdmadeNotfullyReplay.size();
 	    	log.info("listOrdmadeNotfullyReplay size ==> "+ listOrdmadeNotfullyReplay.size());
 	    	
 	    	for(OrdmadeNotfullyReplayData ordmadeNotfullyReplayData : listOrdmadeNotfullyReplay ) {
-	    		long startFor = System.currentTimeMillis();
+	    		//건당 시간 체크용
+	    		long apiRunTimeStartFor = System.currentTimeMillis();
 
     			String r_ifYn = KurlyConstants.STATUS_N;
     			DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
@@ -122,12 +129,12 @@ public class OrdmadeNotfullyReplayBatch {
 	    		} catch (Exception ex) {	
 	    			log.info("== send error == " + ordmadeNotfullyReplayData.getInvoiceNo());  
 	    			retMessage = ex.getMessage().substring(0, 90);
-//	    			throw new Exception("", e);
+    				r_ifYn = KurlyConstants.STATUS_N;
 	    		} finally {
 	    			log.info("====finally createLogApiStatus===============1");
 
-					long endFor = System.currentTimeMillis(); 
-					long diffTimeFor = ( endFor - startFor ); //ms
+	    			apiRunTimeEnd = System.currentTimeMillis();
+	    			apiRunTime = StringUtil.formatInterval(apiRunTimeStartFor, apiRunTimeEnd) ;
 
 					//전송로그 정보 insert
 			    	LogApiStatus logApiStatus = new LogApiStatus();
@@ -161,13 +168,13 @@ public class OrdmadeNotfullyReplayBatch {
 
 			    	logApiStatus.setApiUrl(KurlyConstants.METHOD_ORDMADENOTFULLYREPLAY);
 			    	logApiStatus.setApiInfo(ordmadeNotfullyReplayData.toString());
-			    	logApiStatus.setApiRuntime(diffTimeFor+"");
+			    	logApiStatus.setApiRuntime(apiRunTime);
 
 			    	logApiStatus.setIntfYn(r_ifYn) ; //'Y': 전송완료, 'N': 미전송
 			    	if(KurlyConstants.STATUS_N.equals(r_ifYn)) {
 			    		logApiStatus.setIntfMemo(retMessage);
 			    	} else {
-			    		logApiStatus.setIntfMemo("");
+			    		logApiStatus.setIntfMemo(KurlyConstants.STATUS_OK);
 			    	}
 			    	
 			    	//로그정보 적재
@@ -175,6 +182,7 @@ public class OrdmadeNotfullyReplayBatch {
 	    			log.info("====finally createLogApiStatus===============2");
 			    	
 	    		}
+	    		executeCount++;
 	    	}
     	} catch (Exception e) {
     		result = "error";
@@ -182,10 +190,10 @@ public class OrdmadeNotfullyReplayBatch {
 			resultMessage = e.toString();
     	} finally {
 
-        	long end = System.currentTimeMillis();
-        	long diffTime = ( end - start );  //m
+			apiRunTimeEnd = System.currentTimeMillis();
+			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
 
-        	log.info("================= diffTime(ms) : "+ diffTime);
+        	log.info("================= apiRunTime(ms) : "+ apiRunTime);
         	
 	    	//배치 로그 정보 insert
         	LogBatchExec logBatchExec = new LogBatchExec();
@@ -193,7 +201,7 @@ public class OrdmadeNotfullyReplayBatch {
         	logBatchExec.setExecMethod(KurlyConstants.METHOD_ORDMADENOTFULLYREPLAY);
         	if("sucess".equals(result)) {
             	logBatchExec.setSuccessYn(KurlyConstants.STATUS_Y);
-            	logBatchExec.setMessageLog("");	
+            	logBatchExec.setMessageLog(KurlyConstants.METHOD_ORDMADENOTFULLYREPLAY +" Sucess("+apiRunTime+"ms)");	
         	} else {
             	logBatchExec.setSuccessYn(KurlyConstants.STATUS_N);
             	logBatchExec.setMessageLog(resultMessage);

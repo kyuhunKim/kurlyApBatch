@@ -32,11 +32,17 @@ public class OrdSplitApp {
 	
 	private boolean cellCheckBySku(OrdLineVO ordLine, CellTypeVO cellType)
 	{
+		//CBM으로만 측정.
+		if(ordLine.getSkuCBM() <= cellType.getCellCBM())
+			return true;
+		return false;
+				
+		/* 크기 측정 무시.
 		if(ordLine.getFirst() <= cellType.getFirst()
 		   && ordLine.getSecond() <= cellType.getSecond()
 		   && ordLine.getThird() <= cellType.getThird())
 			return true;
-		return false;
+		return false; */
 	}
 	
 	
@@ -45,6 +51,13 @@ public class OrdSplitApp {
 		if(a<b)
 			return a;
 		return b;
+	}
+	
+	private double max(double a, double b)
+	{
+		if(a<b)
+			return b;
+		return a;
 	}
 	
 	public int runOrdSplit()
@@ -57,38 +70,43 @@ public class OrdSplitApp {
 		List<CellTypeVO> cellList = cellTypeList.getCellList();
 		List<OrdLineVO> ordList = ordInfoList.getOrdList();
 
-		double minCellCBM = 99999999;
+		double minCellCBM = Double.MAX_VALUE;
+		double maxCellCBM = Double.MIN_VALUE;
+		
 		for(CellTypeVO itCellType : cellList)
 		{
+			//WarehouseKey 같을 경우만 실행
+			if(!itCellType.getWarehouseKey().equals(ordInfoList.getWarehouseKey())) {
+				continue;
+			}
+			maxCellCBM = max(maxCellCBM, itCellType.getCellCBM());
+			
 			boolean check = true;
 			for(OrdLineVO itOrdLine : ordList)
 			{
-
-				//WarehouseKey 같을 경우만 실행
-				if(!itCellType.getWarehouseKey().equals(itOrdLine.getWarehouseKey())) {
-					continue;
-				}
-
-				if(cellCheckBySku(itOrdLine, itCellType) != true)
+				if(!cellCheckBySku(itOrdLine, itCellType))
 				{
 					check = false;
 					break;
 				}
 			}
-
 			if(check)
 			{
-				minCellCBM = min(minCellCBM, itCellType.getCellCbm());
+				minCellCBM = min(minCellCBM, itCellType.getCellCBM());
 			}
 
 		} // 여기까지. ableCellList에 가능 셀만 꽂힘.
 		
-		if(minCellCBM == 99999999)
+		if(minCellCBM == Double.MAX_VALUE)
 		{
+			minCellCBM = maxCellCBM;
+			
+			/*이형 상품 체크 없음.
 			//이형 sku 가 들어옴
 			//Exception 처리 요망.
-			log.info("OrdSplitApp : 실패");
+			System.out.println("실패");
 			return -1;		
+			*/
 		}
 
 		//오더라인 분해.
@@ -102,15 +120,18 @@ public class OrdSplitApp {
 				int tempTotalOrdQty = itOrdLine.getOrdQty();
 				int tempMaxOrderQty = (int)(minCellCBM * cellFillRate / itOrdLine.getSkuCBM()); // (셀 크기/sku 크기)를 버림한값 = 최대 들어가는 양
 				
+				if(tempMaxOrderQty == 0)
+					return -1;  // 오더 분할 할 수 없음. (ex, Sku CBM이 셀보다 더 큼.)
+				
 				itOrdLine.setOrdQty(tempMaxOrderQty); //수량 변경
 				
 				//새로운 오더라인 생성 및 추가
 				tempTotalOrdQty = tempTotalOrdQty - tempMaxOrderQty;
-//				ordInfoList.addOrdLine(itOrdLine.getSkuCode(), tempTotalOrdQty);
-//				ordInfoList.addOrdLine(itOrdLine.getSkuCode(), tempTotalOrdQty,
-//						itOrdLine.getShipOrderKey(), itOrdLine.getWarehouseKey(),
-//						itOrdLine.getOwnerKey(), itOrdLine.getOrderNo(),
-//						itOrdLine.getShipOrderItemSeq());
+//						ordInfoList.addOrdLine(itOrdLine.getSkuCode(), tempTotalOrdQty);
+//						ordInfoList.addOrdLine(itOrdLine.getSkuCode(), tempTotalOrdQty,
+//								itOrdLine.getShipOrderKey(), itOrdLine.getWarehouseKey(),
+//								itOrdLine.getOwnerKey(), itOrdLine.getOrderNo(),
+//								itOrdLine.getShipOrderItemSeq());
 				ordInfoList.addOrdLine(itOrdLine.getSkuCode(), tempTotalOrdQty,
 						itOrdLine.getShipOrderKey(), itOrdLine.getWarehouseKey(),
 						itOrdLine.getOwnerKey(), itOrdLine.getOrderNo(), itOrdLine.getShipOrderItemSeq(),

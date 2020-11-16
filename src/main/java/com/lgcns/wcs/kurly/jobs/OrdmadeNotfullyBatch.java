@@ -21,6 +21,7 @@ import com.lgcns.wcs.kurly.producer.KurlyWcsToWmsProducer;
 import com.lgcns.wcs.kurly.service.LogApiStatusService;
 import com.lgcns.wcs.kurly.service.LogBatchExecService;
 import com.lgcns.wcs.kurly.service.OrdmadeNotfullyService;
+import com.lgcns.wcs.kurly.util.StringUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
  * @작성일 : 2020. 07. 21.
  * @작성자 : jooni
  * @변경이력 : 2020. 07. 21. 최초작성
+ * 			2020. 11. 12. RunTime 로직 수정
  * @Method 설명 : WCS 미출오더 처리시 WMS 피킹지시 금지 정보 연계  (WCS => WMS)
  */
 @Slf4j
@@ -51,7 +53,11 @@ public class OrdmadeNotfullyBatch  {
     public void OrdmadeNotfullyTask() {
     	log.info("=================OrdmadeNotfullyBatch start===============");
     	log.info("The current date  : " + LocalDateTime.now());
-    	long start = System.currentTimeMillis();
+    	long apiRunTimeStart = 0;
+		long apiRunTimeEnd   = 0;
+		String apiRunTime    = "";
+		
+		apiRunTimeStart = System.currentTimeMillis();
     	
 		String result = "sucess";
 		String resultMessage = "";
@@ -63,12 +69,13 @@ public class OrdmadeNotfullyBatch  {
     		List<OrdmadeNotfullyData> listOrdmadeNotfully = ordmadeNotfullyService.selectOrdmadeNotfully();
 
 	    	//조회 건수 
-	    	executeCount = listOrdmadeNotfully.size();
+//	    	executeCount = listOrdmadeNotfully.size();
 	    	log.info("listOrdmadeNotfully size ==> "+ listOrdmadeNotfully.size());
 	    	
 	    	for(OrdmadeNotfullyData ordmadeNotfullyData : listOrdmadeNotfully ) {
 
-				long startFor = System.currentTimeMillis();
+	    		//건당 시간 체크용
+	    		long apiRunTimeStartFor = System.currentTimeMillis();
 
     			String r_ifYn = KurlyConstants.STATUS_N;
     			DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
@@ -121,13 +128,13 @@ public class OrdmadeNotfullyBatch  {
 	    		} catch (Exception ex) {	
 	    			log.info("== send error == " + ordmadeNotfullyData.getInvoiceNo());  
 	    			retMessage = ex.getMessage().substring(0, 90);
-//	    			throw new Exception("", e);
+    				r_ifYn = KurlyConstants.STATUS_N;
 	    		} finally {
 	    			log.info("====finally createLogApiStatus===============1");
 
-					long endFor = System.currentTimeMillis(); 
-					long diffTimeFor = ( endFor - startFor ); //ms
-
+	    			apiRunTimeEnd = System.currentTimeMillis();
+	    			apiRunTime = StringUtil.formatInterval(apiRunTimeStartFor, apiRunTimeEnd) ;
+	    			
 					//전송로그 정보 insert
 			    	LogApiStatus logApiStatus = new LogApiStatus();
 
@@ -160,13 +167,13 @@ public class OrdmadeNotfullyBatch  {
 
 			    	logApiStatus.setApiUrl(KurlyConstants.METHOD_ORDMADENOTFULLY);
 			    	logApiStatus.setApiInfo(ordmadeNotfullyData.toString());
-			    	logApiStatus.setApiRuntime(diffTimeFor+"");
+			    	logApiStatus.setApiRuntime(apiRunTime);
 
 			    	logApiStatus.setIntfYn(r_ifYn) ; //'Y': 전송완료, 'N': 미전송
 			    	if(KurlyConstants.STATUS_N.equals(r_ifYn)) {
 			    		logApiStatus.setIntfMemo(retMessage);
 			    	} else {
-			    		logApiStatus.setIntfMemo("");
+			    		logApiStatus.setIntfMemo(KurlyConstants.STATUS_OK);
 			    	}
 			    	
 			    	//로그정보 적재
@@ -174,7 +181,7 @@ public class OrdmadeNotfullyBatch  {
 	    			log.info("====finally createLogApiStatus===============2");
 			    	
 	    		}
-
+	    		executeCount++;
 	    	}
     	} catch (Exception e) {
     		result = "error";
@@ -182,10 +189,10 @@ public class OrdmadeNotfullyBatch  {
 			resultMessage = e.toString();
     	} finally {
 
-        	long end = System.currentTimeMillis();
-        	long diffTime = ( end - start );  //m
+			apiRunTimeEnd = System.currentTimeMillis();
+			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
 
-        	log.info("================= diffTime(ms) : "+ diffTime);
+        	log.info("================= apiRunTime(ms) : "+ apiRunTime);
         	
 	    	//배치 로그 정보 insert
         	LogBatchExec logBatchExec = new LogBatchExec();
@@ -193,7 +200,7 @@ public class OrdmadeNotfullyBatch  {
         	logBatchExec.setExecMethod(KurlyConstants.METHOD_ORDMADENOTFULLY);
         	if("sucess".equals(result)) {
             	logBatchExec.setSuccessYn(KurlyConstants.STATUS_Y);
-            	logBatchExec.setMessageLog("");	
+            	logBatchExec.setMessageLog(KurlyConstants.METHOD_ORDMADENOTFULLY +" Sucess("+apiRunTime+"ms)");	
         	} else {
             	logBatchExec.setSuccessYn(KurlyConstants.STATUS_N);
             	logBatchExec.setMessageLog(resultMessage);

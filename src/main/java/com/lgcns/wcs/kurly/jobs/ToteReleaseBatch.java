@@ -33,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
  * @작성일 : 2020. 07. 14.
  * @작성자 : jooni
  * @변경이력 : 2020. 07. 14. 최초작성
+ * 			2020. 11. 12. RunTime 로직 수정
  * @Method 설명 : 토트 마스트 초기화 연계  (WCS => WMS)
  */
 @Slf4j
@@ -60,23 +61,26 @@ public class ToteReleaseBatch  {
 		String result = "sucess";
 		String resultMessage = "";
 		int executeCount = 0;
+		Date startDate = Calendar.getInstance().getTime();
+		
 		long apiRunTimeStart = 0;
 		long apiRunTimeEnd   = 0;
 		String apiRunTime    = "";
-    	Date startDate = Calendar.getInstance().getTime();
 		
-    	apiRunTimeStart = System.currentTimeMillis();
+		apiRunTimeStart = System.currentTimeMillis();
+		
     	try {
         	
 	    	List<ToteReleaseParamData> listToteRelease = toteReleaseService.selectToteRelease();
 	    	
 	    	//조회 건수 
-	    	executeCount = listToteRelease.size();
+//	    	executeCount = listToteRelease.size();
 	    	
 	    	log.info("toteRelease size ==> "+ listToteRelease.size());
 	    	for(ToteReleaseParamData toteReleaseData : listToteRelease ) {
 
-				long startFor = System.currentTimeMillis();
+	    		//건당 시간 체크용
+	    		long apiRunTimeStartFor = System.currentTimeMillis();
 
     			String r_ifYn = KurlyConstants.STATUS_N;
     			DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
@@ -119,9 +123,6 @@ public class ToteReleaseBatch  {
 //					updateMap.put("toteId",r_toteId);
 					updateMap.put("toteUniqueNo",""+r_toteUniqueNo);
 
-//			    	if("22".equals(r_toteId)) {
-//			    		updateMap.put("modifiedUser","batchbatchbatcchbchbchbchbchbatchbatch");
-//			    	}
 			    	log.info("=================updateToteRelease===============1");
 					toteReleaseService.updateToteRelease(updateMap);
 
@@ -130,7 +131,7 @@ public class ToteReleaseBatch  {
 	    		} catch (Exception ex) {	
 	    			log.info("== send error == " + toteReleaseData.getToteId());  
 	    			retMessage = ex.getMessage().substring(0, 90);
-//	    			throw new Exception("", e);
+    				r_ifYn = KurlyConstants.STATUS_N;
 	    		} finally {
 	    			log.info("====finally createLogApiStatus===============1");
 
@@ -182,8 +183,8 @@ public class ToteReleaseBatch  {
 			    		logApiStatus.setIntfMemo("");
 			    	}
 
-					apiRunTimeEnd = System.currentTimeMillis();
-					apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
+			    	apiRunTimeEnd = System.currentTimeMillis();
+	    			apiRunTime = StringUtil.formatInterval(apiRunTimeStartFor, apiRunTimeEnd) ;
 			    	logApiStatus.setApiRuntime(apiRunTime);
 			    	
 			    	//로그정보 적재
@@ -191,6 +192,7 @@ public class ToteReleaseBatch  {
 	    			log.info("====finally createLogApiStatus===============2");
 			    	
 	    		}
+	    		executeCount++;
 	    	}
     	
     	} catch (Exception e) {
@@ -203,18 +205,18 @@ public class ToteReleaseBatch  {
 			apiRunTimeEnd = System.currentTimeMillis();
 			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
 			
-        	log.info("================= diffTime(ms) : "+ apiRunTime);
+        	log.info("================= apiRunTime(ms) : "+ apiRunTime);
 
 	    	//배치 로그 정보 insert
         	LogBatchExec logBatchExec = new LogBatchExec();
 	    	
         	logBatchExec.setExecMethod(KurlyConstants.METHOD_TOTERELEASE);
         	if("sucess".equals(result)) {
-            	logBatchExec.setMessageLog("");	
             	logBatchExec.setSuccessYn(KurlyConstants.STATUS_Y);
+            	logBatchExec.setMessageLog(KurlyConstants.METHOD_TOTERELEASE +" Sucess("+apiRunTime+"ms)");
         	} else {
-            	logBatchExec.setMessageLog(resultMessage);
             	logBatchExec.setSuccessYn(KurlyConstants.STATUS_N);
+            	logBatchExec.setMessageLog(resultMessage);
         	}
         	logBatchExec.setExecuteDirectYn(KurlyConstants.STATUS_N);
         	logBatchExec.setExecuteCount(executeCount);

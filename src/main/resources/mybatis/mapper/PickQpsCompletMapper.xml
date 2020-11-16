@@ -8,6 +8,7 @@
   <select id="selectPickQpsComplet" resultType="com.lgcns.wcs.kurly.dto.PickQpsCompletData">
   	/* [PickQpsCompletMapper.xml] selectPickQpsComplet */
     SELECT  DISTINCT
+    	OH.INVOICE_UID_KEY     AS invoiceUidKey,
     	OH.SHIP_ORDER_KEY      AS shipOrderKey,
 		OH.INVOICE_NO          AS invoiceNo,
 		OH.WAREHOUSE_KEY       AS warehouseKey,
@@ -17,15 +18,19 @@
 		OH.ORDMADE_SPLIT_YN    AS ordmadeSplitYn,
 		OH.PACK_BOX_SPLIT_YN   AS packBoxSplitYn,
 		OH.PACK_BOX_TYPE_RECOM AS packBoxTypeRecom,
-		OH.SHIP_ORDER_LAST_YN  AS shipOrderLastYn,
+		(CASE WHEN OH.ALLOC_TYPE = 'S' THEN 'Y' 
+			  ELSE QH.SHIP_ORDER_LAST_YN END)  AS shipOrderLastYn,
     	TO_CHAR(SYSDATE, 'YYYYMMDD') AS insertedDate,
 		TO_CHAR(SYSDATE, 'HH24MISS') AS insertedTime,
 		OH.MODIFIED_USER AS insertedUser
-	FROM o_wcs.TB_QPS_ORDER_HDR OH,
-		 o_wcs.TB_QPS_ORDER_DTL OD
-	WHERE OH.INVOICE_NO = OD.INVOICE_NO
-	  AND OH.PICK_QPS_CMPT_YN = 'Y'
-	  AND OH.PICK_CMPT_INTF_YN = 'N'
+	FROM o_wcs.TB_DOC_INVOICE_HDR OH
+     	LEFT OUTER JOIN o_wcs.TB_QPS_ORDER_HDR QH 
+          	ON OH.INVOICE_UID_KEY = QH.INVOICE_UID_KEY,
+		 o_wcs.TB_DOC_INVOICE_DTL OD
+	WHERE OH.INVOICE_UID_KEY  = OD.INVOICE_UID_KEY 
+	  AND OH.PICK_QPS_CMPT_YN = 'Y'  
+	  AND OH.PICK_CMPT_INTF_YN = 'N' 
+	  AND OH.INVOICE_PRINT_SYSTEM = 'WCS'
 	ORDER BY OH.SHIP_ORDER_KEY ASC, OH.INVOICE_NO ASC
   </select>
   
@@ -41,18 +46,20 @@
 		OD.SKU_NAME           AS skuName,
 		OD.SKU_SUB_NAME       AS skuSubName,
 		OD.QTY_QPS_PICKED     AS qtyQpsPicked,
-		SUBSTR(OD.SKU_CELL_CMPT_YMD,1,8) AS qpsPickingDate,
-		SUBSTR(OD.SKU_CELL_CMPT_YMD,9,6) AS qpsPickingTime,
-		OD.QPS_WORKER_NAME    AS qpsWorkerName
-	FROM o_wcs.TB_QPS_ORDER_DTL OD
-	WHERE OD.INVOICE_NO = #{invoiceNo}
-	  AND OD.SHIP_ORDER_KEY = #{shipOrderKey}
+		NVL(SUBSTR(QD.SKU_CELL_CMPT_YMD,1,8),TO_CHAR(SYSDATE, 'YYYYMMDD')) AS qpsPickingDate,
+		NVL(SUBSTR(QD.SKU_CELL_CMPT_YMD,9,6),TO_CHAR(SYSDATE, 'HH24MISS')) AS qpsPickingTime,
+		QD.QPS_WORKER_NAME    AS qpsWorkerName
+	FROM o_wcs.TB_DOC_INVOICE_DTL OD
+       LEFT OUTER JOIn o_wcs.TB_QPS_ORDER_DTL QD 
+          ON ( OD.INVOICE_UID_KEY = QD.INVOICE_UID_KEY
+          		AND OD.INVOICE_SEQ = QD.INVOICE_SEQ )
+	WHERE OD.INVOICE_UID_KEY = #{invoiceUidKey}
 	ORDER BY OD.SHIP_ORDER_KEY ASC, OD.SHIP_ORDER_ITEM_SEQ ASC
   </select>
   
   <update id="updatePickQpsComplet" parameterType="Map">
   /* [PickQpsCompletMapper.xml] updatePickQpsComplet */
-  	UPDATE o_wcs.TB_QPS_ORDER_HDR
+  	UPDATE o_wcs.TB_DOC_INVOICE_HDR
 		SET
 			PICK_CMPT_INTF_YN =  #{pickCmptIntfYn},
 			PICK_CMPT_INTF_DT =  SYSDATE,
@@ -61,7 +68,6 @@
 			MODIFIED_DATE = TO_CHAR(SYSDATE, 'YYYYMMDD') ,
 			MODIFIED_TIME = TO_CHAR(SYSDATE, 'HH24MISS') ,
 			MODIFIED_USER = #{modifiedUser}
-	WHERE INVOICE_NO = #{invoiceNo}
-	  AND SHIP_ORDER_KEY = #{shipOrderKey}
+	WHERE INVOICE_UID_KEY = #{invoiceUidKey}
   </update>
 </mapper>
