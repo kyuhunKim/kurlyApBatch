@@ -28,7 +28,7 @@
 		FROM_SKU_CODE   AS fromSkuCode,
 		FROM_SKU_NAME   AS fromSkuName,
 		FROM_SKU_SUB_NAME AS fromSkuSubName,
-		PICK_BATCH_JOB AS pickBatchGroup,
+		PICKING_BATCH_NO AS pickBatchGroup,
 		TO_CHAR(SYSDATE, 'YYYYMMDD') AS insertedDate,
 		TO_CHAR(SYSDATE, 'HH24MISS') AS insertedTime,
 		MODIFIED_USER AS insertedUser
