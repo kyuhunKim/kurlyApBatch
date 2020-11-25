@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lgcns.wcs.kurly.repository.DasNumUseCellRepository">
+   
+  <select id="selectDasNumUseCellList" resultType="com.lgcns.wcs.kurly.dto.DasNumUseCellData">
+  	/* [DasNumUseCellMapper.xml] selectDasNumUseCellList */
+	<![CDATA[
+	SELECT 
+		UC.WAREHOUSE_KEY       AS  warehouseKey
+		, UC.CELL_TYPE_STATUS  AS  cellTypeStatus
+		, UC.CELL_DAS_GROUP_ID AS  dasCellGroupId
+		, UC.DAS_NUM_USE_CELL  AS  dasNumUseCell
+		, ''                   AS  dasNumAttr1
+		, ''                   AS  dasNumAttr2 
+		, TO_CHAR(SYSDATE,'YYYYMMDD') AS batchRunDate
+		, TO_CHAR(SYSDATE,'HH24MISS') AS batchRunTime         
+	FROM o_wcs.TB_DAS_GROUPID_USE_CELL UC
+	WHERE 1 = 1 
+		AND UC.USE_CELL_INTF_YN = 'N'
+		AND UC.CREATED_DATE     >= TO_CHAR(SYSDATE-3, 'YYYYMMDD')
+	]]>  
+  </select>
+  
+  <update id="updateDasNumUseCell" parameterType="Map">
+  /* [DasNumUseCellMapper.xml] updateDasNumUseCell */
+  	UPDATE o_wcs.TB_DAS_GROUPID_USE_CELL
+		SET 
+			USE_CELL_INTF_YN  = #{useCellIntfYn}
+			, USE_CELL_INTF_DT   = SYSDATE
+			, USE_CELL_INTF_CODE  = #{useCellIntfCode}
+			, USE_CELL_INTF_MEMO  = #{useCellIntfMemo}
+			, MODIFIED_DATE  = TO_CHAR(SYSDATE,'YYYYMMDD')
+			, MODIFIED_TIME  = TO_CHAR(SYSDATE,'HH24MISS')
+			, MODIFIED_USER  = 'WCS_BATCH'
+	WHERE WAREHOUSE_KEY        = #{warehouseKey}
+		AND CELL_DAS_GROUP_ID  = #{dasCellGroupId}
+		AND CELL_TYPE_STATUS   = #{cellTypeStatus}
+		AND USE_CELL_INTF_YN   = 'N'  
+  </update>
+  
+  <select id="selectDasNumUseCellCount" parameterType="Map" resultType="int">
+  	/* [DasNumUseCellMapper.xml] selectDasNumUseCellCount */
+	SELECT 
+		COUNT(*)
+	FROM o_wcs.TB_DAS_GROUPID_USE_CELL UC
+	WHERE UC.WAREHOUSE_KEY         = #{warehouseKey}
+		AND UC.CELL_DAS_GROUP_ID   = #{dasCellGroupId}
+		AND UC.CELL_TYPE_STATUS    = 'MAKE'
+		AND UC.USE_CELL_INTF_YN = 'Y' 
+  </select>
+  
+</mapper>

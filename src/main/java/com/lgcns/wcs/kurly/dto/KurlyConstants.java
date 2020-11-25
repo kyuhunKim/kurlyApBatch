@@ -69,8 +69,12 @@ public final class KurlyConstants {
      * */
     public static final String METHOD_REGIONMASTER = "RegionMaster";
     /**
-     * 전역정보
+     * QPS 호기별 가용셀 정보
      * */
     public static final String METHOD_QPSNUMUSECELL = "QpsNumUseCell";
-	
+
+    /**
+     * DAS 셀그룹번호(DAS출고시 활용)별 가용셀 정보
+     * */
+    public static final String METHOD_DASNUMUSECELL = "DasNumUseCell";
 }

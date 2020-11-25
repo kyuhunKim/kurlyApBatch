@@ -79,6 +79,8 @@ public class BoxRecomBatch  {
     	     * 2020.11.10 인터페이스 받은 모든 오더를 TB_ORD_SHIPMENT_HDR,,DTL 테이블에 생성
     	     * allocType : S, QDAS || memberGrade 가 0003 || MANUAL_PROC_YN : Y 인 경우 분할하지 않음
     	     * 오더분할 하지 않아도 박스추천 로직은 실행해서 추천된 박스가 없을 경우 온도대별 maxBox 값으로 설정
+    	     * 2020.11.19 invoiceNo 뒤에 '-0001' 추가 오더분할이 됐을경우 분할된 순번으로 추가함
+    	     *  invoiceNo 를 originInvoiceNo에 값이 없을 경우 invoiceNo값을 넣어줌
     	     * */
     		
     		//박스정보 조회
@@ -147,6 +149,7 @@ public class BoxRecomBatch  {
 	    			ordVO.setWarehouseKey(itOrd.getWarehouseKey());
 	    			ordVO.setOwnerKey(itOrd.getOwnerKey());
 	    			ordVO.setBoxSplitCheckYn(itOrd.getBoxSplitCheckYn());
+	    			ordVO.setInvoiceNo(itOrd.getInvoiceNo());
 	
 	    			Map<String, String> param = new HashMap<String, String>();
 	    			param.put("shipOrderKey", itOrd.getShipOrderKey());
@@ -196,6 +199,7 @@ public class BoxRecomBatch  {
 		    					tempOrd.setOrderNo(itOrd.getOrderNo());
 		    					tempOrd.setShipOrderKey(itOrd.getShipOrderKey());
 		    					tempOrd.setWarehouseKey(itOrd.getWarehouseKey());
+		    					tempOrd.setInvoiceNo(itOrd.getInvoiceNo());
 		    				}
 		    				
 		    				if(tempOrd == null) {
@@ -213,6 +217,10 @@ public class BoxRecomBatch  {
 	    	    			String shipUidKey = "";
 		    				String t_packBoxTypeRecom = tempOrd.getBoxType();
 		    				String t_packBoxSplitYn = KurlyConstants.STATUS_N;
+		    				//2020.11.19 invoiceNo 뒤에 4자리 순번 추가
+		    				String t_invoiceNo = itOrd.getInvoiceNo();
+		    				t_invoiceNo = t_invoiceNo + "-" + "0001";
+		    				
 		    				//추천박스가 없을 경우 제일큰 박스 추천
 		    				if("NoBox".equals(t_packBoxTypeRecom)) {
 		    					t_packBoxTypeRecom = boxMaster.getMaxBox(boxTypeMaxList, itOrd.getWarehouseKey());
@@ -222,6 +230,7 @@ public class BoxRecomBatch  {
 		    				param.put("shipOrderKey", itOrd.getShipOrderKey());
 		    				param.put("packBoxTypeRecom", t_packBoxTypeRecom);  //추천패킹박스타입
 		    				param.put("packBoxSplitYn", t_packBoxSplitYn);  
+		    				param.put("invoiceNo", t_invoiceNo); 
 		    				log.info( "----------param " + param + "------------------------ " );
 		    				
 		    				shipUidKey = boxRecomService.insertOrdShipmentHdr(param);
@@ -248,6 +257,10 @@ public class BoxRecomBatch  {
 	            				String shipUidKey = "";
 			    				String t_packBoxTypeRecom = "";
 			    				String t_packBoxSplitYn = KurlyConstants.STATUS_N;
+			    				//2020.11.19 invoiceNo 뒤에 4자리 순번 추가
+			    				String t_invoiceNo = itOrd.getInvoiceNo();
+			    				t_invoiceNo = t_invoiceNo + "-" + "0001";
+			    				
 			    				//추천박스가 없을 경우 제일큰 박스 추천
 			    				t_packBoxTypeRecom = boxMaster.getMaxBox(boxTypeMaxList, itOrd.getWarehouseKey());
 			    				
@@ -255,6 +268,7 @@ public class BoxRecomBatch  {
 			    				param.put("shipOrderKey", itOrd.getShipOrderKey());
 			    				param.put("packBoxTypeRecom", t_packBoxTypeRecom);  //추천패킹박스타입
 			    				param.put("packBoxSplitYn", t_packBoxSplitYn);  
+			    				param.put("invoiceNo", t_invoiceNo); 
 			    				log.info( "----------param " + param + "------------------------ " );
 			    				
 			    				shipUidKey = boxRecomService.insertOrdShipmentHdr(param);
@@ -280,10 +294,13 @@ public class BoxRecomBatch  {
 	    	    				{
 	    	    					if(i + 1 == itOrderLine.getSplitSeq())
 	    	    					{
+	    	    						String itemSeq = StringUtil.lpad(""+i, 4, "0");
+	    	    						
 	    	    						tempOrd.addOrdLine(itOrderLine);
 	    	    						tempOrd.setOrderNo(itOrd.getOrderNo() + "_" + i);
 	    	    						tempOrd.setShipOrderKey(itOrd.getShipOrderKey());
 	    		    					tempOrd.setWarehouseKey(itOrd.getWarehouseKey());
+	    		    					tempOrd.setInvoiceNo(itOrd.getInvoiceNo() + "-" + itemSeq);
 	    	    					}
 	    	    				}
 	    	    				
@@ -299,6 +316,8 @@ public class BoxRecomBatch  {
 		    	    				String shipUidKey = "";
 		    	    				String t_packBoxTypeRecom = tempOrd.getBoxType();
 		    	    				String t_packBoxSplitYn = KurlyConstants.STATUS_Y;
+				    				//2020.11.19 invoiceNo 뒤에 4자리 순번 추가
+				    				String t_invoiceNo = tempOrd.getInvoiceNo();
 		    	    				
 		    	    				if("NoBox".equals(t_packBoxTypeRecom)) {
 		    	    					t_packBoxTypeRecom = boxMaster.getMaxBox(boxTypeMaxList, itOrd.getWarehouseKey());
@@ -314,6 +333,7 @@ public class BoxRecomBatch  {
 		    	    				param.put("shipOrderKey", itOrd.getShipOrderKey());
 		    	    				param.put("packBoxTypeRecom", t_packBoxTypeRecom);  //추천패킹박스타입
 		    	    				param.put("packBoxSplitYn", t_packBoxSplitYn);  
+				    				param.put("invoiceNo", t_invoiceNo); 
 		
 		    	    				log.info( "----------param " + param + "------------------------ " );
 		    	    				shipUidKey = boxRecomService.insertOrdShipmentHdr(param);

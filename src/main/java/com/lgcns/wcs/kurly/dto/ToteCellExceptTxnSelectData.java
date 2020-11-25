@@ -88,6 +88,9 @@ public class ToteCellExceptTxnSelectData {
 
 	private String shipUidKey;
 	private String shipUidItemSeq;
-	
+
+	private String shipOrderKey	;
+	private String shipOrderItemSeq	;
+	private String qpsNum	;
 
 }

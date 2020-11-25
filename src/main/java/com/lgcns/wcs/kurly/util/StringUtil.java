@@ -113,4 +113,25 @@ public final class StringUtil {
 
 		return strSource.substring(0, strIndex) + strPostfix;
 	}
+
+	/**
+	 * lpad 함수 : str의 왼쪽에 주어진 길이만큼 addStr로 채운다
+	 * 
+	 * @param str 대상문자열
+	 * @param len 길이
+	 * @param addStr 대체문자
+	 * @return 문자열
+	 */
+
+	public static String lpad(String str, int len, String addStr) {
+		String result = str;
+		int templen = len - result.length();
+
+		for (int i = 0; i < templen; i++) {
+			result = addStr + result;
+		}
+
+		return result;
+	}
+
 }

@@ -19,6 +19,7 @@ import com.lgcns.wcs.kurly.producer.KurlyWcsToWmsProducer;
 import com.lgcns.wcs.kurly.service.LogApiStatusService;
 import com.lgcns.wcs.kurly.service.LogBatchExecService;
 import com.lgcns.wcs.kurly.service.QpsNumUseCellService;
+import com.lgcns.wcs.kurly.util.DateUtil;
 import com.lgcns.wcs.kurly.util.StringUtil;
 
 import lombok.extern.slf4j.Slf4j;
@@ -108,12 +109,8 @@ public class QpsNumUseCellBatch  {
 					//로그 정보 insert
 			    	LogApiStatus logApiStatus = new LogApiStatus();
 
-			    	if(qpsNumUseCellData.getWarehouseKey() ==null ||
-							"".equals(qpsNumUseCellData.getWarehouseKey())) {
-						logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
-					}
-
-			    	logApiStatus.setApiYyyymmdd(qpsNumUseCellData.getBatchRunDate()); 
+			    	String sYyyymmdd = DateUtil.getToday("yyyyMMdd");
+				    logApiStatus.setApiYyyymmdd(sYyyymmdd);
 			    	logApiStatus.setExecMethod(KurlyConstants.METHOD_QPSNUMUSECELL);
 			    	
 			    	logApiStatus.setGroupNo("");  //그룹배치번호
@@ -134,9 +131,20 @@ public class QpsNumUseCellBatch  {
 			    	
 			    	logApiStatus.setSkuCode("");  //상품코드
 			    	logApiStatus.setWcsStatus("");  //WCS 작업상태
-			    	
+
+					if(qpsNumUseCellData != null) {
+				    	if(qpsNumUseCellData.getWarehouseKey() ==null ||
+								"".equals(qpsNumUseCellData.getWarehouseKey())) {
+							logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
+						} else {
+							logApiStatus.setWarehouseKey(qpsNumUseCellData.getWarehouseKey());
+						}
+				    	logApiStatus.setApiInfo(qpsNumUseCellData.toString());
+					} else {
+						logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
+				    	logApiStatus.setApiInfo("");
+					}
 			    	logApiStatus.setApiUrl(KurlyConstants.METHOD_QPSNUMUSECELL);
-			    	logApiStatus.setApiInfo(qpsNumUseCellData.toString());
 			    	logApiStatus.setApiRuntime(apiRunTime);
 			    	
 			    	logApiStatus.setIntfYn(r_ifYn) ; //'Y': 전송완료, 'N': 미전송
@@ -155,7 +163,7 @@ public class QpsNumUseCellBatch  {
         	
     	} catch (Exception e) {
     		result = "error";
-			log.error( " === ToteScanBatch  error" +e );
+			log.error( " === QpsNumUseCellBatch  error" +e );
 			resultMessage = e.toString();
 //			throw new Exception(e);
     	} finally {
@@ -184,7 +192,7 @@ public class QpsNumUseCellBatch  {
         	log.info("=================createLogBatchExec end=============== ");    		
     	}
     	
-    	log.info("=================ToteScanBatch end===============");
+    	log.info("=================QpsNumUseCellBatch end===============");
     	
     }
 

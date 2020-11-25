@@ -19,6 +19,7 @@ spring:
           invoicePrintComplet:  MSG-WCS_AP_INVOICE_PRINT_COMP
           invoiceSortComplet:  MSG-WCS_AP_SHIP_SORT_COMP
           qpsNumUseCell:  MSG-WCS_AP_QPS_NUM_USECELL
+          dasNumUseCell:  MSG-WCS_AP_DAS_NUM_USECELL
   
   datasource:
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy

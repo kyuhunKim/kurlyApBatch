@@ -102,7 +102,8 @@
 		HD.WAREHOUSE_KEY  AS warehouseKey,
 		HD.OWNER_KEY  AS ownerKey,
 		HD.ORDER_NO  AS orderNo,
-		HD.BOX_SPLIT_CHECK_YN  AS boxSplitCheckYn
+		HD.BOX_SPLIT_CHECK_YN  AS boxSplitCheckYn,
+					HD.INVOICE_NO  AS invoiceNo
 	FROM o_wcs.TB_WIF_SHIPMENT_HDR HD,
 		 o_wcs.TB_WIF_SHIPMENT_DTL DT 
 	WHERE HD.SHIP_ORDER_KEY = DT.SHIP_ORDER_KEY 
@@ -139,7 +140,8 @@
 					HD.WAREHOUSE_KEY  AS warehouseKey,
 					HD.OWNER_KEY  AS ownerKey,
 					HD.ORDER_NO  AS orderNo,
-					HD.BOX_SPLIT_CHECK_YN  AS boxSplitCheckYn
+					HD.BOX_SPLIT_CHECK_YN  AS boxSplitCheckYn,
+					HD.INVOICE_NO  AS invoiceNo
 				FROM o_wcs.TB_WIF_SHIPMENT_HDR HD,
 					 o_wcs.TB_WIF_SHIPMENT_DTL DT 
 				WHERE HD.SHIP_ORDER_KEY = DT.SHIP_ORDER_KEY 
@@ -381,7 +383,7 @@
 		      HD.ORDER_TYPE            ,
 		      HD.TRANSPORT_TYPE        ,
 		      HD.ORDER_NO              ,
-		      HD.INVOICE_NO            ,
+		      #{invoiceNo}             ,
 		      HD.COURIER_BOX_PASSWORD  ,
 		      HD.RECIPIENT_NAME        ,
 		      HD.RECIPIENT_TEL_NO      ,
@@ -406,13 +408,14 @@
 		      HD.REGION_CODE           ,
 		      HD.DELIVERY_ROUND        ,
 		      HD.ALLOC_SEQ             ,
-		      HD.ORIGIN_INVOICE_NO     ,
+		      CASE WHEN HD.ORIGIN_INVOICE_NO IS NULL THEN  HD.ORIGIN_INVOICE_NO || '-0001' 
+		      		ELSE HD.INVOICE_NO || '-0001' END   AS ORIGIN_INVOICE_NO ,
 		      TO_CHAR(SYSDATE, 'YYYYMMDD') AS CREATED_DATE,
 		      TO_CHAR(SYSDATE, 'HH24MISS') AS CREATED_TIME,
-		      'BATCH' CREATED_USER          ,
+		      'REC_BATCH' CREATED_USER          ,
 		      TO_CHAR(SYSDATE, 'YYYYMMDD') AS MODIFIED_DATE,
 		      TO_CHAR(SYSDATE, 'HH24MISS') AS MODIFIED_TIME,
-		      'BATCH' MODIFIED_USER     ,
+		      'REC_BATCH' MODIFIED_USER     ,
 		      HD.ALLOC_TYPE             ,
 		      #{packBoxSplitYn}         ,
 		      #{packBoxTypeRecom}       ,
@@ -474,6 +477,7 @@
 		OWNER               ,
 		GROUP_NO            ,
 		WORK_BATCH_NO       ,
+		PICKING_WAVE_NO     ,
 		QPS_NUM             ,
 		WMS_BATCH_YMD
 	)
@@ -518,12 +522,13 @@
 	      DT.REMARK                 ,
 	      TO_CHAR(SYSDATE, 'YYYYMMDD') AS CREATED_DATE,
 	      TO_CHAR(SYSDATE, 'HH24MISS') AS CREATED_TIME,
-	      'BATCH' CREATED_USER          ,
+	      'REC_BATCH' CREATED_USER          ,
 	      TO_CHAR(SYSDATE, 'YYYYMMDD') AS MODIFIED_DATE,
 	      TO_CHAR(SYSDATE, 'HH24MISS') AS MODIFIED_TIME,
-	      'BATCH' MODIFIED_USER       ,
+	      'REC_BATCH' MODIFIED_USER       ,
 	      #{owner}               ,
 		  DT.GROUP_NO            ,
+		  DT.WORK_BATCH_NO       ,
 		  DT.WORK_BATCH_NO       ,
 		  DT.QPS_NUM             ,
 		  DT.WMS_BATCH_YMD
@@ -541,7 +546,7 @@
 			RECEIVE_INTF_MEMO = #{receiveIntfMemo} ,
 			MODIFIED_DATE = TO_CHAR(SYSDATE, 'YYYYMMDD') ,
 			MODIFIED_TIME = TO_CHAR(SYSDATE, 'HH24MISS') ,
-			MODIFIED_USER = 'BATCH'
+			MODIFIED_USER = 'REC_BATCH'
 		WHERE HD.SHIP_ORDER_KEY = #{shipOrderKey}
   </update>
   
@@ -640,10 +645,10 @@
 	      DT.REMARK                 ,
 	      TO_CHAR(SYSDATE, 'YYYYMMDD') AS CREATED_DATE,
 	      TO_CHAR(SYSDATE, 'HH24MISS') AS CREATED_TIME,
-	      'BATCH' CREATED_USER          ,
+	      'REC_BATCH' CREATED_USER          ,
 	      TO_CHAR(SYSDATE, 'YYYYMMDD') AS MODIFIED_DATE,
 	      TO_CHAR(SYSDATE, 'HH24MISS') AS MODIFIED_TIME,
-	      'BATCH' MODIFIED_USER       ,
+	      'REC_BATCH' MODIFIED_USER       ,
 	      #{owner}               ,
 		  DT.GROUP_NO            ,
 		  DT.WORK_BATCH_NO       ,

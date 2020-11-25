@@ -7,6 +7,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.lgcns.wcs.kurly.jobs.BoxRecomBatch;
+import com.lgcns.wcs.kurly.jobs.DasNumUseCellBatch;
 import com.lgcns.wcs.kurly.jobs.InvoicePrintCompletBatch;
 import com.lgcns.wcs.kurly.jobs.InvoiceSortCompletBatch;
 import com.lgcns.wcs.kurly.jobs.OrdmadeNotfullyBatch;
@@ -18,7 +19,6 @@ import com.lgcns.wcs.kurly.jobs.RegionMasterBatch;
 import com.lgcns.wcs.kurly.jobs.ToteCellExceptTxnBatch;
 import com.lgcns.wcs.kurly.jobs.ToteReleaseBatch;
 import com.lgcns.wcs.kurly.jobs.ToteScanBatch;
-import com.lgcns.wcs.kurly.util.HttpUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -62,31 +62,27 @@ public class ScheduleTask {
 	@Autowired
 	QpsNumUseCellBatch qpsNumUseCell;
 	
+	@Autowired
+	DasNumUseCellBatch dasNumUseCell;
+	
 
 	@Scheduled(fixedDelay = 600000)
 	public void testTask() {
 		log.info("The current date (1) testTask: " + LocalDateTime.now());
 		String resDate = boxRecom.selectDate();
 		log.info("The current date (1) resDate: " + resDate);
-//		String serverHostName = "";
-//		String serverIp = "";
-//
-//		serverHostName = HttpUtil.getHostName();
-//		serverIp = HttpUtil.getLocalIp();
-//		log.info("The current date (1) serverHostName: " + serverHostName);
-//		log.info("The current date (1) serverIp: " + serverIp);
+
 		log.info("Current Thread : {}", Thread.currentThread().getName());
 	}
 	
 //	@Scheduled(cron = "0 0/5 * * * *")
-//	@Scheduled(fixedDelay = 300000, initialDelay = 10000)
+//	@Scheduled(fixedDelay = 600000, initialDelay = 10000)
 //	public void BoxRecom() {
 //		log.info("The current date (2) BoxRecom : " + LocalDateTime.now());
 //		log.info("Current Thread : {}", Thread.currentThread().getName());
 //		boxRecom.BoxRecomBatchTask();
 //	}
 //  //ok
-//	@Scheduled(cron = "0 0/5 * * * *")
 //	@Scheduled(fixedDelay = 100000)
 //	public void ToteRelease() {
 //		System.out.println("The current date (3) ToteRelease : " + LocalDateTime.now());
@@ -132,7 +128,7 @@ public class ScheduleTask {
 //		pickQpsComplet.PickQpsCompletTask();
 //	}
 //  //ok
-//	@Scheduled(fixedDelay = 120000)
+//	@Scheduled(fixedDelay = 600000)
 //	public void PackQpsComplet() {
 //		System.out.println("The current date (9) ToteRelease : " + LocalDateTime.now());
 //		 packQpsComplet.PackQpsCompletTask();
@@ -150,9 +146,14 @@ public class ScheduleTask {
 //		System.out.println("The current date (12) ToteRelease : " + LocalDateTime.now());
 //		invoiceSortComplet.InvoiceSortCompletTask();
 //	}
-//	@Scheduled(fixedDelay = 100000) 
+//	@Scheduled(fixedDelay = 600000) 
 //	public void QpsNumUseCell() {
 //		System.out.println("The current date (13) ToteRelease : " + LocalDateTime.now());
 //		qpsNumUseCell.QpsNumUseCellTask();
+//	}
+//	@Scheduled(fixedDelay = 600000) 
+//	public void DasNumUseCell() {
+//		System.out.println("The current date (14) ToteRelease : " + LocalDateTime.now());
+//		dasNumUseCell.DasNumUseCellTask();
 //	}
 }

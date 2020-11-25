@@ -83,6 +83,11 @@ public class ToteCellExceptTxnData {
 	 * */
 	private String insertedUser	;
 	
-	
+
+	private String shipOrderKey	;
+	private String shipOrderItemSeq	;
+	private String qpsNum	;
+	private String shipUidKey	;
+	private String shipUidItemSeq	;
 
 }

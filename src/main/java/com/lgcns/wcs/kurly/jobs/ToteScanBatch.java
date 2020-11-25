@@ -21,6 +21,7 @@ import com.lgcns.wcs.kurly.producer.KurlyWcsToWmsProducer;
 import com.lgcns.wcs.kurly.service.LogApiStatusService;
 import com.lgcns.wcs.kurly.service.LogBatchExecService;
 import com.lgcns.wcs.kurly.service.ToteScanService;
+import com.lgcns.wcs.kurly.util.DateUtil;
 import com.lgcns.wcs.kurly.util.StringUtil;
 
 import lombok.extern.slf4j.Slf4j;
@@ -130,12 +131,9 @@ public class ToteScanBatch  {
 					//로그 정보 insert
 			    	LogApiStatus logApiStatus = new LogApiStatus();
 
-			    	if(toteScanData.getWarehouseKey() ==null ||
-							"".equals(toteScanData.getWarehouseKey())) {
-						logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
-					}
 
-			    	logApiStatus.setApiYyyymmdd(toteScanData.getInsertedDate()); 
+			    	String sYyyymmdd = DateUtil.getToday("yyyyMMdd");
+				    logApiStatus.setApiYyyymmdd(sYyyymmdd);
 			    	logApiStatus.setExecMethod(KurlyConstants.METHOD_TOTESCAN);
 			    	
 			    	logApiStatus.setGroupNo("");  //그룹배치번호
@@ -146,7 +144,7 @@ public class ToteScanBatch  {
 			    	logApiStatus.setShipOrderKey("");  //출하문서번호(WMS)
 			    	logApiStatus.setShipOrderItemSeq("");  //출하문서순번(WMS)
 
-			    	logApiStatus.setToteId(toteScanData.getToteId());  //토트ID번호
+			    	logApiStatus.setToteId("");  //토트ID번호
 			    	logApiStatus.setInvoiceNo("");  //송장번호
 
 			    	logApiStatus.setStatus("");  //상태
@@ -156,9 +154,26 @@ public class ToteScanBatch  {
 			    	
 			    	logApiStatus.setSkuCode("");  //상품코드
 			    	logApiStatus.setWcsStatus("");  //WCS 작업상태
-			    	
+
+					if(toteScanData != null) {
+
+				    	if(toteScanData.getWarehouseKey() ==null ||
+								"".equals(toteScanData.getWarehouseKey())) {
+							logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
+						} else {
+							logApiStatus.setWarehouseKey(toteScanData.getWarehouseKey());
+						}
+				    	
+				    	logApiStatus.setToteId(toteScanData.getToteId());  //토트ID번호
+				    	logApiStatus.setApiInfo(toteScanData.toString());
+						
+					} else {
+				    	logApiStatus.setToteId("");  //토트ID번호
+				    	logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
+				    	logApiStatus.setApiInfo("");
+					}
+					
 			    	logApiStatus.setApiUrl(KurlyConstants.METHOD_TOTESCAN);
-			    	logApiStatus.setApiInfo(toteScanData.toString());
 			    	logApiStatus.setApiRuntime(apiRunTime);
 			    	
 			    	logApiStatus.setIntfYn(r_ifYn) ; //'Y': 전송완료, 'N': 미전송

@@ -138,11 +138,6 @@ public class ToteReleaseBatch  {
 	    			//로그 정보 insert
 			    	LogApiStatus logApiStatus = new LogApiStatus();
 
-					if(toteReleaseData.getWarehouseKey() ==null ||
-							"".equals(toteReleaseData.getWarehouseKey())) {
-						logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
-					}
-
 			    	logApiStatus.setExecMethod(KurlyConstants.METHOD_TOTERELEASE);
 			    	
 			    	logApiStatus.setGroupNo("");  //그룹배치번호
@@ -169,11 +164,18 @@ public class ToteReleaseBatch  {
 				    logApiStatus.setApiYyyymmdd(sYyyymmdd);
 				    
 					if(toteReleaseData != null) {
+						if(toteReleaseData.getWarehouseKey() ==null ||
+								"".equals(toteReleaseData.getWarehouseKey())) {
+							logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
+						} else {
+							logApiStatus.setWarehouseKey(toteReleaseData.getWarehouseKey());
+						}
 				    	logApiStatus.setApiInfo(toteReleaseData.toString());
 				    	logApiStatus.setToteId(toteReleaseData.getToteId());  //토트ID번호
 					} else {
 				    	logApiStatus.setApiInfo("");
 				    	logApiStatus.setToteId("");  //토트ID번호
+						logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
 					}
 			    	
 			    	logApiStatus.setIntfYn(r_ifYn) ; //'Y': 전송완료, 'N': 미전송

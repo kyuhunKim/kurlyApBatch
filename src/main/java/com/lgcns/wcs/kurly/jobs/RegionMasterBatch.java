@@ -13,6 +13,7 @@ import com.lgcns.wcs.kurly.dto.LogBatchExec;
 import com.lgcns.wcs.kurly.service.LogApiStatusService;
 import com.lgcns.wcs.kurly.service.LogBatchExecService;
 import com.lgcns.wcs.kurly.service.RegionMasterService;
+import com.lgcns.wcs.kurly.util.DateUtil;
 import com.lgcns.wcs.kurly.util.StringUtil;
 
 import lombok.extern.slf4j.Slf4j;
@@ -60,9 +61,10 @@ public class RegionMasterBatch  {
 			//로그 정보 insert
 			LogApiStatus logApiStatus = new LogApiStatus();
 
-			logApiStatus.setWarehouseKey(" ");
-			
-			logApiStatus.setApiYyyymmdd(""); 
+//			logApiStatus.setWarehouseKey(" ");
+
+	    	String sYyyymmdd = DateUtil.getToday("yyyyMMdd");
+		    logApiStatus.setApiYyyymmdd(sYyyymmdd);
 			logApiStatus.setExecMethod(KurlyConstants.METHOD_REGIONMASTER);
 			    	
 			logApiStatus.setGroupNo("");  //그룹배치번호

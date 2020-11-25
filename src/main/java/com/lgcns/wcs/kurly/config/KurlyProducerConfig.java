@@ -12,6 +12,7 @@ import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
+import com.lgcns.wcs.kurly.dto.DasNumUseCellData;
 import com.lgcns.wcs.kurly.dto.InvoicePrintCompletData;
 import com.lgcns.wcs.kurly.dto.InvoiceSortCompletData;
 import com.lgcns.wcs.kurly.dto.OrdmadeNotfullyData;
@@ -224,5 +225,24 @@ public class KurlyProducerConfig {
 
         return new KafkaTemplate<>(new DefaultKafkaProducerFactory<>(configPros));    	
     }
-    
+
+    /**
+   	 * 
+   	 * @Method Name : dasNumUseCellKafkaTemplate
+   	 * @작성일 : 2020. 11. 24.
+   	 * @작성자 : jooni
+   	 * @변경이력 : 2020. 11. 24. 최초작성
+   	 * @Method 설명 : DAS 호기별 가용셀 정보 kafkaTemplate
+	 */
+    @Bean("dasNumUseCellKafkaTemplate")
+    public KafkaTemplate<String, DasNumUseCellData> dasNumUseCellKafkaTemplate(){
+        Map<String, Object> configPros = new HashMap<>();
+
+        configPros.put(ProducerConfig.RETRIES_CONFIG, 1);
+        configPros.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVER);
+        configPros.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        configPros.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+
+        return new KafkaTemplate<>(new DefaultKafkaProducerFactory<>(configPros));    	
+    }
 }

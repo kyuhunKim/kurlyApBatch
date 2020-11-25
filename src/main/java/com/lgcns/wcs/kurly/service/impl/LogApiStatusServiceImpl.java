@@ -52,8 +52,8 @@ public class LogApiStatusServiceImpl implements LogApiStatusService {
 			logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
 		}
 		String v_ApiInfo = logApiStatus.getApiInfo();
-		String c_ApiInfo = StringUtil.cutString(v_ApiInfo, 3500, "");
-		logApiStatus.setApiInfo(c_ApiInfo);
+//		String c_ApiInfo = StringUtil.cutString(v_ApiInfo, 3500, "");
+		logApiStatus.setApiInfo(v_ApiInfo);
 		
 		String v_intfMemo = logApiStatus.getIntfMemo();
 		String c_intfMemo = StringUtil.cutString(v_intfMemo, 3500, "");

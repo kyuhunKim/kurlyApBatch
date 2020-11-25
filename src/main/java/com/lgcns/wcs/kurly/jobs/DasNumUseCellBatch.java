@@ -12,13 +12,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.async.DeferredResult;
 
-import com.lgcns.wcs.kurly.dto.InvoiceSortCompletData;
+import com.lgcns.wcs.kurly.dto.DasNumUseCellData;
 import com.lgcns.wcs.kurly.dto.KurlyConstants;
 import com.lgcns.wcs.kurly.dto.LogApiStatus;
 import com.lgcns.wcs.kurly.dto.LogBatchExec;
 import com.lgcns.wcs.kurly.dto.ResponseMesssage;
 import com.lgcns.wcs.kurly.producer.KurlyWcsToWmsProducer;
-import com.lgcns.wcs.kurly.service.InvoiceSortCompletService;
+import com.lgcns.wcs.kurly.service.DasNumUseCellService;
 import com.lgcns.wcs.kurly.service.LogApiStatusService;
 import com.lgcns.wcs.kurly.service.LogBatchExecService;
 import com.lgcns.wcs.kurly.util.DateUtil;
@@ -28,31 +28,30 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * 
- * @Name : InvoiceSortCompletBatch
- * @작성일 : 2020. 07. 16.
+ * @Name : DasNumUseCellBatch
+ * @작성일 : 2020. 11. 24.
  * @작성자 : jooni
- * @변경이력 : 2020. 07. 16. 최초작성
- * 			2020. 11. 12. RunTime 로직 수정
- * @Method 설명 : WCS 방면 분류 완료 정보  (WCS => WMS)
+ * @변경이력 : 2020. 11. 24. 최초작성
+ * @Method 설명 : DAS 셀그룹번호(DAS출고시 활용)별 가용셀 정보
  */
 @Slf4j
 @Component
-public class InvoiceSortCompletBatch  {
+public class DasNumUseCellBatch  {
 
 	@Autowired
     KurlyWcsToWmsProducer wcsProducer;
 	
     @Autowired
+    DasNumUseCellService dasNumUseCellService;
+    
+    @Autowired
     LogBatchExecService logBatchExecService;
     
     @Autowired
     LogApiStatusService logApiStatusService;
-    
-    @Autowired
-    InvoiceSortCompletService invoiceSortCompletService;
 
-    public void InvoiceSortCompletTask() {
-    	log.info("=================InvoiceSortCompletBatch start===============");
+    public void DasNumUseCellTask()  {
+    	log.info("=================DasNumUseCellBatch start===============");
     	log.info("The current date  : " + LocalDateTime.now());
     	long apiRunTimeStart = 0;
 		long apiRunTimeEnd   = 0;
@@ -64,18 +63,13 @@ public class InvoiceSortCompletBatch  {
 		String resultMessage = "";
 		int executeCount = 0;
     	Date startDate = Calendar.getInstance().getTime();
-    	try
-    	{
-    		//WCS 방면 분류 완료 정보 데이타 조회
-    		List<InvoiceSortCompletData> listInvoiceSortComplet = invoiceSortCompletService.selectInvoiceSortComplet();
+    	try {
+    		List<DasNumUseCellData> dasNumUseCellList = dasNumUseCellService.selectDasNumUseCellList();
 	    	
-	    	//조회 건수 
-//	    	executeCount = listInvoiceSortComplet.size();
-	    	log.info("invoiceSortComplet size ==> "+ listInvoiceSortComplet.size());
-	    	
-	    	for(InvoiceSortCompletData invoiceSortCompletData : listInvoiceSortComplet ) {
-
-	    		//1건당 시간 체크용
+        	log.info("dasNumUseCellList size ==> "+ dasNumUseCellList.size());
+        	
+        	for(DasNumUseCellData dasNumUseCellData : dasNumUseCellList ) {
+        		//건당 시간 체크용
 	    		long apiRunTimeStartFor = System.currentTimeMillis();
 
     			String r_ifYn = KurlyConstants.STATUS_N;
@@ -85,8 +79,26 @@ public class InvoiceSortCompletBatch  {
     			String retMessage = "";
 	    		try {
 	    			
+	    			// 셀 그룹ID가 삭제인 경우에는 이전에 생성된 인터페이스 데이터가 있는지 확인해서
+	    			// 정상적으로 연계된 경우만 전송함   
+	    			if("DELETE".equals(dasNumUseCellData.getCellTypeStatus())) {
+
+		    			Map<String, String> countMap = new HashMap<String, String>();
+		    			countMap.put("warehouseKey",dasNumUseCellData.getWarehouseKey());
+		    			countMap.put("dasCellGroupId",dasNumUseCellData.getDasCellGroupId());
+						
+	    				int makeCount = dasNumUseCellService.selectDasNumUseCellCount(countMap);
+	    				
+	    				//인터페이스된 데이터가 존재하는 경우만 진행
+	    				if(makeCount < 1) {
+		    				r_ifYn = KurlyConstants.STATUS_N;
+			    			retMessage = "make interface does not exist";
+	    					continue;
+	    				}
+	    			}
+	    			
 	    			//kafka 전송
-	    			deferredResult = wcsProducer.sendInvoiceSortCompletObject(invoiceSortCompletData);
+	    			deferredResult = wcsProducer.sendDasNumUseCellObject(dasNumUseCellData);	
 	    			ResponseEntity<ResponseMesssage> res = (ResponseEntity<ResponseMesssage>)deferredResult.getResult();
 	    			retStatus = (String)res.getBody().getStatus();
 	    			retMessage = (String)res.getBody().getMessage();
@@ -94,54 +106,47 @@ public class InvoiceSortCompletBatch  {
 	    			log.info(" >>>>>>>>>>>"+retMessage);
 	    	    	log.info(" >>>>>>>>>>>deferredResult.getResult()="+ deferredResult.getResult());
 	    	    	
-//	    			if(deferredResult.getResult().toString().indexOf("SUCCESS") > -1) {
 	    	    	if(retStatus.equals("SUCCESS")) {
 	    				r_ifYn = KurlyConstants.STATUS_Y;
 	    			} else {
 	    				r_ifYn = KurlyConstants.STATUS_N;
 	    			}
 	    			
-	    			log.info("=================updateInvoiceSortComplet===============1");
-			    	//인터페이스 처리내역 update
-	    			String r_invoiceNo = invoiceSortCompletData.getInvoiceNo();
-	    			String r_warehouseKey = invoiceSortCompletData.getWarehouseKey();
-	    			String r_shipOrderKey = invoiceSortCompletData.getShipOrderKey();
-					Map<String, String> updateMap = new HashMap<String, String>();
-					
-					if(KurlyConstants.STATUS_N.equals(r_ifYn)) {
-						updateMap.put("invoiceSortIntfYn",KurlyConstants.STATUS_N);
-						updateMap.put("invoiceSortIntfCode",KurlyConstants.STATUS_NG);
-						updateMap.put("invoiceSortIntfMemo",retMessage);
-					} else {
-						updateMap.put("invoiceSortIntfYn",KurlyConstants.STATUS_Y);
-						updateMap.put("invoiceSortIntfCode",KurlyConstants.STATUS_OK);
-						updateMap.put("invoiceSortIntfMemo","");
-					}
-					updateMap.put("modifiedUser",KurlyConstants.DEFAULT_USERID);
-					updateMap.put("invoiceNo",r_invoiceNo);
-					updateMap.put("warehouseKey",r_warehouseKey);
-					updateMap.put("shipOrderKey",r_shipOrderKey);
-					
-			    	invoiceSortCompletService.updateInvoiceSortComplet(updateMap);
-
-			    	log.info("=================updateInvoiceSortComplet===============2");
-			    	
 	    		} catch (Exception ex) {	
-	    			log.info("== send error == " + invoiceSortCompletData.getInvoiceNo());  
+	    			log.info("== send error == " + dasNumUseCellData.getWarehouseKey());  
 	    			retMessage = ex.getMessage().substring(0, 90);
+	    			ex.printStackTrace();
     				r_ifYn = KurlyConstants.STATUS_N;
 	    		} finally {
-	    			log.info("====finally createLogApiStatus===============1");
+	    			
+	    			Map<String, String> updateMap = new HashMap<String, String>();
+					
+					if(KurlyConstants.STATUS_N.equals(r_ifYn)) {
+						updateMap.put("useCellIntfYn",KurlyConstants.STATUS_N);
+						updateMap.put("useCellIntfCode",KurlyConstants.STATUS_NG);
+						updateMap.put("useCellIntfMemo",retMessage);
+					} else {
+						updateMap.put("useCellIntfYn",KurlyConstants.STATUS_Y);
+						updateMap.put("useCellIntfCode",KurlyConstants.STATUS_OK);
+						updateMap.put("useCellIntfMemo","");
+					}
+					updateMap.put("warehouseKey",dasNumUseCellData.getWarehouseKey());
+					updateMap.put("dasCellGroupId",dasNumUseCellData.getDasCellGroupId());
+					updateMap.put("cellTypeStatus",dasNumUseCellData.getCellTypeStatus());
+
+					dasNumUseCellService.updateDasNumUseCell(updateMap);
+			    	
+	    			log.info("====finally createLogApiStatus===============");
 
 	    			apiRunTimeEnd = System.currentTimeMillis();
 	    			apiRunTime = StringUtil.formatInterval(apiRunTimeStartFor, apiRunTimeEnd) ;
 
-					//전송로그 정보 insert
+					//로그 정보 insert
 			    	LogApiStatus logApiStatus = new LogApiStatus();
 
 			    	String sYyyymmdd = DateUtil.getToday("yyyyMMdd");
 				    logApiStatus.setApiYyyymmdd(sYyyymmdd);
-			    	logApiStatus.setExecMethod(KurlyConstants.METHOD_INVOICESORTCOMPLET);
+			    	logApiStatus.setExecMethod(KurlyConstants.METHOD_DASNUMUSECELL);
 			    	
 			    	logApiStatus.setGroupNo("");  //그룹배치번호
 			    	logApiStatus.setWorkBatchNo("");  //작업배치번호
@@ -163,35 +168,20 @@ public class InvoiceSortCompletBatch  {
 			    	logApiStatus.setWcsStatus("");  //WCS 작업상태
 			    	logApiStatus.setApiInfo("");
 
-					logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
-					if(invoiceSortCompletData != null) {
-
-				    	if(invoiceSortCompletData.getWarehouseKey() ==null ||
-								"".equals(invoiceSortCompletData.getWarehouseKey())) {
+					if(dasNumUseCellData != null) {
+				    	if(dasNumUseCellData.getWarehouseKey() ==null ||
+								"".equals(dasNumUseCellData.getWarehouseKey())) {
 							logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
 						} else {
-							logApiStatus.setWarehouseKey(invoiceSortCompletData.getWarehouseKey());
+							logApiStatus.setWarehouseKey(dasNumUseCellData.getWarehouseKey());
 						}
-				    	
-				    	logApiStatus.setShipUidWcs(invoiceSortCompletData.getShipUidWcs());  //출고오더UID(WCS)
-				    	logApiStatus.setShipOrderKey(invoiceSortCompletData.getShipOrderKey());  //출하문서번호(WMS)
-				    	logApiStatus.setInvoiceNo(invoiceSortCompletData.getInvoiceNo());  //송장번호
-				    	logApiStatus.setWcsStatus(invoiceSortCompletData.getInvoiceStatus());  //WCS 작업상태
-
-				    	logApiStatus.setApiInfo(invoiceSortCompletData.toString());
+				    	logApiStatus.setApiInfo(dasNumUseCellData.toString());
 					} else {
 						logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
-						
-
-				    	logApiStatus.setShipUidWcs("");  //출고오더UID(WCS)
-				    	logApiStatus.setShipOrderKey("");  //출하문서번호(WMS)
-				    	logApiStatus.setInvoiceNo("");  //송장번호
-				    	logApiStatus.setWcsStatus("");  //WCS 작업상태
-				    	
-				    	logApiStatus.setApiInfo("");	
+						logApiStatus.setApiInfo("");
 					}
-			    	
-			    	logApiStatus.setApiUrl(KurlyConstants.METHOD_INVOICESORTCOMPLET);
+					
+			    	logApiStatus.setApiUrl(KurlyConstants.METHOD_DASNUMUSECELL);
 			    	logApiStatus.setApiRuntime(apiRunTime);
 			    	
 			    	logApiStatus.setIntfYn(r_ifYn) ; //'Y': 전송완료, 'N': 미전송
@@ -201,33 +191,32 @@ public class InvoiceSortCompletBatch  {
 			    		logApiStatus.setIntfMemo(KurlyConstants.STATUS_OK);
 			    	}
 			    	
-			    	//로그정보 적재
 			    	logApiStatusService.createLogApiStatus(logApiStatus);
-	    			log.info("====finally createLogApiStatus===============2");
+	    			log.info("====finally createLogApiStatus===============");
 			    	
 	    		}
 	    		executeCount++;
-	    	}
-    	
+        	}	
+        	
     	} catch (Exception e) {
     		result = "error";
-			log.info( " === InvoiceSortCompletBatch  error" +e );
+			log.error( " === DasNumUseCellBatch  error" +e );
 			resultMessage = e.toString();
 //			throw new Exception(e);
     	} finally {
 
-			apiRunTimeEnd = System.currentTimeMillis();
+    		apiRunTimeEnd = System.currentTimeMillis();
 			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
 
-        	log.info("================= apiRunTime(ms) : "+ apiRunTime);
+			log.info("================= apiRunTime(ms) : "+ apiRunTime);
 
 	    	//배치 로그 정보 insert
         	LogBatchExec logBatchExec = new LogBatchExec();
 	    	
-        	logBatchExec.setExecMethod(KurlyConstants.METHOD_INVOICESORTCOMPLET);
+        	logBatchExec.setExecMethod(KurlyConstants.METHOD_DASNUMUSECELL);
         	if("sucess".equals(result)) {
             	logBatchExec.setSuccessYn(KurlyConstants.STATUS_Y);
-            	logBatchExec.setMessageLog(KurlyConstants.METHOD_INVOICESORTCOMPLET+" Sucess("+apiRunTime+"ms)");	
+            	logBatchExec.setMessageLog(KurlyConstants.METHOD_DASNUMUSECELL +" Sucess("+apiRunTime+"ms)");	
         	} else {
             	logBatchExec.setSuccessYn(KurlyConstants.STATUS_N);
             	logBatchExec.setMessageLog(resultMessage);
@@ -236,13 +225,13 @@ public class InvoiceSortCompletBatch  {
         	logBatchExec.setExecuteCount(executeCount);
         	logBatchExec.setStartDate(startDate);
         	
-    		
-	    	//로그정보 적재
         	logBatchExecService.createLogBatchExec(logBatchExec);
-	    	
-        	log.info("=================InvoiceSortCompletBatch end=============== ");    		
+        	log.info("=================createLogBatchExec end=============== ");    		
     	}
-    	log.info("=================InvoiceSortCompletBatch end===============");
+    	
+    	log.info("=================DasNumUseCellBatch end===============");
     	
     }
+
 }
+

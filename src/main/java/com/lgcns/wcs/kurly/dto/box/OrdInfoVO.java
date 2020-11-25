@@ -24,6 +24,7 @@ public class OrdInfoVO {
 	private String boxType = "";
 	private String boxSplitCheckYn = "Y";
 	private String allocType = "";
+	private String invoiceNo = "";  //송장번호
 	
 	public String getShipOrderKey() {
 		return shipOrderKey;
@@ -321,4 +322,13 @@ public class OrdInfoVO {
 	public void setAllocType(String allocType) {
 		this.allocType = allocType;
 	}
+
+	public String getInvoiceNo() {
+		return invoiceNo;
+	}
+
+	public void setInvoiceNo(String invoiceNo) {
+		this.invoiceNo = invoiceNo;
+	}
+	
 }

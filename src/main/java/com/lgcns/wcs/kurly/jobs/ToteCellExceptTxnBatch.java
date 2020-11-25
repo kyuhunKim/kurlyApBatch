@@ -115,6 +115,12 @@ public class ToteCellExceptTxnBatch {
 	    			toteCellExceptTxnData.setInsertedDate(toteCellExceptTxnSelectData.getInsertedDate());
 	    			toteCellExceptTxnData.setInsertedTime(toteCellExceptTxnSelectData.getInsertedTime());
 	    			toteCellExceptTxnData.setInsertedUser(toteCellExceptTxnSelectData.getInsertedUser());
+
+	    			toteCellExceptTxnData.setShipOrderKey(toteCellExceptTxnSelectData.getShipOrderKey());
+	    			toteCellExceptTxnData.setShipOrderItemSeq(toteCellExceptTxnSelectData.getShipOrderItemSeq());
+	    			toteCellExceptTxnData.setQpsNum(toteCellExceptTxnSelectData.getQpsNum());
+	    			toteCellExceptTxnData.setShipUidKey(toteCellExceptTxnSelectData.getShipUidKey());
+	    			toteCellExceptTxnData.setShipUidItemSeq(toteCellExceptTxnSelectData.getShipUidItemSeq());
 	    			
 	    			//kafka 전송
 	    			deferredResult = wcsProducer.sendToteCellExceptTxnObject(toteCellExceptTxnData);
@@ -167,11 +173,6 @@ public class ToteCellExceptTxnBatch {
 					//전송로그 정보 insert
 			    	LogApiStatus logApiStatus = new LogApiStatus();
 
-			    	if(toteCellExceptTxnSelectData.getWarehouseKey() ==null ||
-							"".equals(toteCellExceptTxnSelectData.getWarehouseKey())) {
-						logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
-					}
-
 			    	logApiStatus.setExecMethod(KurlyConstants.METHOD_TOTECELLEXCEPTTXN);
 			    	
 			    	logApiStatus.setShipOrderKey("");  //출하문서번호(WMS)
@@ -201,6 +202,14 @@ public class ToteCellExceptTxnBatch {
 				    	
 				    	logApiStatus.setSkuCode(toteCellExceptTxnSelectData.getSkuCode());  //상품코드
 				    	logApiStatus.setApiInfo(toteCellExceptTxnSelectData.toString());
+				    	
+				    	if(toteCellExceptTxnSelectData.getWarehouseKey() ==null ||
+								"".equals(toteCellExceptTxnSelectData.getWarehouseKey())) {
+							logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
+						} else {
+							logApiStatus.setWarehouseKey(toteCellExceptTxnSelectData.getWarehouseKey());
+						}
+				    	
 					} else {
 						logApiStatus.setToteId("");  //토트ID번호
 				    	logApiStatus.setGroupNo("");  //그룹배치번호
@@ -213,6 +222,8 @@ public class ToteCellExceptTxnBatch {
 				    	
 				    	logApiStatus.setSkuCode("");  //상품코드
 				    	logApiStatus.setApiInfo("");
+				    	
+				    	logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
 					}
 					
 			    	logApiStatus.setIntfYn(r_ifYn) ; //'Y': 전송완료, 'N': 미전송

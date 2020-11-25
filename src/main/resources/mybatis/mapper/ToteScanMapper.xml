@@ -8,11 +8,11 @@
   <select id="selectToteScan" resultType="com.lgcns.wcs.kurly.dto.ToteScanData">
   	/* [ToteScanMapper.xml] selectToteScan */
     SELECT 
-    	TOTE_ID         AS toteId,
+		TOTE_ID         AS toteId,
 		WAREHOUSE_KEY   AS warehouseKey,
 		PICKING_TYPE    AS pickingType,
-		ALLOC_TYPE    AS processType,
-		QPS_NUM     AS qpsUnitNo,
+		ALLOC_TYPE      AS processType,
+		QPS_NUM         AS qpsUnitNo,
 		FAC_EQP_ID      AS facEqpId,
 		FAC_EQP_NM      AS facEqpName,
 		SUBSTR(TOTE_INITIAL_SCAN_YMD,1,8) AS toteScanDate,

@@ -10,6 +10,7 @@ import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.async.DeferredResult;
 
+import com.lgcns.wcs.kurly.dto.DasNumUseCellData;
 import com.lgcns.wcs.kurly.dto.InvoicePrintCompletData;
 import com.lgcns.wcs.kurly.dto.InvoiceSortCompletData;
 import com.lgcns.wcs.kurly.dto.OrdmadeNotfullyData;
@@ -53,6 +54,8 @@ public class KurlyWcsToWmsProducer {
     private KafkaTemplate<String, InvoiceSortCompletData> invoiceSortCompletKafkaTemplate;
     @Qualifier("qpsNumUseCellKafkaTemplate")
     private KafkaTemplate<String, QpsNumUseCellData> qpsNumUseCellKafkaTemplate;
+    @Qualifier("dasNumUseCellKafkaTemplate")
+    private KafkaTemplate<String, DasNumUseCellData> dasNumUseCellKafkaTemplate;
     
     @Value("${spring.kafka.topics.wcs-out.destination.tote-release}")
     private String WMS_TOTE_RELEASE;
@@ -74,6 +77,9 @@ public class KurlyWcsToWmsProducer {
     private String WMS_INVOICE_SORTCOMPLET;
     @Value("${spring.kafka.topics.wcs-out.destination.qpsNumUseCell}")
     private String WMS_QPSNUMUSECELL;
+
+    @Value("${spring.kafka.topics.wcs-out.destination.dasNumUseCell}")
+    private String WMS_DASNUMUSECELL;
     
     @Autowired
     ToteReleaseService toteReleaseService;
@@ -88,7 +94,8 @@ public class KurlyWcsToWmsProducer {
     	    KafkaTemplate<String, PackQpsCompletData> packQpsCompletKafkaTemplate,
     	    KafkaTemplate<String, InvoicePrintCompletData> invoicePrintCompletKafkaTemplate,
     	    KafkaTemplate<String, InvoiceSortCompletData> invoiceSortCompletKafkaTemplate,
-    	    KafkaTemplate<String, QpsNumUseCellData> qpsNumUseCellKafkaTemplate
+    	    KafkaTemplate<String, QpsNumUseCellData> qpsNumUseCellKafkaTemplate,
+    	    KafkaTemplate<String, DasNumUseCellData> dasNumUseCellKafkaTemplate
            ){
       this.toteReleaseKafkaTemplate = toteReleaseKafkaTemplate;
       this.toteScanKafkaTemplate = toteScanKafkaTemplate;
@@ -100,6 +107,7 @@ public class KurlyWcsToWmsProducer {
       this.invoicePrintCompletKafkaTemplate = invoicePrintCompletKafkaTemplate;
       this.invoiceSortCompletKafkaTemplate = invoiceSortCompletKafkaTemplate;
       this.qpsNumUseCellKafkaTemplate = qpsNumUseCellKafkaTemplate;
+      this.dasNumUseCellKafkaTemplate = dasNumUseCellKafkaTemplate;
     }
 
     /**
@@ -181,7 +189,7 @@ public class KurlyWcsToWmsProducer {
 		DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
 
         try {
-//	    	ListenableFuture<SendResult<String, ToteScanData>> future =  toteScanKafkaTemplate.send(WMS_TOTE_RELEASE, toteScanData);
+//	    	ListenableFuture<SendResult<String, ToteScanData>> future =  toteScanKafkaTemplate.send(WMS_TOTE_SCAN, toteScanData);
 //	       
 //	  	    future.addCallback(new ListenableFutureCallback<>() {
 //	    	    @Override
@@ -244,7 +252,7 @@ public class KurlyWcsToWmsProducer {
 		DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
 
         try {
-//        	ListenableFuture<SendResult<String, ToteCellExceptTxnData>> future =  toteCellExceptTxnKafkaTemplate.send(WMS_TOPIC, toteCellExceptTxnData);
+//        	ListenableFuture<SendResult<String, ToteCellExceptTxnData>> future =  toteCellExceptTxnKafkaTemplate.send(WMS_TOTE_CELLEXCEPTTXN, toteCellExceptTxnData);
 //        	
 //        	future.addCallback(new ListenableFutureCallback<>() {
 //        	    @Override
@@ -310,7 +318,7 @@ public class KurlyWcsToWmsProducer {
 		DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
 
         try {
-//        	ListenableFuture<SendResult<String, OrdmadeNotfullyReplayData>> future =  ordmadeNotfullyReplayKafkaTemplate.send(WMS_TOPIC, ordmadeNotfullyReplayData);
+//        	ListenableFuture<SendResult<String, OrdmadeNotfullyReplayData>> future =  ordmadeNotfullyReplayKafkaTemplate.send(WMS_ORDMADE_NOTFULLYREPLAY, ordmadeNotfullyReplayData);
 //        	
 //        	future.addCallback(new ListenableFutureCallback<>() {
 //        	    @Override
@@ -375,7 +383,7 @@ public class KurlyWcsToWmsProducer {
 		DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
 
         try {
-//        	ListenableFuture<SendResult<String, OrdmadeNotfullyData>> future =  ordmadeNotfullyKafkaTemplate.send(WMS_TOPIC, ordmadeNotfullyData);
+//        	ListenableFuture<SendResult<String, OrdmadeNotfullyData>> future =  ordmadeNotfullyKafkaTemplate.send(WMS_ORDMADE_NOTFULLY, ordmadeNotfullyData);
 //        	
 //        	future.addCallback(new ListenableFutureCallback<>() {
 //        	    @Override
@@ -441,7 +449,7 @@ public class KurlyWcsToWmsProducer {
 		DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
 
         try {
-//        	ListenableFuture<SendResult<String, PackQpsCompletData>> future =  packQpsCompletKafkaTemplate.send(WMS_TOPIC, packQpsCompletData);
+//        	ListenableFuture<SendResult<String, PackQpsCompletData>> future =  packQpsCompletKafkaTemplate.send(WMS_PACK_QPSCOMPLET, packQpsCompletData);
 //        	
 //        	future.addCallback(new ListenableFutureCallback<>() {
 //        	    @Override
@@ -506,7 +514,7 @@ public class KurlyWcsToWmsProducer {
 		DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
 
         try {
-//        	ListenableFuture<SendResult<String, PickQpsCompletData>> future =  pickQpsCompletKafkaTemplate.send(WMS_TOPIC, pickQpsCompletData);
+//        	ListenableFuture<SendResult<String, PickQpsCompletData>> future =  pickQpsCompletKafkaTemplate.send(WMS_PICK_QPSCOMPLET, pickQpsCompletData);
 //        	
 //        	future.addCallback(new ListenableFutureCallback<>() {
 //        	    @Override
@@ -570,7 +578,7 @@ public class KurlyWcsToWmsProducer {
 		DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
 
         try {
-//        	ListenableFuture<SendResult<String, InvoicePrintCompletData>> future =  invoicePrintCompletKafkaTemplate.send(WMS_TOPIC, invoicePrintCompletData);
+//        	ListenableFuture<SendResult<String, InvoicePrintCompletData>> future =  invoicePrintCompletKafkaTemplate.send(WMS_INVOICE_PRINTCOMPLET, invoicePrintCompletData);
 //        	
 //        	future.addCallback(new ListenableFutureCallback<>() {
 //        	    @Override
@@ -635,7 +643,7 @@ public class KurlyWcsToWmsProducer {
 		DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
 
         try {
-//        	ListenableFuture<SendResult<String, InvoiceSortCompletData>> future =  invoiceSortCompletKafkaTemplate.send(WMS_TOPIC, invoiceSortCompletData);
+//        	ListenableFuture<SendResult<String, InvoiceSortCompletData>> future =  invoiceSortCompletKafkaTemplate.send(WMS_INVOICE_SORTCOMPLET, invoiceSortCompletData);
 //        	
 //        	future.addCallback(new ListenableFutureCallback<>() {
 //        	    @Override
@@ -700,7 +708,7 @@ public class KurlyWcsToWmsProducer {
 		DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
 
         try {
-//        	ListenableFuture<SendResult<String, QpsNumUseCellData>> future =  qpsNumUseCellKafkaTemplate.send(WMS_TOPIC, qpsNumUseCellData);
+//        	ListenableFuture<SendResult<String, QpsNumUseCellData>> future =  qpsNumUseCellKafkaTemplate.send(WMS_QPSNUMUSECELL, qpsNumUseCellData);
 //        	
 //        	future.addCallback(new ListenableFutureCallback<>() {
 //        	    @Override
@@ -738,6 +746,72 @@ public class KurlyWcsToWmsProducer {
             e.printStackTrace();
             log.error("================= Kafka  [topic = {}, value = {}] Exception: {}",
             		WMS_QPSNUMUSECELL,  qpsNumUseCellData, e.getMessage());
+
+	    	ResponseMesssage resMessage = new ResponseMesssage();
+	    	resMessage.setStatus("FAILURE");
+	    	resMessage.setMessage(e.getMessage());
+            ResponseEntity<ResponseMesssage> responseEntity = new ResponseEntity<>(resMessage, HttpStatus.INTERNAL_SERVER_ERROR);
+            deferredResult.setResult(responseEntity);
+        }
+    	
+    	log.info("=================sendQpsNumUseCellObject end===============");
+    	return deferredResult;
+    }
+
+
+    /**
+	 * 
+	 * @Method Name : sendDasNumUseCellObject
+	 * @작성일 : 2020. 11. 24.
+	 * @작성자 : jooni
+	 * @변경이력 : 2020. 11. 24. 최초작성
+	 * @Method 설명 : DAS 호기별 가용셀 정보  (WCS => WMS)
+     */
+    public DeferredResult<ResponseEntity<?>> sendDasNumUseCellObject(DasNumUseCellData dasNumUseCellData){
+    	log.info("=================sendDasNumUseCellObject start===============");
+    	log.info("================="+dasNumUseCellData.toString());
+    		
+		DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
+
+        try {
+//        	ListenableFuture<SendResult<String, DasNumUseCellData>> future =  qpsNumUseCellKafkaTemplate.send(WMS_QPSNUMUSECELL, dasNumUseCellData);
+//        	
+//        	future.addCallback(new ListenableFutureCallback<>() {
+//        	    @Override
+//            	public void onSuccess(SendResult<String, InvoiceSortCompletData> result) {
+//        	    	log.info("sendInvoiceSortCompletObject onSuccess Sent message : " + result.toString() );
+//
+//        	    	ResponseMesssage resMessage = new ResponseMesssage();
+//        	    	resMessage.setStatus("SUCCESS");
+//        	    	resMessage.setMessage("");
+//                    ResponseEntity<ResponseMesssage> responseEntity = new ResponseEntity<>(resMessage, HttpStatus.OK);
+//                    deferredResult.setResult(responseEntity);
+//            	}
+//        	    @Override
+//            	public void onFailure(Throwable ex) {
+//        	    	log.info("sendInvoiceSortCompletObject onFailure  Unable to send message due to : " + ex.getMessage());
+//
+//        	    	ResponseMesssage resMessage = new ResponseMesssage();
+//        	    	resMessage.setStatus("FAILURE");
+//        	    	resMessage.setMessage(ex.getMessage());
+//                    ResponseEntity<ResponseMesssage> responseEntity = new ResponseEntity<>(resMessage, HttpStatus.INTERNAL_SERVER_ERROR);
+//                    deferredResult.setResult(responseEntity);
+//            	}
+//            });
+
+        	SendResult<String, DasNumUseCellData> result =  dasNumUseCellKafkaTemplate.send(WMS_DASNUMUSECELL,  dasNumUseCellData).get();
+        	log.info("=================Producer send result [key = {}, value = {}]", result.getProducerRecord().key(),
+                    result.getProducerRecord().value());
+
+	    	ResponseMesssage resMessage = new ResponseMesssage();
+	    	resMessage.setStatus("SUCCESS");
+	    	resMessage.setMessage("");
+            ResponseEntity<ResponseMesssage> responseEntity = new ResponseEntity<>(resMessage, HttpStatus.OK);
+            deferredResult.setResult(responseEntity);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("================= Kafka  [topic = {}, value = {}] Exception: {}",
+            		WMS_DASNUMUSECELL,  dasNumUseCellData, e.getMessage());
 
 	    	ResponseMesssage resMessage = new ResponseMesssage();
 	    	resMessage.setStatus("FAILURE");
