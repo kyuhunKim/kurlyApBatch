@@ -146,7 +146,7 @@ public class ScheduleTask {
 //		System.out.println("The current date (12) ToteRelease : " + LocalDateTime.now());
 //		invoiceSortComplet.InvoiceSortCompletTask();
 //	}
-	@Scheduled(fixedDelay = 600000) 
+	@Scheduled(fixedDelay = 600000, initialDelay = 30000) 
 	public void QpsNumUseCell() {
 		System.out.println("The current date (13) ToteRelease : " + LocalDateTime.now());
 		qpsNumUseCell.QpsNumUseCellTask();
