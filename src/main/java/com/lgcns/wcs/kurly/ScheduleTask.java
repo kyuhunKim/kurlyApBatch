@@ -146,14 +146,14 @@ public class ScheduleTask {
 //		System.out.println("The current date (12) ToteRelease : " + LocalDateTime.now());
 //		invoiceSortComplet.InvoiceSortCompletTask();
 //	}
-//	@Scheduled(fixedDelay = 600000) 
-//	public void QpsNumUseCell() {
-//		System.out.println("The current date (13) ToteRelease : " + LocalDateTime.now());
-//		qpsNumUseCell.QpsNumUseCellTask();
-//	}
-//	@Scheduled(fixedDelay = 600000) 
-//	public void DasNumUseCell() {
-//		System.out.println("The current date (14) ToteRelease : " + LocalDateTime.now());
-//		dasNumUseCell.DasNumUseCellTask();
-//	}
+	@Scheduled(fixedDelay = 600000) 
+	public void QpsNumUseCell() {
+		System.out.println("The current date (13) ToteRelease : " + LocalDateTime.now());
+		qpsNumUseCell.QpsNumUseCellTask();
+	}
+	@Scheduled(fixedDelay = 600000) 
+	public void DasNumUseCell() {
+		System.out.println("The current date (14) ToteRelease : " + LocalDateTime.now());
+		dasNumUseCell.DasNumUseCellTask();
+	}
 }
