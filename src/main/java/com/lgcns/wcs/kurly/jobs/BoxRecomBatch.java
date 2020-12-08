@@ -788,9 +788,9 @@ public class BoxRecomBatch  {
 				if( StringUtil.isEmpty(searchOrdInfoVO.getSellingType()) ) {
 					wifShipmentDtlVO.setSellingType("");
 				}
-				if( StringUtil.isEmpty(searchOrdInfoVO.getNetWeight()) ) {
-					wifShipmentDtlVO.setNetWeight("");
-				}
+//				if( StringUtil.isEmpty(searchOrdInfoVO.getNetWeight()) ) {
+//					wifShipmentDtlVO.setNetWeight("");
+//				}
 				if( StringUtil.isEmpty(searchOrdInfoVO.getSkuOptionName()) ) {
 					wifShipmentDtlVO.setSkuOptionName("");
 				}

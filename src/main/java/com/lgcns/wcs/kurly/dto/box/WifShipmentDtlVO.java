@@ -95,10 +95,10 @@ private String shipUidKey ;
 	private double grossWeight ;
 	/*Net weight	
 	 * */
-	private String netWeight ;
+	private double netWeight ;
 	/*Weight unit	
 	 * */
-	private double weightUnit ;
+	private String weightUnit ;
 	/*Length	
 	 * */
 	private double length ;
