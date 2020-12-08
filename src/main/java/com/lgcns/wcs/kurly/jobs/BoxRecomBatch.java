@@ -635,13 +635,13 @@ public class BoxRecomBatch  {
 					wifShipmentVO.setCustomerTelNo("");
 				}
 				if( StringUtil.isEmpty(wifShipmentVO.getZipCode()) ) {
-					wifShipmentVO.setZipCode("");
+					wifShipmentVO.setZipCode(" ");
 				}
 				if( StringUtil.isEmpty(wifShipmentVO.getCustomerPhoneNo()) ) {
-					wifShipmentVO.setCustomerPhoneNo("");
+					wifShipmentVO.setCustomerPhoneNo(" ");
 				}
 				if( StringUtil.isEmpty(wifShipmentVO.getNewZipCode()) ) {
-					wifShipmentVO.setNewZipCode("");
+					wifShipmentVO.setNewZipCode(" ");
 				}
 				if( StringUtil.isEmpty(wifShipmentVO.getJibunBasicAddr()) ) {
 					wifShipmentVO.setJibunBasicAddr(" ");
@@ -794,6 +794,9 @@ public class BoxRecomBatch  {
 //				if( StringUtil.isEmpty(searchOrdInfoVO.getNetWeight()) ) {
 //					wifShipmentDtlVO.setNetWeight("");
 //				}
+				if( StringUtil.isEmpty(searchOrdInfoVO.getWeightUnit()) ) {
+					wifShipmentDtlVO.setWeightUnit(" ");
+				}
 				if( StringUtil.isEmpty(searchOrdInfoVO.getSkuOptionName()) ) {
 					wifShipmentDtlVO.setSkuOptionName("");
 				}
