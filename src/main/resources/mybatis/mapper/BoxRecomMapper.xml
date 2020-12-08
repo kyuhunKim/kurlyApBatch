@@ -235,7 +235,8 @@
 		HD.REGION_CODE            AS regionCode,
 		HD.DELIVERY_ROUND         AS deliveryRound,
 		HD.ALLOC_SEQ              AS allocSeq,
-		HD.ORIGIN_INVOICE_NO      AS originInvoiceNo ,
+		CASE WHEN HD.ORIGIN_INVOICE_NO IS NULL THEN  HD.INVOICE_NO || '-0001' 
+		      		ELSE HD.ORIGIN_INVOICE_NO || '-0001' END    AS originInvoiceNo ,
 		HD.ALLOC_TYPE             AS allocType,
 		(CASE WHEN HD.MEMBER_GRADE = '0003' 
               THEN 'Y' ELSE 'N' END) AS specialMgntCustYn    ,
