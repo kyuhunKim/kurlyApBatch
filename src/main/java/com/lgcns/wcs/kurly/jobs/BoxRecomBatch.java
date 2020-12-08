@@ -688,6 +688,9 @@ public class BoxRecomBatch  {
 				if( "null".equals(wifShipmentVO.getAllocSeq()) ) {
 					wifShipmentVO.setAllocSeq("");
 				}
+		    	if( StringUtil.isEmpty(wifShipmentVO.getAllocType()) ) {
+		    		wifShipmentVO.setAllocType("");  
+				}
 				
 			} else {
 				continue;
