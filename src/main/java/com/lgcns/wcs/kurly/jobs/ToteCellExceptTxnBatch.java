@@ -148,7 +148,7 @@ public class ToteCellExceptTxnBatch {
 					if(KurlyConstants.STATUS_N.equals(r_ifYn)) {
 						updateMap.put("exceptIfYn",KurlyConstants.STATUS_N);
 						updateMap.put("exceptIfRetCode",KurlyConstants.STATUS_NG);
-						updateMap.put("exceptIfRetMessage",retMessage);
+						updateMap.put("exceptIfRetMessage",retMessage.substring(0, 990));
 					} else {
 						updateMap.put("exceptIfYn",KurlyConstants.STATUS_Y);
 						updateMap.put("exceptIfRetCode",KurlyConstants.STATUS_OK);

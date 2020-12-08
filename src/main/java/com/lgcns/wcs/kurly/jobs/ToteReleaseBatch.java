@@ -113,7 +113,7 @@ public class ToteReleaseBatch  {
 					if(KurlyConstants.STATUS_N.equals(r_ifYn)) {
 						updateMap.put("toteReleaseIntfYn",KurlyConstants.STATUS_N);
 						updateMap.put("toteReleaseIntfCode",KurlyConstants.STATUS_NG);
-						updateMap.put("toteReleaseIntfMemo",retMessage);
+						updateMap.put("toteReleaseIntfMemo",retMessage.substring(0, 990));
 					} else {
 						updateMap.put("toteReleaseIntfYn",KurlyConstants.STATUS_Y);
 						updateMap.put("toteReleaseIntfCode",KurlyConstants.STATUS_OK);

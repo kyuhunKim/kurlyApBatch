@@ -51,6 +51,35 @@ public class LogApiStatusServiceImpl implements LogApiStatusService {
 				"".equals(logApiStatus.getWarehouseKey())) {
 			logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
 		}
+		
+    	if( StringUtil.isEmpty(logApiStatus.getToteId()) ) {
+			logApiStatus.setToteId("");  
+		}
+    	if( StringUtil.isEmpty(logApiStatus.getGroupNo()) ) {
+			logApiStatus.setGroupNo("");  
+		}
+    	if( StringUtil.isEmpty(logApiStatus.getWorkBatchNo()) ) {
+			logApiStatus.setWorkBatchNo("");  
+		}
+		if( StringUtil.isEmpty(logApiStatus.getShipUidWcs()) ) {
+			logApiStatus.setShipUidWcs("");  //출고오더UID(WCS)
+		}
+		if( StringUtil.isEmpty(logApiStatus.getShipUidSeq()) ) {
+			logApiStatus.setShipUidSeq("");  //출고오더UID(WCS)
+		}
+		if( StringUtil.isEmpty(logApiStatus.getShipOrderKey()) ) {
+			logApiStatus.setShipOrderKey("");  //출하문서번호(WMS)
+		}
+    	if( StringUtil.isEmpty(logApiStatus.getWcsStatus()) ) {
+    		logApiStatus.setWcsStatus("");  //WCS 작업상태
+		}
+    	if( StringUtil.isEmpty(logApiStatus.getInvoiceNo()) ) {
+    		logApiStatus.setInvoiceNo("");  //송장번호
+		}
+    	if( StringUtil.isEmpty(logApiStatus.getSkuCode()) ) {
+    		logApiStatus.setSkuCode("");  
+		}
+    	
 		String v_ApiInfo = logApiStatus.getApiInfo();
 //		String c_ApiInfo = StringUtil.cutString(v_ApiInfo, 3500, "");
 		logApiStatus.setApiInfo(v_ApiInfo);
@@ -61,7 +90,7 @@ public class LogApiStatusServiceImpl implements LogApiStatusService {
     	
 		int seqId = logApiStatusRepository.createLogApiStatus(logApiStatus);
 		
-    	log.info("=================createLogApiStatus end========"+ "["+seqId+"]");
+    	log.info("=================createLogApiStatus end========");
 		return seqId;
 	}
 

@@ -10,14 +10,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.lgcns.wcs.kurly.dto.KurlyConstants;
 import com.lgcns.wcs.kurly.dto.box.BoxTypeVO;
 import com.lgcns.wcs.kurly.dto.box.CellTypeVO;
 import com.lgcns.wcs.kurly.dto.box.OrdInfoList;
 import com.lgcns.wcs.kurly.dto.box.OrdInfoVO;
 import com.lgcns.wcs.kurly.dto.box.OrdLineVO;
+import com.lgcns.wcs.kurly.dto.box.SearchOrdInfoVO;
 import com.lgcns.wcs.kurly.dto.box.SearchVO;
 import com.lgcns.wcs.kurly.dto.box.SkuTypeMap;
 import com.lgcns.wcs.kurly.dto.box.SkuTypeVO;
+import com.lgcns.wcs.kurly.dto.box.WifShipmentDtlVO;
+import com.lgcns.wcs.kurly.dto.box.WifShipmentVO;
 import com.lgcns.wcs.kurly.repository.BoxRecomRepository;
 import com.lgcns.wcs.kurly.service.BoxRecomService;
 
@@ -163,6 +167,15 @@ public class BoxRecomServiceImpl implements BoxRecomService {
 	public String insertOrdShipmentHdr(Map<String, String> data) throws Exception {
 		String shipUidKey = this.getShipUidKey();
 		data.put("shipUidKey", shipUidKey);
+
+		//20201201 오더생성 전에 삭제,취소 인터페이스 왔을 경우 wif update
+		int chgmgntCnt = boxRecomRepository.selectWifShipChgmgntCnt(data);
+		if(chgmgntCnt > 0) {
+			boxRecomRepository.updateWifShipChgmgntUpdate(data);
+			data.put("shipmentCnclYn", "Y");
+		} else {
+			data.put("shipmentCnclYn", "N");
+		}
 		
 		boxRecomRepository.insertOrdShipmentHdr(data);
 		
@@ -263,20 +276,6 @@ public class BoxRecomServiceImpl implements BoxRecomService {
 
 	/**
 	 * 
-	 * @Method Name : selectOrdShipmentCount
-	 * @작성일 : 2020. 10. 22.
-	 * @작성자 : jooni
-	 * @변경이력 : 2020. 10. 22. 최초작성
-	 * @Method 설명 : OrdShipmentCount select
-	 */
-	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Throwable.class)
-	public int selectOrdShipmentCount(Map<String, String> data){
-		int count = boxRecomRepository.selectOrdShipmentCount(data);
-		return count;
-	}
-
-	/**
-	 * 
 	 * @Method Name : selectDate
 	 * @작성일 : 2020. 10. 22.
 	 * @작성자 : jooni
@@ -331,5 +330,85 @@ public class BoxRecomServiceImpl implements BoxRecomService {
 		List<OrdInfoVO> resultData = boxRecomRepository.selectOrdInfoSearchList(svo);
 		return resultData;
 	}
-	
+
+	/**
+	 * 
+	 * @Method Name : selectOrdLineListAll
+	 * @작성일 : 2020. 12. 07.
+	 * @작성자 : jooni
+	 * @변경이력 : 2020. 12. 07. 최초작성
+	 * @Method 설명 : OrdInfoSearchList all select
+	 */
+	@Transactional(propagation=Propagation.REQUIRED)
+	public List<SearchOrdInfoVO> selectOrdLineListAll(SearchVO svo) {
+		List<SearchOrdInfoVO> resultData = boxRecomRepository.selectOrdLineListAll(svo);
+		return resultData;
+	}
+
+	/**
+	 * 
+	 * @Method Name : insertOrdShipmentListType
+	 * @작성일 : 2020. 12. 07.
+	 * @작성자 : jooni
+	 * @변경이력 : 2020. 12. 07. 최초작성
+	 * @Method 설명 : header, detail listType insert
+	 */
+	@Transactional(propagation=Propagation.REQUIRED, rollbackFor= Throwable.class)
+	public void insertOrdShipmentListType(List<WifShipmentVO> hdList, List<WifShipmentDtlVO> dtList) {
+		
+		String inft_yn = KurlyConstants.STATUS_Y;
+		try
+    	{
+			//OrdShipmentHdrL insert
+			HashMap<String, Object> hdMap = new HashMap<String, Object>();
+			hdMap.put("hdList",hdList);
+			
+			boxRecomRepository.insertOrdShipmentHdrListType(hdMap);
+
+			//OrdShipmentDtl insert
+			HashMap<String, Object> dtMap = new HashMap<String, Object>();
+			dtMap.put("dtList",dtList);
+			
+			boxRecomRepository.insertOrdShipmentDtlListType(dtMap);
+		
+    	} catch (Exception e) {
+    		
+			log.info( " === insertOrdShipmentListType  error >> " +e );
+			inft_yn = KurlyConstants.STATUS_N;
+			    				
+			e.printStackTrace();
+			
+    	} finally {
+    		
+    		//상태 업데이트
+    		HashMap<String, Object> uParam = new HashMap<String, Object>();
+    		uParam.put("hdList",hdList);
+    		uParam.put("receiveIntfYn", inft_yn);
+    		if(KurlyConstants.STATUS_N.equals(inft_yn)) {
+    			uParam.put("receiveIntfCode", "");
+	    	} else {
+	    		uParam.put("receiveIntfCode", KurlyConstants.STATUS_OK);
+	    	}
+			uParam.put("receiveIntfMemo", "");
+
+//			log.info( "----------uParam " + uParam + "------------------------ " );
+			boxRecomRepository.updateWifShipmentHdrList(uParam);
+
+    	} //finally end
+		
+		
+	};
+
+	/**
+	 * 
+	 * @Method Name : updateWifShipmentHdrList
+	 * @작성일 : 2020. 12. 07.
+	 * @작성자 : jooni
+	 * @변경이력 : 2020. 12. 07. 최초작성
+	 * @Method 설명 : header 실행 결과  listType insert
+	 */
+	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Throwable.class)
+	public void updateWifShipmentHdrList(Map<String, Object> data)  {
+		boxRecomRepository.updateWifShipmentHdrList(data);
+	}
 }

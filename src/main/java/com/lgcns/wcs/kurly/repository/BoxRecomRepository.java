@@ -1,5 +1,6 @@
 package com.lgcns.wcs.kurly.repository;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,6 +11,7 @@ import com.lgcns.wcs.kurly.dto.box.BoxTypeVO;
 import com.lgcns.wcs.kurly.dto.box.CellTypeVO;
 import com.lgcns.wcs.kurly.dto.box.OrdInfoVO;
 import com.lgcns.wcs.kurly.dto.box.OrdLineVO;
+import com.lgcns.wcs.kurly.dto.box.SearchOrdInfoVO;
 import com.lgcns.wcs.kurly.dto.box.SearchVO;
 import com.lgcns.wcs.kurly.dto.box.SkuTypeVO;
 
@@ -38,11 +40,19 @@ public interface BoxRecomRepository  {
 	
 	void insertOrdShipmentDtlAll(Map<String, String> data) ;
 	
-	int selectOrdShipmentCount(Map<String, String> data) ;
-	
 	String selectDate() ;
 	
 	List<BoxTypeVO> selectBoxTypeMaxList();
 	int selectOrdInfoSearchCount();
 	List<OrdInfoVO> selectOrdInfoSearchList(SearchVO svo);
+	
+	void updateWifShipChgmgntUpdate(Map<String, String> data) ;
+	int selectWifShipChgmgntCnt(Map<String, String> data) ;
+
+	List<SearchOrdInfoVO> selectOrdLineListAll(SearchVO svo);
+
+	void insertOrdShipmentHdrListType(HashMap<String, Object> data);
+	void insertOrdShipmentDtlListType(HashMap<String, Object> data);
+
+	void updateWifShipmentHdrList(Map<String, Object> data) ;
 }

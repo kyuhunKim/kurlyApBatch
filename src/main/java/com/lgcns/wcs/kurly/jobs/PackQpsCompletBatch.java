@@ -121,7 +121,7 @@ public class PackQpsCompletBatch  {
 					if(KurlyConstants.STATUS_N.equals(r_ifYn)) {
 						updateMap.put("packCmptIntfYn",KurlyConstants.STATUS_N);
 						updateMap.put("packCmptIntfCode",KurlyConstants.STATUS_NG);
-						updateMap.put("packCmptIntfMemo",retMessage);
+						updateMap.put("packCmptIntfMemo",retMessage.substring(0, 990));
 					} else {
 						updateMap.put("packCmptIntfYn",KurlyConstants.STATUS_Y);
 						updateMap.put("packCmptIntfCode",KurlyConstants.STATUS_OK);

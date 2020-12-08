@@ -22,8 +22,10 @@ spring:
           dasNumUseCell:  MSG-WCS_AP_DAS_NUM_USECELL
   
   datasource:
-    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-    url: jdbc:log4jdbc:oracle:thin:@10.12.43.111:1521:wcsprod
+#    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+#    url: jdbc:log4jdbc:oracle:thin:@10.12.43.111:1521:wcsprod
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    url: jdbc:oracle:thin:@10.12.43.111:1521:wcsprod
     username : s_wcs
     password : s_wcs
     
@@ -60,6 +62,7 @@ spring.main.allow-bean-definition-overriding: true
 # mybatis 설정.
 mybatis:
   mapper-locations: classpath:/mybatis/mapper/*.xml
+  config-location: classpath:/mybatis-config.xml
 
 logging:
   level:

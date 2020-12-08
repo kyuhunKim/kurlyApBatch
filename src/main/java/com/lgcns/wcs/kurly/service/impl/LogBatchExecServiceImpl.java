@@ -65,7 +65,7 @@ public class LogBatchExecServiceImpl implements LogBatchExecService {
 		
 		int seqId = logBatchExecRepository.createLogBatchExec(logBatchExec);
 
-    	log.info("=================createLogBatchExec end========"+ "["+seqId+"]");
+    	log.info("=================createLogBatchExec end========");
     	
 		return seqId;
 	}

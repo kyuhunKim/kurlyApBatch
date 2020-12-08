@@ -12,7 +12,8 @@
 		UC.WAREHOUSE_KEY       AS  warehouseKey
 		, UC.CELL_TYPE_STATUS  AS  cellTypeStatus
 		, UC.CELL_DAS_GROUP_ID AS  dasCellGroupId
-		, UC.DAS_NUM_USE_CELL  AS  dasNumUseCell
+		, (CASE WHEN UC.CELL_TYPE_STATUS = 'DELETE' THEN 0 
+				ELSE UC.DAS_NUM_USE_CELL END) AS  dasNumUseCell
 		, ''                   AS  dasNumAttr1
 		, ''                   AS  dasNumAttr2 
 		, TO_CHAR(SYSDATE,'YYYYMMDD') AS batchRunDate

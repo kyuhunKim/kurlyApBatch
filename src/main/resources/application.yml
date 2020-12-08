@@ -27,16 +27,20 @@ spring:
 #   dev
 #    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
 #    url: jdbc:log4jdbc:oracle:thin:@15.15.21.220:1521/wcsdev
+#    driver-class-name: oracle.jdbc.driver.OracleDriver
+#    url: jdbc:oracle:thin:@15.15.21.220:1521/wcsdev
 #    username : s_wcs
 #    password : smartAPP9
 #   real
-    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-    url: jdbc:log4jdbc:oracle:thin:@10.12.43.111:1521:wcsprod
+##    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+##    url: jdbc:log4jdbc:oracle:thin:@10.12.43.111:1521:wcsprod
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    url: jdbc:oracle:thin:@10.12.43.111:1521:wcsprod
     username : s_wcs
     password : s_wcs
     
     hikari:
-      minimum-idle: 5
+      minimum-idle: 15
       maximum-pool-size: 50
       idle-timeout:  10000
       connection-timeout: 10000
@@ -64,10 +68,10 @@ spring:
         
 spring.main.allow-bean-definition-overriding: true
 
-
 # mybatis 설정.
 mybatis:
   mapper-locations: classpath:/mybatis/mapper/*.xml
+  config-location: classpath:/mybatis-config.xml
 
 logging:
   level:

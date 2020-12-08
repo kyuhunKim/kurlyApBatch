@@ -112,7 +112,7 @@ public class OrdmadeNotfullyBatch  {
 					if(KurlyConstants.STATUS_N.equals(r_ifYn)) {
 						updateMap.put("notfullyIfYn",KurlyConstants.STATUS_N);
 						updateMap.put("notfullyIfRetCode",KurlyConstants.STATUS_NG);
-						updateMap.put("notfullyIfRetMessage",retMessage);
+						updateMap.put("notfullyIfRetMessage",retMessage.substring(0, 990));
 					} else {
 						updateMap.put("notfullyIfYn",KurlyConstants.STATUS_Y);
 						updateMap.put("notfullyIfRetCode",KurlyConstants.STATUS_OK);

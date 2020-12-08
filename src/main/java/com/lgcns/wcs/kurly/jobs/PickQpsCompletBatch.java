@@ -121,7 +121,7 @@ public class PickQpsCompletBatch  {
 					if(KurlyConstants.STATUS_N.equals(r_ifYn)) {
 						updateMap.put("pickCmptIntfYn",KurlyConstants.STATUS_N);
 						updateMap.put("pickCmptIntfCode",KurlyConstants.STATUS_NG);
-						updateMap.put("pickCmptIntfMemo",retMessage);
+						updateMap.put("pickCmptIntfMemo",retMessage.substring(0, 990));
 					} else {
 						updateMap.put("pickCmptIntfYn",KurlyConstants.STATUS_Y);
 						updateMap.put("pickCmptIntfCode",KurlyConstants.STATUS_OK);

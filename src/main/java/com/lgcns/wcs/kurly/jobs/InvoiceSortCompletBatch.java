@@ -111,7 +111,7 @@ public class InvoiceSortCompletBatch  {
 					if(KurlyConstants.STATUS_N.equals(r_ifYn)) {
 						updateMap.put("invoiceSortIntfYn",KurlyConstants.STATUS_N);
 						updateMap.put("invoiceSortIntfCode",KurlyConstants.STATUS_NG);
-						updateMap.put("invoiceSortIntfMemo",retMessage);
+						updateMap.put("invoiceSortIntfMemo",retMessage.substring(0, 990));
 					} else {
 						updateMap.put("invoiceSortIntfYn",KurlyConstants.STATUS_Y);
 						updateMap.put("invoiceSortIntfCode",KurlyConstants.STATUS_OK);

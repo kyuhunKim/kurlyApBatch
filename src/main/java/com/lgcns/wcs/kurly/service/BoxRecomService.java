@@ -10,9 +10,12 @@ import com.lgcns.wcs.kurly.dto.box.CellTypeVO;
 import com.lgcns.wcs.kurly.dto.box.OrdInfoList;
 import com.lgcns.wcs.kurly.dto.box.OrdInfoVO;
 import com.lgcns.wcs.kurly.dto.box.OrdLineVO;
+import com.lgcns.wcs.kurly.dto.box.SearchOrdInfoVO;
 import com.lgcns.wcs.kurly.dto.box.SearchVO;
 import com.lgcns.wcs.kurly.dto.box.SkuTypeMap;
 import com.lgcns.wcs.kurly.dto.box.SkuTypeVO;
+import com.lgcns.wcs.kurly.dto.box.WifShipmentDtlVO;
+import com.lgcns.wcs.kurly.dto.box.WifShipmentVO;
 
 
 /**
@@ -48,8 +51,6 @@ public interface BoxRecomService {
 	
 	public void insertOrdShipmentDtl(OrdInfoVO tempOrd, String shipUidKey, int splitSeqNum) throws Exception ;
 	
-	public int selectOrdShipmentCount(Map<String, String> data);
-	
 	public String selectDate() ;
 	
 	public List<BoxTypeVO> selectBoxTypeMaxList() ;
@@ -57,4 +58,11 @@ public interface BoxRecomService {
 	public int selectOrdInfoSearchCount() ;
 	
 	public List<OrdInfoVO> selectOrdInfoSearchList(SearchVO svo) ;
+
+	public List<SearchOrdInfoVO> selectOrdLineListAll(SearchVO svo) ;
+
+	public void insertOrdShipmentListType(List<WifShipmentVO> data, List<WifShipmentDtlVO> data2);
+
+	public void updateWifShipmentHdrList(Map<String, Object> data) ;
+	
 }

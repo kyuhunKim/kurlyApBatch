@@ -106,7 +106,7 @@ public class ToteScanBatch  {
 					if(KurlyConstants.STATUS_N.equals(r_ifYn)) {
 						updateMap.put("toteScanIfYn",KurlyConstants.STATUS_N);
 						updateMap.put("toteScanIfRetCode",KurlyConstants.STATUS_NG);
-						updateMap.put("toteScanIfRetMessage",retMessage);
+						updateMap.put("toteScanIfRetMessage",retMessage.substring(0, 990));
 					} else {
 						updateMap.put("toteScanIfYn",KurlyConstants.STATUS_Y);
 						updateMap.put("toteScanIfRetCode",KurlyConstants.STATUS_OK);

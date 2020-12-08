@@ -21,7 +21,7 @@ public class HttpUtil {
 		String inputLine = "";
 		StringBuffer outResult = new StringBuffer();
 		
-		log.info("=inputUrl="+inputUrl);
+//		log.info("=inputUrl="+inputUrl);
 		
 		try
 		{
@@ -53,9 +53,9 @@ public class HttpUtil {
 			}
 			conn.disconnect();
 			
-			log.info("================================");
-			log.info("="+outResult.toString());
-			log.info("================================");
+//			log.info("================================");
+//			log.info("="+outResult.toString());
+//			log.info("================================");
 			
 		} catch(Exception e) {
 			log.info(e.getMessage());

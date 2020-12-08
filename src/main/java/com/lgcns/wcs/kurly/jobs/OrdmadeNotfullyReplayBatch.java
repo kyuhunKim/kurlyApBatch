@@ -112,7 +112,7 @@ public class OrdmadeNotfullyReplayBatch {
 					if(KurlyConstants.STATUS_N.equals(r_ifYn)) {
 						updateMap.put("notfullyReqIfYn",KurlyConstants.STATUS_N);
 						updateMap.put("notfullyReqIfRetCode",KurlyConstants.STATUS_NG);
-						updateMap.put("notfullyReqIfRetMessage",retMessage);
+						updateMap.put("notfullyReqIfRetMessage",retMessage.substring(0, 990));
 					} else {
 						updateMap.put("notfullyReqIfYn",KurlyConstants.STATUS_Y);
 						updateMap.put("notfullyReqIfRetCode",KurlyConstants.STATUS_OK);
