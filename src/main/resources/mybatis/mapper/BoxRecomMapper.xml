@@ -478,8 +478,8 @@
 		      HD.REGION_CODE           ,
 		      HD.DELIVERY_ROUND        ,
 		      HD.ALLOC_SEQ             ,
-		      CASE WHEN HD.ORIGIN_INVOICE_NO IS NULL THEN  HD.ORIGIN_INVOICE_NO || '-0001' 
-		      		ELSE HD.INVOICE_NO || '-0001' END   AS ORIGIN_INVOICE_NO ,
+		      CASE WHEN HD.ORIGIN_INVOICE_NO IS NULL THEN  HD.INVOICE_NO || '-0001' 
+		      		ELSE HD.ORIGIN_INVOICE_NO || '-0001' END   AS ORIGIN_INVOICE_NO ,
 		      TO_CHAR(SYSDATE, 'YYYYMMDD') AS CREATED_DATE,
 		      TO_CHAR(SYSDATE, 'HH24MISS') AS CREATED_TIME,
 		      'REC_BATCH' CREATED_USER          ,
@@ -929,7 +929,7 @@
 		      #{item.regionCode}       AS REGION_CODE        ,
 		      #{item.deliveryRound}    AS DELIVERY_ROUND     ,
 		      #{item.allocSeq}         AS ALLOC_SEQ          ,
-		      #{item.originInvoiceNo} || '-0001'  AS ORIGIN_INVOICE_NO,
+		      #{item.originInvoiceNo}   AS ORIGIN_INVOICE_NO,
 		      TO_CHAR(SYSDATE, 'YYYYMMDD')   AS CREATED_DATE ,
 		      TO_CHAR(SYSDATE, 'HH24MISS')   AS CREATED_TIME ,
 		      'REC_BATCH02'            AS CREATED_USER       ,

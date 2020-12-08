@@ -21,7 +21,7 @@ public class BoxRecommendApp {
 		int ableBoxNum = 0;
 		for(BoxTypeVO itBoxType : boxTypeMaster.getBoxMaster())
 		{
-			System.out.println(ordList.getWarehouseKey() + ", " + itBoxType.getWarehouseKey());
+//			System.out.println(ordList.getWarehouseKey() + ", " + itBoxType.getWarehouseKey());
 			
 			//Warehouse check.
 			if(!ordList.getWarehouseKey().equals(itBoxType.getWarehouseKey()))
