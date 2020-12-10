@@ -136,7 +136,7 @@ public class DasNumUseCellBatch  {
 
 					dasNumUseCellService.updateDasNumUseCell(updateMap);
 			    	
-	    			log.info("====finally createLogApiStatus===============");
+//	    			log.info("====finally createLogApiStatus===============");
 
 	    			apiRunTimeEnd = System.currentTimeMillis();
 	    			apiRunTime = StringUtil.formatInterval(apiRunTimeStartFor, apiRunTimeEnd) ;
@@ -192,7 +192,7 @@ public class DasNumUseCellBatch  {
 			    	}
 			    	
 			    	logApiStatusService.createLogApiStatus(logApiStatus);
-	    			log.info("====finally createLogApiStatus===============");
+//	    			log.info("====finally createLogApiStatus===============");
 			    	
 	    		}
 	    		executeCount++;
@@ -226,7 +226,6 @@ public class DasNumUseCellBatch  {
         	logBatchExec.setStartDate(startDate);
         	
         	logBatchExecService.createLogBatchExec(logBatchExec);
-        	log.info("=================createLogBatchExec end=============== ");    		
     	}
     	
     	log.info("=================DasNumUseCellBatch end===============");

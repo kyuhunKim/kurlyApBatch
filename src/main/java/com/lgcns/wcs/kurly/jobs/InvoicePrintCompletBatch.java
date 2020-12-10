@@ -127,14 +127,13 @@ public class InvoicePrintCompletBatch  {
 					
 			    	invoicePrintCompletService.updateInvoicePrintComplet(updateMap);
 
-			    	log.info("=================updateInvoicePrintComplet===============2");
 			    	
 	    		} catch (Exception ex) {	
 	    			log.info("== send error == " + invoicePrintCompletData.getInvoiceNo());  
 	    			retMessage = ex.getMessage().substring(0, 90);
     				r_ifYn = KurlyConstants.STATUS_N;
 	    		} finally {
-	    			log.info("====finally createLogApiStatus===============1");
+//	    			log.info("====finally createLogApiStatus===============1");
 
 	    			apiRunTimeEnd = System.currentTimeMillis();
 	    			apiRunTime = StringUtil.formatInterval(apiRunTimeStartFor, apiRunTimeEnd) ;
@@ -210,7 +209,7 @@ public class InvoicePrintCompletBatch  {
 			    	
 			    	//로그정보 적재
 			    	logApiStatusService.createLogApiStatus(logApiStatus);
-	    			log.info("====finally createLogApiStatus===============2");
+//	    			log.info("====finally createLogApiStatus===============2");
 			    	
 	    		}
 	    		executeCount++;
@@ -246,8 +245,8 @@ public class InvoicePrintCompletBatch  {
 	    	//로그정보 적재
         	logBatchExecService.createLogBatchExec(logBatchExec);
 	    	
-        	log.info("=================InvoicePrintCompletBatch end=============== ");    		
     	}
+    	log.info("=================InvoicePrintCompletBatch executeCount["+executeCount+"]");
     	log.info("=================InvoicePrintCompletBatch end===============");
     	
                                                                                                                                                                                                                                             }

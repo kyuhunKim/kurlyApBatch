@@ -206,9 +206,9 @@ public class BoxRecomBatch  {
     				//box 추천 실행
     				new BoxRecommendApp(tempOrd, boxMaster);
 
-    				log.info( "------------------------------------------" );
-    				log.info( "S boxType : " + tempOrd.getBoxType()  );
-    				log.info( "------------------------------------------" );
+//    				log.info( "------------------------------------------" );
+//    				log.info( "S boxType : " + tempOrd.getBoxType()  );
+//    				log.info( "------------------------------------------" );
     				
     				String t_packBoxTypeRecom = tempOrd.getBoxType();
     				String t_packBoxSplitYn = KurlyConstants.STATUS_N;

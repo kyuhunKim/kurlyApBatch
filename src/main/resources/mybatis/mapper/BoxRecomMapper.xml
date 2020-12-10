@@ -278,9 +278,9 @@
 		DT.QPS_NUM                AS qpsNum,
 		DT.WMS_BATCH_YMD          AS wmsBatchYmd ,
 		DT.SKU_CODE               AS skuCode,
-		SM.LENGTH                 AS skuDepth,
-		SM.WIDTH                  AS skuWidth,
-		SM.HEIGHT                 AS skuHeight,
+		(CASE WHEN SM.LENGTH = 0 THEN DT.LENGTH ELSE SM.LENGTH END)    AS skuDepth,
+		(CASE WHEN SM.WIDTH  = 0 THEN DT.WIDTH  ELSE SM.WIDTH  END)    AS skuWidth,
+		(CASE WHEN SM.HEIGHT = 0 THEN DT.HEIGHT ELSE SM.HEIGHT END)    AS skuHeight,
 		SUM(DT.QTY_SHIP_ORDER)    AS ordQty
 	FROM o_wcs.TB_WIF_SHIPMENT_HDR HD,
 		 o_wcs.TB_WIF_SHIPMENT_DTL DT,
@@ -368,14 +368,13 @@
 		DT.QPS_NUM             ,
 		DT.WMS_BATCH_YMD       ,
 		DT.SKU_CODE,
-		SM.LENGTH  ,
-		SM.WIDTH   ,
-		SM.HEIGHT
+		(CASE WHEN SM.LENGTH = 0 THEN DT.LENGTH ELSE SM.LENGTH END) ,
+		(CASE WHEN SM.WIDTH  = 0 THEN DT.WIDTH  ELSE SM.WIDTH END)  ,
+		(CASE WHEN SM.HEIGHT = 0 THEN DT.HEIGHT ELSE SM.HEIGHT END)
 	ORDER BY HD.SHIP_ORDER_KEY ASC,
 		DT.SHIP_ORDER_ITEM_SEQ ASC
      ]]> 
   </select>
-  
   
   <select id="getShipUidKey" resultType="String">
   	/* [BoxRecomMapper.xml] getShipUidKey */
@@ -1119,9 +1118,15 @@
 			MODIFIED_DATE = TO_CHAR(SYSDATE, 'YYYYMMDD') ,
 			MODIFIED_TIME = TO_CHAR(SYSDATE, 'HH24MISS') ,
 			MODIFIED_USER = 'REC_BATCH'
-		WHERE HD.SHIP_ORDER_KEY IN
-		<foreach collection="hdList" item="item" open="(" close=")" separator=",">
-		 #{item.shipOrderKey}
-		</foreach>
+		WHERE EXISTS (
+			SELECT 1
+			  FROM (
+			  <foreach collection="hdList" item="item" index="index" separator="union all">
+		 		SELECT #{item.shipOrderKey} AS SHIP_ORD_KEY
+		 		 FROM DUAL 
+			  </foreach>
+			  ) A
+			  WHERE A.SHIP_ORD_KEY = HD.SHIP_ORDER_KEY )
+		
   </update>
 </mapper>
