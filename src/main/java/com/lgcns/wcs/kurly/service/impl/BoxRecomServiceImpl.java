@@ -382,7 +382,7 @@ public class BoxRecomServiceImpl implements BoxRecomService {
     		
     		//상태 업데이트
     		HashMap<String, Object> uParam = new HashMap<String, Object>();
-    		uParam.put("hdList",hdList);
+//    		uParam.put("hdList",hdList);
     		uParam.put("receiveIntfYn", inft_yn);
     		if(KurlyConstants.STATUS_N.equals(inft_yn)) {
     			uParam.put("receiveIntfCode", "");

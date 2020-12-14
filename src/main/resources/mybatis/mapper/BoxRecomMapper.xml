@@ -1053,7 +1053,7 @@
 		SELECT 
 		      LPAD(#{item.shipUidItemSeq, jdbcType=VARCHAR}, 6, '0')  AS  SHIP_UID_ITEM_SEQ, 
 		      #{item.shipOrderKey, jdbcType=VARCHAR}      AS  SHIP_ORDER_KEY         ,
-		      LPAD(#{item.shipUidItemSeq, jdbcType=VARCHAR}, 6, '0')  AS  SHIP_ORDER_ITEM_SEQ    ,
+		      LPAD(#{item.shipOrderItemSeq, jdbcType=VARCHAR}, 6, '0')  AS  SHIP_ORDER_ITEM_SEQ    ,
 		      #{item.itemStatus, jdbcType=VARCHAR}        AS  ITEM_STATUS        ,
 		      #{item.skuCode, jdbcType=VARCHAR}           AS  SKU_CODE           ,
 		      #{item.qtyOriginOrder}    AS  QTY_ORIGIN_ORDER   ,
@@ -1118,15 +1118,11 @@
 			MODIFIED_DATE = TO_CHAR(SYSDATE, 'YYYYMMDD') ,
 			MODIFIED_TIME = TO_CHAR(SYSDATE, 'HH24MISS') ,
 			MODIFIED_USER = 'REC_BATCH'
-		WHERE EXISTS (
-			SELECT 1
-			  FROM (
-			  <foreach collection="hdList" item="item" index="index" separator="union all">
-		 		SELECT #{item.shipOrderKey} AS SHIP_ORD_KEY
-		 		 FROM DUAL 
-			  </foreach>
-			  ) A
-			  WHERE A.SHIP_ORD_KEY = HD.SHIP_ORDER_KEY )
-		
+		WHERE HD.RECEIVE_INTF_YN = 'N'
+		  AND EXISTS (
+			  SELECT 1
+			  	from o_wcs.TB_ORD_SHIPMENT_HDR OHD
+			 WHERE OHD.SHIP_ORDER_KEY = HD.SHIP_ORDER_KEY 
+			)
   </update>
 </mapper>

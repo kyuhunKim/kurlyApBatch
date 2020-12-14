@@ -389,7 +389,7 @@ public class BoxRecomBatch  {
 		    					}
 		    					
 		    					wifShipmentDtlVO.setShipOrderKey(itOrderLine.getShipOrderKey());
-		    					wifShipmentDtlVO.setShipOrderItemSeq(v_shipUidItemSeq);
+		    					wifShipmentDtlVO.setShipOrderItemSeq(itOrderLine.getShipOrderItemSeq());
 		    					wifShipmentDtlVO.setSkuCode(itOrderLine.getSkuCode());
 		    					wifShipmentDtlVO.setQtyQpsOrder(""+itOrderLine.getOrdQty());
 		    					wifShipmentDtlVO.setOwner(itOrd.getOwnerKey());
