@@ -33,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
  * @작성자 : jooni
  * @변경이력 : 2020. 07. 16. 최초작성
  * 			2020. 11. 12. RunTime 로직 수정
+ * 			2020. 12. 14. ORIGIN_INVOICE_NO -0001 없이 전송하도록 수정 
  * @Method 설명 : WCS 방면 분류 완료 정보  (WCS => WMS)
  */
 @Slf4j
@@ -90,9 +91,9 @@ public class InvoiceSortCompletBatch  {
 	    			ResponseEntity<ResponseMesssage> res = (ResponseEntity<ResponseMesssage>)deferredResult.getResult();
 	    			retStatus = (String)res.getBody().getStatus();
 	    			retMessage = (String)res.getBody().getMessage();
-	    			log.info(" >>>>>>>>>>>"+retStatus);
-	    			log.info(" >>>>>>>>>>>"+retMessage);
-	    	    	log.info(" >>>>>>>>>>>deferredResult.getResult()="+ deferredResult.getResult());
+//	    			log.info(" >>>>>>>>>>>"+retStatus);
+//	    			log.info(" >>>>>>>>>>>"+retMessage);
+	    	    	log.info(" >>>>>>>>>>>InvoiceSortCompletBatch deferredResult.getResult()="+ deferredResult.getResult());
 	    	    	
 //	    			if(deferredResult.getResult().toString().indexOf("SUCCESS") > -1) {
 	    	    	if(retStatus.equals("SUCCESS")) {
@@ -101,7 +102,6 @@ public class InvoiceSortCompletBatch  {
 	    				r_ifYn = KurlyConstants.STATUS_N;
 	    			}
 	    			
-	    			log.info("=================updateInvoiceSortComplet===============1");
 			    	//인터페이스 처리내역 update
 	    			String r_invoiceNo = invoiceSortCompletData.getInvoiceNo();
 	    			String r_warehouseKey = invoiceSortCompletData.getWarehouseKey();
@@ -124,14 +124,12 @@ public class InvoiceSortCompletBatch  {
 					
 			    	invoiceSortCompletService.updateInvoiceSortComplet(updateMap);
 
-			    	log.info("=================updateInvoiceSortComplet===============2");
 			    	
 	    		} catch (Exception ex) {	
 	    			log.info("== send error == " + invoiceSortCompletData.getInvoiceNo());  
 	    			retMessage = ex.getMessage().substring(0, 90);
     				r_ifYn = KurlyConstants.STATUS_N;
 	    		} finally {
-	    			log.info("====finally createLogApiStatus===============1");
 
 	    			apiRunTimeEnd = System.currentTimeMillis();
 	    			apiRunTime = StringUtil.formatInterval(apiRunTimeStartFor, apiRunTimeEnd) ;
@@ -203,7 +201,6 @@ public class InvoiceSortCompletBatch  {
 			    	
 			    	//로그정보 적재
 			    	logApiStatusService.createLogApiStatus(logApiStatus);
-	    			log.info("====finally createLogApiStatus===============2");
 			    	
 	    		}
 	    		executeCount++;
@@ -240,7 +237,6 @@ public class InvoiceSortCompletBatch  {
 	    	//로그정보 적재
         	logBatchExecService.createLogBatchExec(logBatchExec);
 	    	
-        	log.info("=================InvoiceSortCompletBatch end=============== ");    		
     	}
     	log.info("=================InvoiceSortCompletBatch end===============");
     	

@@ -14,7 +14,8 @@
 		OH.WAREHOUSE_KEY       AS warehouseKey,
 		OH.SHIP_UID_KEY        AS shipUidWcs,
 		OH.CELL_ID             AS cellId,
-		OH.ORIGIN_INVOICE_NO   AS originInvoiceNo,
+		CASE WHEN LENGTH(OH.ORIGIN_INVOICE_NO) > 21 THEN SUBSTR(OH.ORIGIN_INVOICE_NO,0,20) 
+			ELSE OH.ORIGIN_INVOICE_NO END       AS originInvoiceNo,
 		OH.ORDMADE_SPLIT_YN    AS ordmadeSplitYn,
 		OH.PACK_BOX_SPLIT_YN   AS packBoxSplitYn,
 		OH.PACK_BOX_TYPE_RECOM AS packBoxTypeRecom,

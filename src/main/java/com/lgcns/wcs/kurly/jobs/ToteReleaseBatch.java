@@ -95,9 +95,9 @@ public class ToteReleaseBatch  {
 	    			ResponseEntity<ResponseMesssage> res = (ResponseEntity<ResponseMesssage>)deferredResult.getResult();
 	    			retStatus = (String)res.getBody().getStatus();
 	    			retMessage = (String)res.getBody().getMessage();
-	    			log.info(" >>>>>>>>>>>"+retStatus);
-	    			log.info(" >>>>>>>>>>>"+retMessage);
-	    	    	log.info(" >>>>>>>>>>>deferredResult.getResult()="+ deferredResult.getResult());
+//	    			log.info(" >>>>>>>>>>>"+retStatus);
+//	    			log.info(" >>>>>>>>>>>"+retMessage);
+	    	    	log.info(" >>>>>>>>>>>toteRelease deferredResult.getResult()="+ deferredResult.getResult());
 	    	    	
 //	    			if(deferredResult.getResult().toString().indexOf("SUCCESS") > -1) {
 	    	    	if(retStatus.equals("SUCCESS")) {
@@ -123,17 +123,14 @@ public class ToteReleaseBatch  {
 //					updateMap.put("toteId",r_toteId);
 					updateMap.put("toteUniqueNo",""+r_toteUniqueNo);
 
-			    	log.info("=================updateToteRelease===============1");
 					toteReleaseService.updateToteRelease(updateMap);
 
-			    	log.info("=================updateToteRelease===============2");
 			    	
 	    		} catch (Exception ex) {	
 	    			log.info("== send error == " + toteReleaseData.getToteId());  
 	    			retMessage = ex.getMessage().substring(0, 90);
     				r_ifYn = KurlyConstants.STATUS_N;
 	    		} finally {
-	    			log.info("====finally createLogApiStatus===============1");
 
 	    			//로그 정보 insert
 			    	LogApiStatus logApiStatus = new LogApiStatus();
@@ -191,7 +188,6 @@ public class ToteReleaseBatch  {
 			    	
 			    	//로그정보 적재
 			    	logApiStatusService.createLogApiStatus(logApiStatus);
-	    			log.info("====finally createLogApiStatus===============2");
 			    	
 	    		}
 	    		executeCount++;
@@ -226,7 +222,6 @@ public class ToteReleaseBatch  {
         	
         	logBatchExecService.createLogBatchExec(logBatchExec);
 
-        	log.info("=================createLogBatchExec end=============== ");    		
     	}
     	log.info("=================ToteReleaseTasklet end=============== ");    
 

@@ -127,9 +127,9 @@ public class ToteCellExceptTxnBatch {
 	    			ResponseEntity<ResponseMesssage> res = (ResponseEntity<ResponseMesssage>)deferredResult.getResult();
 	    			retStatus = (String)res.getBody().getStatus();
 	    			retMessage = (String)res.getBody().getMessage();
-	    			log.info(" >>>>>>>>>>>"+retStatus);
-	    			log.info(" >>>>>>>>>>>"+retMessage);
-	    	    	log.info(" >>>>>>>>>>>deferredResult.getResult()="+ deferredResult.getResult());
+//	    			log.info(" >>>>>>>>>>>"+retStatus);
+//	    			log.info(" >>>>>>>>>>>"+retMessage);
+	    	    	log.info(" >>>>>>>>>>>ToteCellExceptTxnBatch deferredResult.getResult()="+ deferredResult.getResult());
 	    	    	
 //	    			if(deferredResult.getResult().toString().indexOf("SUCCESS") > -1) {
 	    	    	if(retStatus.equals("SUCCESS")) {
@@ -138,7 +138,6 @@ public class ToteCellExceptTxnBatch {
 	    				r_ifYn = KurlyConstants.STATUS_N;
 	    			}
 	    			
-	    			log.info("=================updateToteCellExceptTxn===============1");
 			    	//인터페이스 처리내역 update
 	    			String r_toteId = toteCellExceptTxnSelectData.getToteId();
 	    			String r_toteIdSeq = toteCellExceptTxnSelectData.getToteIdSeq();
@@ -161,14 +160,12 @@ public class ToteCellExceptTxnBatch {
 
 			    	toteCellExceptTxnService.updateToteCellExceptTxn(updateMap);
 
-			    	log.info("=================updateToteCellExceptTxn===============2");
 			    	
 	    		} catch (Exception ex) {	
 	    			log.info("== send error == " + toteCellExceptTxnSelectData.getToteId());  
 	    			retMessage = ex.getMessage().substring(0, 90);
     				r_ifYn = KurlyConstants.STATUS_N;
 	    		} finally {
-	    			log.info("====finally createLogApiStatus===============1");
 	    			
 					//전송로그 정보 insert
 			    	LogApiStatus logApiStatus = new LogApiStatus();
@@ -239,7 +236,6 @@ public class ToteCellExceptTxnBatch {
 			    	
 			    	//로그정보 적재
 			    	logApiStatusService.createLogApiStatus(logApiStatus);
-	    			log.info("====finally createLogApiStatus===============2");
 			    	
 	    		}
 	    		executeCount++;
@@ -277,7 +273,6 @@ public class ToteCellExceptTxnBatch {
 	    	//로그정보 적재
         	logBatchExecService.createLogBatchExec(logBatchExec);
 	    	
-        	log.info("=================createLogBatchExec end=============== ");    		
     	}
     	log.info("=================ToteCellExceptTxnBatch end=============== ");    	
 

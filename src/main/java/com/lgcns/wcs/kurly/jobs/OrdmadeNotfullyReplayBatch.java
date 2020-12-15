@@ -90,9 +90,9 @@ public class OrdmadeNotfullyReplayBatch {
 	    			ResponseEntity<ResponseMesssage> res = (ResponseEntity<ResponseMesssage>)deferredResult.getResult();
 	    			retStatus = (String)res.getBody().getStatus();
 	    			retMessage = (String)res.getBody().getMessage();
-	    			log.info(" >>>>>>>>>>>"+retStatus);
-	    			log.info(" >>>>>>>>>>>"+retMessage);
-	    	    	log.info(" >>>>>>>>>>>deferredResult.getResult()="+ deferredResult.getResult());
+//	    			log.info(" >>>>>>>>>>>"+retStatus);
+//	    			log.info(" >>>>>>>>>>>"+retMessage);
+	    	    	log.info(" >>>>>>>>>>>OrdmadeNotfullyReplayBatch deferredResult.getResult()="+ deferredResult.getResult());
 	    	    	
 //	    			if(deferredResult.getResult().toString().indexOf("SUCCESS") > -1) {
 	    	    	if(retStatus.equals("SUCCESS")) {
@@ -101,7 +101,6 @@ public class OrdmadeNotfullyReplayBatch {
 	    				r_ifYn = KurlyConstants.STATUS_N;
 	    			}
 	    			
-	    			log.info("=================updateOrdmadeNotfullyReplay===============1");
 			    	//인터페이스 처리내역 update
 	    			String r_invoiceNo = ordmadeNotfullyReplayData.getInvoiceNo();
 	    			String r_invoiceSeq = ordmadeNotfullyReplayData.getInvoiceSeq();
@@ -125,14 +124,12 @@ public class OrdmadeNotfullyReplayBatch {
 
 					ordmadeNotfullyReplayService.updateOrdmadeNotfullyReplay(updateMap);
 
-			    	log.info("=================updateOrdmadeNotfullyReplay===============2");
 			    	
 	    		} catch (Exception ex) {	
 	    			log.info("== send error == " + ordmadeNotfullyReplayData.getInvoiceNo());  
 	    			retMessage = ex.getMessage().substring(0, 90);
     				r_ifYn = KurlyConstants.STATUS_N;
 	    		} finally {
-	    			log.info("====finally createLogApiStatus===============1");
 
 	    			apiRunTimeEnd = System.currentTimeMillis();
 	    			apiRunTime = StringUtil.formatInterval(apiRunTimeStartFor, apiRunTimeEnd) ;
@@ -213,7 +210,6 @@ public class OrdmadeNotfullyReplayBatch {
 			    	
 			    	//로그정보 적재
 			    	logApiStatusService.createLogApiStatus(logApiStatus);
-	    			log.info("====finally createLogApiStatus===============2");
 			    	
 	    		}
 	    		executeCount++;
@@ -248,7 +244,6 @@ public class OrdmadeNotfullyReplayBatch {
 	    	//로그정보 적재
         	logBatchExecService.createLogBatchExec(logBatchExec);
 	    	
-        	log.info("=================createLogBatchExec end=============== ");  
         }
     	log.info("=================OrdmadeNotfullyReplayBatch end===============");
     	

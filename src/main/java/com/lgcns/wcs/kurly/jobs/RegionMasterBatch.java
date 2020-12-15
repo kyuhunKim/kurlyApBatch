@@ -56,8 +56,6 @@ public class RegionMasterBatch  {
     		
     		String retData = regionMasterService.insertRegionMaster();
 
-    		log.info("====finally createLogApiStatus===============1");
-
 			//로그 정보 insert
 			LogApiStatus logApiStatus = new LogApiStatus();
 
@@ -100,7 +98,6 @@ public class RegionMasterBatch  {
 			logApiStatus.setApiRuntime(apiRunTime);
 	    	
 	    	logApiStatusService.createLogApiStatus(logApiStatus);
-			log.info("====finally createLogApiStatus===============2");
 			    	
     	} catch (Exception e) {
     		result = "error";
@@ -129,7 +126,6 @@ public class RegionMasterBatch  {
         	logBatchExec.setStartDate(startDate);
         	
         	logBatchExecService.createLogBatchExec(logBatchExec);
-        	log.info("=================createLogBatchExec end=============== ");    		
     	}
     	
     	log.info("=================RegionMasterBatch end===============");

@@ -11,7 +11,8 @@
 		SHIP_ORDER_KEY    AS shipOrderKey,
 		INVOICE_NO            AS invoiceNo,
 		WAREHOUSE_KEY         AS warehouseKey,
-		ORIGIN_INVOICE_NO     AS originInvoiceNo,
+		CASE WHEN LENGTH(ORIGIN_INVOICE_NO) > 21 THEN SUBSTR(ORIGIN_INVOICE_NO,0,20) 
+			ELSE ORIGIN_INVOICE_NO END       AS originInvoiceNo,
 		SHIP_UID_KEY      AS shipUidWcs,
 		PACK_BOX_SPLIT_YN     AS packBoxSplitYn,
 		PACK_BOX_TYPE_RECOM   AS packBoxTypeRecom,

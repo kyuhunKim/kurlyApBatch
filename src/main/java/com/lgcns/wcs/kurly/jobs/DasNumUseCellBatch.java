@@ -102,9 +102,9 @@ public class DasNumUseCellBatch  {
 	    			ResponseEntity<ResponseMesssage> res = (ResponseEntity<ResponseMesssage>)deferredResult.getResult();
 	    			retStatus = (String)res.getBody().getStatus();
 	    			retMessage = (String)res.getBody().getMessage();
-	    			log.info(" >>>>>>>>>>>"+retStatus);
-	    			log.info(" >>>>>>>>>>>"+retMessage);
-	    	    	log.info(" >>>>>>>>>>>deferredResult.getResult()="+ deferredResult.getResult());
+//	    			log.info(" >>>>>>>>>>>"+retStatus);
+//	    			log.info(" >>>>>>>>>>>"+retMessage);
+	    	    	log.info(" >>>>>>>>>>>dasNumUseCellList deferredResult.getResult()="+ deferredResult.getResult());
 	    	    	
 	    	    	if(retStatus.equals("SUCCESS")) {
 	    				r_ifYn = KurlyConstants.STATUS_Y;
@@ -136,8 +136,6 @@ public class DasNumUseCellBatch  {
 
 					dasNumUseCellService.updateDasNumUseCell(updateMap);
 			    	
-//	    			log.info("====finally createLogApiStatus===============");
-
 	    			apiRunTimeEnd = System.currentTimeMillis();
 	    			apiRunTime = StringUtil.formatInterval(apiRunTimeStartFor, apiRunTimeEnd) ;
 
@@ -192,7 +190,6 @@ public class DasNumUseCellBatch  {
 			    	}
 			    	
 			    	logApiStatusService.createLogApiStatus(logApiStatus);
-//	    			log.info("====finally createLogApiStatus===============");
 			    	
 	    		}
 	    		executeCount++;

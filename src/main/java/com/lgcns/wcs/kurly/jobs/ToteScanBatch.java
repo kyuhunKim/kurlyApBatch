@@ -88,9 +88,9 @@ public class ToteScanBatch  {
 	    			ResponseEntity<ResponseMesssage> res = (ResponseEntity<ResponseMesssage>)deferredResult.getResult();
 	    			retStatus = (String)res.getBody().getStatus();
 	    			retMessage = (String)res.getBody().getMessage();
-	    			log.info(" >>>>>>>>>>>"+retStatus);
-	    			log.info(" >>>>>>>>>>>"+retMessage);
-	    	    	log.info(" >>>>>>>>>>>deferredResult.getResult()="+ deferredResult.getResult());
+//	    			log.info(" >>>>>>>>>>>"+retStatus);
+//	    			log.info(" >>>>>>>>>>>"+retMessage);
+	    	    	log.info(" >>>>>>>>>>>toteScan  deferredResult.getResult()="+ deferredResult.getResult());
 	    	    	
 	    	    	if(retStatus.equals("SUCCESS")) {
 	    				r_ifYn = KurlyConstants.STATUS_Y;
@@ -116,14 +116,12 @@ public class ToteScanBatch  {
 
 			    	toteScanService.updateToteScan(updateMap);
 
-			    	log.info("=================updateToteRelease===============2");
 	    		} catch (Exception ex) {	
 	    			log.info("== send error == " + toteScanData.getToteId());  
 	    			retMessage = ex.getMessage().substring(0, 90);
     				r_ifYn = KurlyConstants.STATUS_N;
 	    			ex.printStackTrace();
 	    		} finally {
-	    			log.info("====finally createLogApiStatus===============1");
 
 	    			apiRunTimeEnd = System.currentTimeMillis();
 	    			apiRunTime = StringUtil.formatInterval(apiRunTimeStartFor, apiRunTimeEnd) ;
@@ -184,7 +182,6 @@ public class ToteScanBatch  {
 			    	}
 			    	
 			    	logApiStatusService.createLogApiStatus(logApiStatus);
-	    			log.info("====finally createLogApiStatus===============2");
 			    	
 	    		}
 	    		executeCount++;
@@ -218,7 +215,6 @@ public class ToteScanBatch  {
         	logBatchExec.setStartDate(startDate);
         	
         	logBatchExecService.createLogBatchExec(logBatchExec);
-        	log.info("=================createLogBatchExec end=============== ");    		
     	}
     	
     	log.info("=================ToteScanBatch end===============");
