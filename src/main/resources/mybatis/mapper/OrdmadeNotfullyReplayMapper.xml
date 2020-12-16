@@ -11,7 +11,7 @@
 		OD.SHIP_ORDER_KEY      AS shipOrderKey,
 		OD.SHIP_ORDER_ITEM_SEQ AS shipOrderItemSeq,
 		OD.WAREHOUSE_KEY      AS warehouseKey,
-		OD.SHIP_UID_KEY   AS shipUidWcs,
+		OD.SHIP_UID_KEY   AS shipUidKey,
 		OD.SHIP_UID_ITEM_SEQ   AS shipUidSeq,
 		'SUPPLY'               AS pickingType,
 		OD.INVOICE_NO         AS invoiceNo,

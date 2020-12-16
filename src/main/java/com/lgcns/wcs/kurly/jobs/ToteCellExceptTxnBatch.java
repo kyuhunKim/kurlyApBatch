@@ -127,9 +127,9 @@ public class ToteCellExceptTxnBatch {
 	    			ResponseEntity<ResponseMesssage> res = (ResponseEntity<ResponseMesssage>)deferredResult.getResult();
 	    			retStatus = (String)res.getBody().getStatus();
 	    			retMessage = (String)res.getBody().getMessage();
-//	    			log.info(" >>>>>>>>>>>"+retStatus);
-//	    			log.info(" >>>>>>>>>>>"+retMessage);
-	    	    	log.info(" >>>>>>>>>>>ToteCellExceptTxnBatch deferredResult.getResult()="+ deferredResult.getResult());
+	    			log.info(" >>>>>>ToteCellExceptTxnBatch retStatus=>"+retStatus);
+//	    			log.info(" >>>>>>"+retMessage);
+//	    	    	log.info(" >>>>>>ToteCellExceptTxnBatch deferredResult.getResult()="+ deferredResult.getResult());
 	    	    	
 //	    			if(deferredResult.getResult().toString().indexOf("SUCCESS") > -1) {
 	    	    	if(retStatus.equals("SUCCESS")) {

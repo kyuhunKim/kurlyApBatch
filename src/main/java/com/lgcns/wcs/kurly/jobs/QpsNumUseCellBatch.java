@@ -85,9 +85,9 @@ public class QpsNumUseCellBatch  {
 	    			ResponseEntity<ResponseMesssage> res = (ResponseEntity<ResponseMesssage>)deferredResult.getResult();
 	    			retStatus = (String)res.getBody().getStatus();
 	    			retMessage = (String)res.getBody().getMessage();
-//	    			log.info(" >>>>>>>>>>>"+retStatus);
-//	    			log.info(" >>>>>>>>>>>"+retMessage);
-	    	    	log.info(" >>>>>>>>>>>QpsNumUseCellBatch deferredResult.getResult()="+ deferredResult.getResult());
+	    			log.info(" >>>>>>QpsNumUseCellBatch retStatus=>"+retStatus);
+//	    			log.info(" >>>>>>"+retMessage);
+//	    	    	log.info(" >>>>>>QpsNumUseCellBatch deferredResult.getResult()="+ deferredResult.getResult());
 	    	    	
 	    	    	if(retStatus.equals("SUCCESS")) {
 	    				r_ifYn = KurlyConstants.STATUS_Y;

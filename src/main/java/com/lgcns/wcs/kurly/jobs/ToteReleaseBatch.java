@@ -95,9 +95,9 @@ public class ToteReleaseBatch  {
 	    			ResponseEntity<ResponseMesssage> res = (ResponseEntity<ResponseMesssage>)deferredResult.getResult();
 	    			retStatus = (String)res.getBody().getStatus();
 	    			retMessage = (String)res.getBody().getMessage();
-//	    			log.info(" >>>>>>>>>>>"+retStatus);
-//	    			log.info(" >>>>>>>>>>>"+retMessage);
-	    	    	log.info(" >>>>>>>>>>>toteRelease deferredResult.getResult()="+ deferredResult.getResult());
+	    			log.info(" >>>>>>toteRelease retStatus=>"+retStatus);
+//	    			log.info(" >>>>>>"+retMessage);
+//	    	    	log.info(" >>>>>>toteRelease deferredResult.getResult()="+ deferredResult.getResult());
 	    	    	
 //	    			if(deferredResult.getResult().toString().indexOf("SUCCESS") > -1) {
 	    	    	if(retStatus.equals("SUCCESS")) {

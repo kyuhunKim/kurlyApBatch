@@ -90,9 +90,9 @@ public class OrdmadeNotfullyReplayBatch {
 	    			ResponseEntity<ResponseMesssage> res = (ResponseEntity<ResponseMesssage>)deferredResult.getResult();
 	    			retStatus = (String)res.getBody().getStatus();
 	    			retMessage = (String)res.getBody().getMessage();
-//	    			log.info(" >>>>>>>>>>>"+retStatus);
-//	    			log.info(" >>>>>>>>>>>"+retMessage);
-	    	    	log.info(" >>>>>>>>>>>OrdmadeNotfullyReplayBatch deferredResult.getResult()="+ deferredResult.getResult());
+	    			log.info(" >>>>>>OrdmadeNotfullyReplayBatch retStatus=>"+retStatus);
+//	    			log.info(" >>>>>>"+retMessage);
+//	    	    	log.info(" >>>>>>OrdmadeNotfullyReplayBatch deferredResult.getResult()="+ deferredResult.getResult());
 	    	    	
 //	    			if(deferredResult.getResult().toString().indexOf("SUCCESS") > -1) {
 	    	    	if(retStatus.equals("SUCCESS")) {
@@ -172,8 +172,8 @@ public class OrdmadeNotfullyReplayBatch {
 				    	logApiStatus.setGroupNo(ordmadeNotfullyReplayData.getGroupNo());  //그룹배치번호
 				    	logApiStatus.setWorkBatchNo(ordmadeNotfullyReplayData.getWorkBatchNo());  //작업배치번호
 				    	
-				    	logApiStatus.setShipUidWcs(ordmadeNotfullyReplayData.getShipUidWcs());  //출고오더UID(WCS)
-				    	logApiStatus.setShipUidSeq(ordmadeNotfullyReplayData.getShipUidSeq());  //출고오더UID순번(WCS)
+				    	logApiStatus.setShipUidWcs(ordmadeNotfullyReplayData.getShipUidKey());  //출고오더UID(WCS)
+				    	logApiStatus.setShipUidSeq(ordmadeNotfullyReplayData.getShipUidItemSeq());  //출고오더UID순번(WCS)
 				    	logApiStatus.setShipOrderKey(ordmadeNotfullyReplayData.getShipOrderKey());  //출하문서번호(WMS)
 				    	logApiStatus.setShipOrderItemSeq(ordmadeNotfullyReplayData.getShipOrderItemSeq());  //출하문서순번(WMS)
 				    	logApiStatus.setInvoiceNo(ordmadeNotfullyReplayData.getInvoiceNo());  //송장번호

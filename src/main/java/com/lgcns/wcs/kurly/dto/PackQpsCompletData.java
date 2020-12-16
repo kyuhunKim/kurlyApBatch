@@ -27,7 +27,7 @@ public class PackQpsCompletData {
 	private String warehouseKey ;
 	/*출고오더UID(WCS)
 	 * */
-	private String shipUidWcs ;
+	private String shipUidKey ;
 	/*셀UID번호
 	 * */
 	private String cellId ;

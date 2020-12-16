@@ -101,9 +101,9 @@ public class PackQpsCompletBatch  {
 	    			ResponseEntity<ResponseMesssage> res = (ResponseEntity<ResponseMesssage>)deferredResult.getResult();
 	    			retStatus = (String)res.getBody().getStatus();
 	    			retMessage = (String)res.getBody().getMessage();
-//	    			log.info(" >>>>>>>>>>>"+retStatus);
-//	    			log.info(" >>>>>>>>>>>"+retMessage);
-	    	    	log.info(" >>>>>>>>>>>PackQpsCompletBatch deferredResult.getResult()="+ deferredResult.getResult());
+	    			log.info(" >>>>>>PackQpsCompletBatch retStatus=>"+retStatus);
+//	    			log.info(" >>>>>>"+retMessage);
+//	    	    	log.info(" >>>>>>PackQpsCompletBatch deferredResult.getResult()="+ deferredResult.getResult());
 	    	    	
 //	    			if(deferredResult.getResult().toString().indexOf("SUCCESS") > -1) {
 	    	    	if(retStatus.equals("SUCCESS")) {
@@ -180,7 +180,7 @@ public class PackQpsCompletBatch  {
 						} else {
 							logApiStatus.setWarehouseKey(packQpsCompletData.getWarehouseKey());
 						}
-				    	logApiStatus.setShipUidWcs(packQpsCompletData.getShipUidWcs());  //출고오더UID(WCS)
+				    	logApiStatus.setShipUidWcs(packQpsCompletData.getShipUidKey());  //출고오더UID(WCS)
 				    	logApiStatus.setShipOrderKey(packQpsCompletData.getShipOrderKey());  //출하문서번호(WMS)
 				    	logApiStatus.setInvoiceNo(packQpsCompletData.getInvoiceNo());  //송장번호
 				    	logApiStatus.setApiInfo(packQpsCompletData.toString());

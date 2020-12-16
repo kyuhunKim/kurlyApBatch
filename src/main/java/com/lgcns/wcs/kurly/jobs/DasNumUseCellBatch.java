@@ -102,9 +102,9 @@ public class DasNumUseCellBatch  {
 	    			ResponseEntity<ResponseMesssage> res = (ResponseEntity<ResponseMesssage>)deferredResult.getResult();
 	    			retStatus = (String)res.getBody().getStatus();
 	    			retMessage = (String)res.getBody().getMessage();
-//	    			log.info(" >>>>>>>>>>>"+retStatus);
-//	    			log.info(" >>>>>>>>>>>"+retMessage);
-	    	    	log.info(" >>>>>>>>>>>dasNumUseCellList deferredResult.getResult()="+ deferredResult.getResult());
+	    			log.info(" >>>>>>dasNumUseCellList retStatus=>"+retStatus);
+//	    			log.info(" >>>>>>dasNumUseCellList retMessage=>"+retMessage);
+//	    	    	log.info(" >>>>>>dasNumUseCellList deferredResult.getResult()="+ deferredResult.getResult());
 	    	    	
 	    	    	if(retStatus.equals("SUCCESS")) {
 	    				r_ifYn = KurlyConstants.STATUS_Y;

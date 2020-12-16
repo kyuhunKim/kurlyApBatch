@@ -91,9 +91,9 @@ public class InvoiceSortCompletBatch  {
 	    			ResponseEntity<ResponseMesssage> res = (ResponseEntity<ResponseMesssage>)deferredResult.getResult();
 	    			retStatus = (String)res.getBody().getStatus();
 	    			retMessage = (String)res.getBody().getMessage();
-//	    			log.info(" >>>>>>>>>>>"+retStatus);
-//	    			log.info(" >>>>>>>>>>>"+retMessage);
-	    	    	log.info(" >>>>>>>>>>>InvoiceSortCompletBatch deferredResult.getResult()="+ deferredResult.getResult());
+	    			log.info(" >>>>>>InvoiceSortCompletBatch retStatus=>"+retStatus);
+//	    			log.info(" >>>>>>"+retMessage);
+//	    	    	log.info(" >>>>>>InvoiceSortCompletBatch deferredResult.getResult()="+ deferredResult.getResult());
 	    	    	
 //	    			if(deferredResult.getResult().toString().indexOf("SUCCESS") > -1) {
 	    	    	if(retStatus.equals("SUCCESS")) {
@@ -171,7 +171,7 @@ public class InvoiceSortCompletBatch  {
 							logApiStatus.setWarehouseKey(invoiceSortCompletData.getWarehouseKey());
 						}
 				    	
-				    	logApiStatus.setShipUidWcs(invoiceSortCompletData.getShipUidWcs());  //출고오더UID(WCS)
+				    	logApiStatus.setShipUidWcs(invoiceSortCompletData.getShipUidKey());  //출고오더UID(WCS)
 				    	logApiStatus.setShipOrderKey(invoiceSortCompletData.getShipOrderKey());  //출하문서번호(WMS)
 				    	logApiStatus.setInvoiceNo(invoiceSortCompletData.getInvoiceNo());  //송장번호
 				    	logApiStatus.setWcsStatus(invoiceSortCompletData.getInvoiceStatus());  //WCS 작업상태
