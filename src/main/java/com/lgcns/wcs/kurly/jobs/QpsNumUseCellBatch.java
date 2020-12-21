@@ -50,7 +50,7 @@ public class QpsNumUseCellBatch  {
     LogApiStatusService logApiStatusService;
 
     public void QpsNumUseCellTask()  {
-    	log.info("=================QpsNumUseCellBatch start===============");
+    	log.info("=======QpsNumUseCellBatch start=======");
     	log.info("The current date  : " + LocalDateTime.now());
     	long apiRunTimeStart = 0;
 		long apiRunTimeEnd   = 0;
@@ -169,7 +169,7 @@ public class QpsNumUseCellBatch  {
     		apiRunTimeEnd = System.currentTimeMillis();
 			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
 
-			log.info("================= apiRunTime(ms) : "+ apiRunTime);
+			log.info("======= apiRunTime(ms) : "+ apiRunTime);
 
 	    	//배치 로그 정보 insert
         	LogBatchExec logBatchExec = new LogBatchExec();
@@ -189,7 +189,7 @@ public class QpsNumUseCellBatch  {
         	logBatchExecService.createLogBatchExec(logBatchExec);
     	}
     	
-    	log.info("=================QpsNumUseCellBatch end===============");
+    	log.info("=======QpsNumUseCellBatch end=======");
     	
     }
 

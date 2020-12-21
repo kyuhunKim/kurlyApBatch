@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.lgcns.wcs.kurly.dto.box.BoxTypeVO;
 import com.lgcns.wcs.kurly.dto.box.CellTypeVO;
@@ -24,6 +25,7 @@ import com.lgcns.wcs.kurly.dto.box.SkuTypeVO;
  */
 @Mapper
 @Repository
+@Transactional
 public interface BoxRecomRepository  {
 	List<SkuTypeVO> selectSkuMasterList();
 	List<BoxTypeVO> selectBoxTypeList();

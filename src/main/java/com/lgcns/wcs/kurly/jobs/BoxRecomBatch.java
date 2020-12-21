@@ -59,7 +59,7 @@ public class BoxRecomBatch  {
     DataSourceTransactionManager transactionManager;
     
     public void BoxRecomBatchTask() {
-    	log.info("=================BoxRecomBatch start===============");
+    	log.info("=======BoxRecomBatch start=======");
     	log.info("The current date  : " + LocalDateTime.now());
     	long apiRunTimeStart = 0;
 		long apiRunTimeEnd   = 0;
@@ -92,6 +92,8 @@ public class BoxRecomBatch  {
     	     *  invoiceNo 를 originInvoiceNo에 값이 없을 경우 invoiceNo값을 넣어줌
     	     * ##2020.12.08
     	     *  실행시간 개선 로직수정 
+    	     * ##2020.12.18
+    	     *  오더분할된 카운트를 TB_ORD_SHIPMENT_HDR 테이블의 ORDER_NO_INVOICE_CNT 필드에 셋팅
     	     * */
     		
     		//박스정보 조회
@@ -173,7 +175,7 @@ public class BoxRecomBatch  {
     		long runTimeEnd1 = System.currentTimeMillis();
     		String apiRunTime1 = StringUtil.formatInterval(runTimeStart1, runTimeEnd1) ;
 
-        	log.info("========order select========= apiRunTime1(ms) : "+ apiRunTime1);
+        	log.info("========order select======= apiRunTime1(ms) : "+ apiRunTime1);
     		
     		runTimeStart1 = System.currentTimeMillis();
     		
@@ -233,6 +235,7 @@ public class BoxRecomBatch  {
     				wifShipmentVO.setPackBoxTypeRecom(t_packBoxTypeRecom);
     				wifShipmentVO.setPackBoxSplitYn(t_packBoxSplitYn);
     				wifShipmentVO.setShipmentCnclYn("N");
+    				wifShipmentVO.setOrderNoInvoiceCnt(1);
 
     				hdrVO(selectList,  wifShipmentVO) ;
     				
@@ -285,6 +288,7 @@ public class BoxRecomBatch  {
 	    				wifShipmentVO.setPackBoxTypeRecom(t_packBoxTypeRecom);
 	    				wifShipmentVO.setPackBoxSplitYn(t_packBoxSplitYn);
 	    				wifShipmentVO.setShipmentCnclYn("N");
+	    				wifShipmentVO.setOrderNoInvoiceCnt(1);
 
 	    				this.hdrVO(selectList,  wifShipmentVO) ;
 	    				
@@ -369,6 +373,7 @@ public class BoxRecomBatch  {
 		    				wifShipmentVO.setPackBoxTypeRecom(t_packBoxTypeRecom);
 		    				wifShipmentVO.setPackBoxSplitYn(t_packBoxSplitYn);
 		    				wifShipmentVO.setShipmentCnclYn("N");
+		    				wifShipmentVO.setOrderNoInvoiceCnt(splitSeqNum);
 
 		    				this.hdrVO(selectList,  wifShipmentVO) ;
 		    				
@@ -477,7 +482,7 @@ public class BoxRecomBatch  {
     		apiRunTimeEnd = System.currentTimeMillis();
 			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
 
-        	log.info("================= apiRunTime(ms) : "+ apiRunTime);
+        	log.info("======= apiRunTime(ms) : "+ apiRunTime);
 
 	    	//배치 로그 정보 insert
         	LogBatchExec logBatchExec = new LogBatchExec();
@@ -498,9 +503,9 @@ public class BoxRecomBatch  {
 	    	//로그정보 적재
         	logBatchExecService.createLogBatchExec(logBatchExec);
 	    	
-        	log.info("=================BoxRecomBatch  finally end=============== ");    		
+        	log.info("=======BoxRecomBatch  finally end======= ");    		
     	}
-    	log.info("=================BoxRecomBatch end===============");
+    	log.info("=======BoxRecomBatch end=======");
     	
     }
 

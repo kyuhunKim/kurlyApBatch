@@ -11,7 +11,7 @@
 	SELECT 
 		UC.WAREHOUSE_KEY       AS  warehouseKey
 		, UC.CELL_TYPE_STATUS  AS  cellTypeStatus
-		, UC.CELL_DAS_GROUP_ID AS  dasCellGroupId
+		, UC.DAS_CELL_GROUP_ID AS  dasCellGroupId
 		, (CASE WHEN UC.CELL_TYPE_STATUS = 'DELETE' THEN 0 
 				ELSE UC.DAS_NUM_USE_CELL END) AS  dasNumUseCell
 		, ''                   AS  dasNumAttr1
@@ -22,6 +22,7 @@
 	WHERE 1 = 1 
 		AND UC.USE_CELL_INTF_YN = 'N'
 		AND UC.CREATED_DATE     >= TO_CHAR(SYSDATE-3, 'YYYYMMDD')
+	ORDER BY DAS_CELL_GROUP_ID ASC, MODIFIED_DATE ASC, MODIFIED_TIME ASC
 	]]>  
   </select>
   

@@ -55,7 +55,7 @@ public class ToteReleaseBatch  {
 
     public void ToteReleaseTask()  {
     	
-    	log.info("=================ToteReleaseBatch start===============");
+    	log.info("=======ToteReleaseBatch start=======");
     	log.info("The current date  : " + LocalDateTime.now());
     	
 		String result = "sucess";
@@ -179,7 +179,7 @@ public class ToteReleaseBatch  {
 			    	if(KurlyConstants.STATUS_N.equals(r_ifYn)) {
 			    		logApiStatus.setIntfMemo(retMessage);
 			    	} else {
-			    		logApiStatus.setIntfMemo("");
+			    		logApiStatus.setIntfMemo(KurlyConstants.STATUS_OK);
 			    	}
 
 			    	apiRunTimeEnd = System.currentTimeMillis();
@@ -203,7 +203,7 @@ public class ToteReleaseBatch  {
 			apiRunTimeEnd = System.currentTimeMillis();
 			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
 			
-        	log.info("================= apiRunTime(ms) : "+ apiRunTime);
+        	log.info("======= apiRunTime(ms) : "+ apiRunTime);
 
 	    	//배치 로그 정보 insert
         	LogBatchExec logBatchExec = new LogBatchExec();
@@ -223,7 +223,7 @@ public class ToteReleaseBatch  {
         	logBatchExecService.createLogBatchExec(logBatchExec);
 
     	}
-    	log.info("=================ToteReleaseTasklet end=============== ");    
+    	log.info("=======ToteReleaseTasklet end======= ");    
 
     }
 }

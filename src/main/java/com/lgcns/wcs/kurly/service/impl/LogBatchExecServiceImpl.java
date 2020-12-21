@@ -46,7 +46,6 @@ public class LogBatchExecServiceImpl implements LogBatchExecService {
 	@Transactional(propagation=Propagation.REQUIRES_NEW, rollbackFor=SQLException.class)
 	public int createLogBatchExec(LogBatchExec logBatchExec) {
 
-//    	log.info("=================createLogBatchExec start===============");
 		Date endDate = Calendar.getInstance().getTime();
 		
 		if(logBatchExec.getWarehouseKey() ==null ||
@@ -65,7 +64,6 @@ public class LogBatchExecServiceImpl implements LogBatchExecService {
 		
 		int seqId = logBatchExecRepository.createLogBatchExec(logBatchExec);
 
-//    	log.info("=================createLogBatchExec end========");
     	
 		return seqId;
 	}
@@ -83,7 +81,6 @@ public class LogBatchExecServiceImpl implements LogBatchExecService {
 		
 		int seqId = 0; 
 
-//    	log.info("=================createLogBatchExec start===============");
 		if(param != null) {
 			String serverHostName = "";
 			String serverIp = "";
@@ -121,7 +118,6 @@ public class LogBatchExecServiceImpl implements LogBatchExecService {
 			seqId = logBatchExecRepository.createLogBatchExec(logBatchExec);
 		}
 
-//    	log.info("=================createLogBatchExec end===============");
 		
     	return seqId;
 	}	

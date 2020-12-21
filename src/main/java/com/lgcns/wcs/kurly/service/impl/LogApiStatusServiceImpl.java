@@ -41,7 +41,6 @@ public class LogApiStatusServiceImpl implements LogApiStatusService {
 	@Transactional(propagation=Propagation.REQUIRES_NEW, rollbackFor=SQLException.class)
 	public int createLogApiStatus(LogApiStatus logApiStatus) {
 		
-//		log.info("=================createLogApiStatus end========");
 		if(logApiStatus.getApiYyyymmdd() ==null ||
 				"".equals(logApiStatus.getApiYyyymmdd())) {
 	        String sYyyymmdd = DateUtil.getToday("yyyyMMdd");
@@ -90,7 +89,6 @@ public class LogApiStatusServiceImpl implements LogApiStatusService {
     	
 		int seqId = logApiStatusRepository.createLogApiStatus(logApiStatus);
 		
-//    	log.info("=================createLogApiStatus end========");
 		return seqId;
 	}
 

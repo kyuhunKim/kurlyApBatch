@@ -744,32 +744,6 @@
 	FROM DUAL
   </select>
   
-  <select id="selectBoxTypeMaxList_bak" resultType="com.lgcns.wcs.kurly.dto.box.BoxTypeVO">
-  	/* [BoxRecomMapper.xml] selectBoxTypeMaxList */
-	SELECT
-		T.BOX_TYPE_CD  AS boxTypeCd, 
-	    T.BOX_TYPE_NM  AS boxTypeName,
-	    T.CNTR_CD      AS warehouseKey,
-	    T.BOX_TYPE_GRP_CD  AS boxShape,
-	    T.BOX_WTH_LEN  AS BoxWidth,
-	    T.BOX_VERT_LEN  AS BoxDepth,
-	    T.BOX_HGT_LEN  AS BoxHeight
-	FROM (
-		SELECT 
-		    B.BOX_TYPE_CD  , 
-		    B.BOX_TYPE_NM  ,
-		    B.CNTR_CD      ,
-		    B.BOX_TYPE_GRP_CD  ,
-		    B.BOX_WTH_LEN  ,
-		    B.BOX_VERT_LEN  ,
-		    B.BOX_HGT_LEN  , 
-		    (BOX_WTH_LEN * BOX_VERT_LEN * BOX_HGT_LEN)  AS BoxCBM
-			, ROW_NUMBER() OVER(PARTITION BY CNTR_CD ORDER BY (BOX_WTH_LEN * BOX_VERT_LEN * BOX_HGT_LEN) DESC) as RowIdx
-		FROM o_wcs.TB_COM_BOX_TYPE_MST  B
-	) T
-	WHERE ROWIDX = 1
-  </select>
-  
   <select id="selectBoxTypeMaxList" resultType="com.lgcns.wcs.kurly.dto.box.BoxTypeVO">
   	/* [BoxRecomMapper.xml] selectBoxTypeMaxList */
 	SELECT
@@ -884,8 +858,9 @@
 		  PACK_BOX_SPLIT_YN     ,
 		  PACK_BOX_TYPE_RECOM   ,
 		  SPECIAL_MGNT_CUST_YN  ,
-		  MANUAL_PROC_YN,
-		  SHIPMENT_CNCL_YN
+		  MANUAL_PROC_YN        ,
+		  SHIPMENT_CNCL_YN      ,
+		  ORDER_NO_INVOICE_CNT
 		)
 		SELECT o_wcs.SEQ_ORD_SHIPMENT_HDR.NEXTVAL, A.* 
            from (
@@ -932,7 +907,7 @@
 		      #{item.originInvoiceNo}   AS ORIGIN_INVOICE_NO,
 		      TO_CHAR(SYSDATE, 'YYYYMMDD')   AS CREATED_DATE ,
 		      TO_CHAR(SYSDATE, 'HH24MISS')   AS CREATED_TIME ,
-		      'REC_BATCH02'            AS CREATED_USER       ,
+		      'REC_BATCH'            AS CREATED_USER       ,
 		      TO_CHAR(SYSDATE, 'YYYYMMDD') AS MODIFIED_DATE  ,
 		      TO_CHAR(SYSDATE, 'HH24MISS') AS MODIFIED_TIME  ,
 		      'REC_BATCH'              AS MODIFIED_USER         ,
@@ -941,7 +916,8 @@
 		      #{item.packBoxTypeRecom, jdbcType=VARCHAR}  AS PACK_BOX_TYPE_RECOM  ,
 		      #{item.specialMgntCustYn, jdbcType=VARCHAR}  AS SPECIAL_MGNT_CUST_YN,
 		      #{item.manualProcYn, jdbcType=VARCHAR}       AS MANUAL_PROC_YN      ,
-		      #{item.shipmentCnclYn, jdbcType=VARCHAR}     AS SHIPMENT_CNCL_YN
+		      #{item.shipmentCnclYn, jdbcType=VARCHAR}     AS SHIPMENT_CNCL_YN    ,
+		      #{item.orderNoInvoiceCnt}     AS ORDER_NO_INVOICE_CNT
 		  FROM DUAL
 		  </foreach> ) A
   </insert>
@@ -1090,7 +1066,7 @@
 		      #{item.remark, jdbcType=VARCHAR}            AS  REMARK             ,
 		      TO_CHAR(SYSDATE, 'YYYYMMDD') AS CREATED_DATE ,
 		      TO_CHAR(SYSDATE, 'HH24MISS') AS CREATED_TIME ,
-		      'REC_BATCH02'             AS CREATED_USER    ,
+		      'REC_BATCH'             AS CREATED_USER    ,
 		      TO_CHAR(SYSDATE, 'YYYYMMDD') AS MODIFIED_DATE,
 		      TO_CHAR(SYSDATE, 'HH24MISS') AS MODIFIED_TIME,
 		      'REC_BATCH'               AS MODIFIED_USER   ,

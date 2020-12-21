@@ -53,7 +53,7 @@ public class InvoicePrintCompletBatch  {
     InvoicePrintCompletService invoicePrintCompletService;
 
     public void InvoicePrintCompletTask() {
-    	log.info("=================InvoicePrintCompletBatch start===============");
+    	log.info("=======InvoicePrintCompletBatch start=======");
     	log.info("The current date  : " + LocalDateTime.now());
 
 		long apiRunTimeStart = 0;
@@ -137,7 +137,7 @@ public class InvoicePrintCompletBatch  {
 	    			apiRunTimeEnd = System.currentTimeMillis();
 	    			apiRunTime = StringUtil.formatInterval(apiRunTimeStartFor, apiRunTimeEnd) ;
 
-	            	log.info("================= apiRunTime(ms) : "+ apiRunTime);
+	            	log.info("======= apiRunTime(ms) : "+ apiRunTime);
 
 					//전송로그 정보 insert
 			    	LogApiStatus logApiStatus = new LogApiStatus();
@@ -223,7 +223,7 @@ public class InvoicePrintCompletBatch  {
 			apiRunTimeEnd = System.currentTimeMillis();
 			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
 
-        	log.info("================= apiRunTime(ms) : "+ apiRunTime);
+        	log.info("======= apiRunTime(ms) : "+ apiRunTime);
 
 	    	//배치 로그 정보 insert
         	LogBatchExec logBatchExec = new LogBatchExec();
@@ -244,7 +244,7 @@ public class InvoicePrintCompletBatch  {
         	logBatchExecService.createLogBatchExec(logBatchExec);
 	    	
     	}
-    	log.info("=================InvoicePrintCompletBatch end===============");
+    	log.info("=======InvoicePrintCompletBatch end=======");
     	
                                                                                                                                                                                                                                             }
 }

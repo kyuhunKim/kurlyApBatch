@@ -40,7 +40,7 @@ public class RegionMasterBatch  {
     LogApiStatusService logApiStatusService;
 
     public void RegionMasterTask()  {
-    	log.info("=================RegionMasterBatch start===============");
+    	log.info("=======RegionMasterBatch start=======");
     	log.info("The current date  : " + LocalDateTime.now());
     	long apiRunTimeStart = 0;
 		long apiRunTimeEnd   = 0;
@@ -108,7 +108,7 @@ public class RegionMasterBatch  {
     		apiRunTimeEnd = System.currentTimeMillis();
 			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
 
-        	log.info("================= apiRunTime(ms) : "+ apiRunTime);
+        	log.info("======= apiRunTime(ms) : "+ apiRunTime);
 
 	    	//배치 로그 정보 insert
         	LogBatchExec logBatchExec = new LogBatchExec();
@@ -128,7 +128,7 @@ public class RegionMasterBatch  {
         	logBatchExecService.createLogBatchExec(logBatchExec);
     	}
     	
-    	log.info("=================RegionMasterBatch end===============");
+    	log.info("=======RegionMasterBatch end=======");
     	
     }
 

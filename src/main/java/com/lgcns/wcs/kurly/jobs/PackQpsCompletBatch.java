@@ -56,7 +56,7 @@ public class PackQpsCompletBatch  {
     PackQpsCompletService packQpsCompletService;
 
     public void PackQpsCompletTask()  {
-    	log.info("=================PackQpsCompletBatch start===============");
+    	log.info("=======PackQpsCompletBatch start=======");
     	log.info("The current date  : " + LocalDateTime.now());
     	long apiRunTimeStart = 0;
 		long apiRunTimeEnd   = 0;
@@ -219,7 +219,7 @@ public class PackQpsCompletBatch  {
     		apiRunTimeEnd = System.currentTimeMillis();
 			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
 
-        	log.info("================= apiRunTime(ms) : "+ apiRunTime);
+        	log.info("======= apiRunTime(ms) : "+ apiRunTime);
         	
 	    	//배치 로그 정보 insert
         	LogBatchExec logBatchExec = new LogBatchExec();
@@ -240,7 +240,7 @@ public class PackQpsCompletBatch  {
         	logBatchExecService.createLogBatchExec(logBatchExec);
 	    	
         }
-    	log.info("=================PackQpsCompletBatch end===============");
+    	log.info("=======PackQpsCompletBatch end=======");
     	
     }
 }

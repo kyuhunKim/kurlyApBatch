@@ -52,7 +52,7 @@ public class ToteScanBatch  {
     LogApiStatusService logApiStatusService;
 
     public void ToteScanTask()  {
-    	log.info("=================ToteScanBatch start===============");
+    	log.info("=========ToteScanBatch start=======");
     	log.info("The current date  : " + LocalDateTime.now());
     	long apiRunTimeStart = 0;
 		long apiRunTimeEnd   = 0;
@@ -197,7 +197,7 @@ public class ToteScanBatch  {
     		apiRunTimeEnd = System.currentTimeMillis();
 			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
 
-        	log.info("================= apiRunTime(ms) : "+ apiRunTime);
+        	log.info("========= apiRunTime(ms) : "+ apiRunTime);
 
 	    	//배치 로그 정보 insert
         	LogBatchExec logBatchExec = new LogBatchExec();
@@ -217,7 +217,7 @@ public class ToteScanBatch  {
         	logBatchExecService.createLogBatchExec(logBatchExec);
     	}
     	
-    	log.info("=================ToteScanBatch end===============");
+    	log.info("=========ToteScanBatch end=======");
     	
     }
 

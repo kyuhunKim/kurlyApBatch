@@ -53,7 +53,7 @@ public class InvoiceSortCompletBatch  {
     InvoiceSortCompletService invoiceSortCompletService;
 
     public void InvoiceSortCompletTask() {
-    	log.info("=================InvoiceSortCompletBatch start===============");
+    	log.info("=======InvoiceSortCompletBatch start=======");
     	log.info("The current date  : " + LocalDateTime.now());
     	long apiRunTimeStart = 0;
 		long apiRunTimeEnd   = 0;
@@ -216,7 +216,7 @@ public class InvoiceSortCompletBatch  {
 			apiRunTimeEnd = System.currentTimeMillis();
 			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
 
-        	log.info("================= apiRunTime(ms) : "+ apiRunTime);
+        	log.info("======= apiRunTime(ms) : "+ apiRunTime);
 
 	    	//배치 로그 정보 insert
         	LogBatchExec logBatchExec = new LogBatchExec();
@@ -238,7 +238,7 @@ public class InvoiceSortCompletBatch  {
         	logBatchExecService.createLogBatchExec(logBatchExec);
 	    	
     	}
-    	log.info("=================InvoiceSortCompletBatch end===============");
+    	log.info("=======InvoiceSortCompletBatch end=======");
     	
     }
 }

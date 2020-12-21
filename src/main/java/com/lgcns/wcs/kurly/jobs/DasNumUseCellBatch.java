@@ -51,7 +51,7 @@ public class DasNumUseCellBatch  {
     LogApiStatusService logApiStatusService;
 
     public void DasNumUseCellTask()  {
-    	log.info("=================DasNumUseCellBatch start===============");
+    	log.info("=======DasNumUseCellBatch start=======");
     	log.info("The current date  : " + LocalDateTime.now());
     	long apiRunTimeStart = 0;
 		long apiRunTimeEnd   = 0;
@@ -205,7 +205,7 @@ public class DasNumUseCellBatch  {
     		apiRunTimeEnd = System.currentTimeMillis();
 			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
 
-			log.info("================= apiRunTime(ms) : "+ apiRunTime);
+			log.info("======= apiRunTime(ms) : "+ apiRunTime);
 
 	    	//배치 로그 정보 insert
         	LogBatchExec logBatchExec = new LogBatchExec();
@@ -225,7 +225,7 @@ public class DasNumUseCellBatch  {
         	logBatchExecService.createLogBatchExec(logBatchExec);
     	}
     	
-    	log.info("=================DasNumUseCellBatch end===============");
+    	log.info("=======DasNumUseCellBatch end=======");
     	
     }
 

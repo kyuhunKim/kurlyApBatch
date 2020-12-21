@@ -53,9 +53,6 @@ public class HttpUtil {
 			}
 			conn.disconnect();
 			
-//			log.info("================================");
-//			log.info("="+outResult.toString());
-//			log.info("================================");
 			
 		} catch(Exception e) {
 			log.info(e.getMessage());

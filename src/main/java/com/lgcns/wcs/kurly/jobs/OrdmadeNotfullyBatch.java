@@ -52,7 +52,7 @@ public class OrdmadeNotfullyBatch  {
     OrdmadeNotfullyService ordmadeNotfullyService;
 
     public void OrdmadeNotfullyTask() {
-    	log.info("=================OrdmadeNotfullyBatch start===============");
+    	log.info("=======OrdmadeNotfullyBatch start=======");
     	log.info("The current date  : " + LocalDateTime.now());
     	long apiRunTimeStart = 0;
 		long apiRunTimeEnd   = 0;
@@ -212,7 +212,7 @@ public class OrdmadeNotfullyBatch  {
 			apiRunTimeEnd = System.currentTimeMillis();
 			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
 
-        	log.info("================= apiRunTime(ms) : "+ apiRunTime);
+        	log.info("======= apiRunTime(ms) : "+ apiRunTime);
         	
 	    	//배치 로그 정보 insert
         	LogBatchExec logBatchExec = new LogBatchExec();
@@ -234,7 +234,7 @@ public class OrdmadeNotfullyBatch  {
         	logBatchExecService.createLogBatchExec(logBatchExec);
 	    	
         }
-    	log.info("=================OrdmadeNotfullyBatch end===============");
+    	log.info("=======OrdmadeNotfullyBatch end=======");
     	
     }
 }

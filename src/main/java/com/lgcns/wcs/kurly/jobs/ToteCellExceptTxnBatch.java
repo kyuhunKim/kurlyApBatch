@@ -55,7 +55,7 @@ public class ToteCellExceptTxnBatch {
 
     public void ToteCellExceptTxnTask()  {
     	
-    	log.info("=================ToteCellExceptTxnBatch start===============");
+    	log.info("=======ToteCellExceptTxnBatch start=======");
     	log.info("The current date  : " + LocalDateTime.now());
     	
 		String result = "sucess";
@@ -251,7 +251,7 @@ public class ToteCellExceptTxnBatch {
 			apiRunTimeEnd = System.currentTimeMillis();
 			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
 	    	
-        	log.info("================= apiRunTime(ms) : "+ apiRunTime);
+        	log.info("======= apiRunTime(ms) : "+ apiRunTime);
         	
 
 	    	//배치 로그 정보 insert
@@ -274,7 +274,7 @@ public class ToteCellExceptTxnBatch {
         	logBatchExecService.createLogBatchExec(logBatchExec);
 	    	
     	}
-    	log.info("=================ToteCellExceptTxnBatch end=============== ");    	
+    	log.info("=======ToteCellExceptTxnBatch end======= ");    	
 
     }
 }

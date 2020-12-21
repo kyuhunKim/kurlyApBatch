@@ -152,13 +152,18 @@ public class WifShipmentVO {
 	 * */
 	private String modifiedUser	;
 
-	
+	//패킹박스분할여부
 	private String packBoxSplitYn ;
 
+	//추천패킹박스타입
 	private String packBoxTypeRecom ;
-	
+	//특별관리고객용W/S여부
 	private String specialMgntCustYn ;
+	//매뉴얼출고처리여부(Y:WMS출고처리,N:WCS설비출고처리)
 	private String manualProcYn ;
+	//출고오더취소여부
 	private String shipmentCnclYn ;
+	//주문번호별운송장총갯수
+	private int orderNoInvoiceCnt = 0;
 
 }
