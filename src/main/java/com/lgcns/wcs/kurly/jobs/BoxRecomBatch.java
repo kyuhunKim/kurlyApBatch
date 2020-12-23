@@ -131,6 +131,27 @@ public class BoxRecomBatch  {
 			int k = 0;
     		for(SearchOrdInfoVO searchOrdInfoVO : selectList)
     		{
+    			af_shipOrderKey = searchOrdInfoVO.getShipOrderKey();
+    			if(bf_shipOrderKey.equals("") || !bf_shipOrderKey.equals(af_shipOrderKey))
+    			{
+    				ordVO = new OrdInfoVO();
+    				ordVO.setShipOrderKey(searchOrdInfoVO.getShipOrderKey());
+        			ordVO.setOrderNo(searchOrdInfoVO.getOrderNo());
+        			ordVO.setWarehouseKey(searchOrdInfoVO.getWarehouseKey());
+        			ordVO.setOwnerKey(searchOrdInfoVO.getOwnerKey());
+        			ordVO.setBoxSplitCheckYn(searchOrdInfoVO.getBoxSplitCheckYn());
+        			ordVO.setInvoiceNo(searchOrdInfoVO.getInvoiceNo());
+    				ordList.addOrd(ordVO);
+    			}
+    			
+    			ordVO.addOrdLine(searchOrdInfoVO.getSkuCode(), searchOrdInfoVO.getOrdQty(),
+						searchOrdInfoVO.getShipOrderKey(), searchOrdInfoVO.getWarehouseKey(), 
+						searchOrdInfoVO.getOwnerKey(), searchOrdInfoVO.getOrderNo(), searchOrdInfoVO.getShipOrderItemSeq(),
+    					searchOrdInfoVO.getSkuDepth(), searchOrdInfoVO.getSkuHeight(), searchOrdInfoVO.getSkuWidth());
+
+    			bf_shipOrderKey = af_shipOrderKey;
+    			
+    			/*
     			bf_shipOrderKey = searchOrdInfoVO.getShipOrderKey();
     			
     			if(bf_shipOrderKey.equals(af_shipOrderKey)) {
@@ -169,6 +190,7 @@ public class BoxRecomBatch  {
 	    			k++;
 	    			
     			}
+    			*/
     			
     		}
     		

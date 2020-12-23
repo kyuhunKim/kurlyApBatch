@@ -76,7 +76,7 @@ public class ScheduleTask {
 		log.info("Current Thread : {}", Thread.currentThread().getName());
 	}
 	//오더분할 배치 - 10초
-	@Scheduled(fixedDelay = 100000, initialDelay = 10000)
+	@Scheduled(fixedDelay = 10000)
 	public void BoxRecom() {
 		log.info("The current date (2) BoxRecom : " + LocalDateTime.now());
 		log.info("Current Thread : {}", Thread.currentThread().getName());

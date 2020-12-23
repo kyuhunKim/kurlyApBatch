@@ -1,6 +1,8 @@
 package com.lgcns.wcs.kurly.service.impl;
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -92,4 +94,13 @@ public class LogApiStatusServiceImpl implements LogApiStatusService {
 		return seqId;
 	}
 
+	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=SQLException.class)
+	public void createLogApiStatusList(List<LogApiStatus> logApiStatus) {
+		
+		HashMap<String, Object> hdMap = new HashMap<String, Object>();
+		hdMap.put("logApiStatusList",logApiStatus);
+		
+		logApiStatusRepository.createLogApiStatusList(hdMap);
+		
+	}
 }

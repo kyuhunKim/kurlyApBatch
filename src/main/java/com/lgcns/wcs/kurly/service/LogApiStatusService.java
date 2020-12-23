@@ -1,5 +1,7 @@
 package com.lgcns.wcs.kurly.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.lgcns.wcs.kurly.dto.LogApiStatus;
@@ -15,4 +17,6 @@ import com.lgcns.wcs.kurly.dto.LogApiStatus;
 public interface LogApiStatusService {
 
 	public int createLogApiStatus(LogApiStatus logApiStatus);
+
+	public void createLogApiStatusList(List<LogApiStatus> logApiStatus);
 }

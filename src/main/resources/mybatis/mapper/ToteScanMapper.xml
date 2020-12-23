@@ -37,4 +37,33 @@
 			TOTE_SCAN_IF_RET_MESSAGE = #{toteScanIfRetMessage} 
 	WHERE WIF_PICK_TOTE_HDR_SEQ = #{toteUniqueNo}
   </update>
+  
+  <update id="updateToteScanList" parameterType="map">
+  /* [ToteScanMapper.xml] updateToteScanList */
+    MERGE INTO o_wcs.TB_WIF_PICK_TOTE_HDR  HDR
+    	USING (
+    		<foreach collection="updateList" item="item" index="index" separator="UNION ALL">
+    		SELECT
+				#{item.toteUniqueNo}  AS TOTE_UNIQUE_NO,
+				#{item.toteScanIfYn}  AS TOTE_SCAN_IF_YN ,  
+				#{item.toteScanIfRetCode}  AS TOTE_SCAN_IF_RET_CODE ,
+				#{item.toteScanIfRetMessage}  AS TOTE_SCAN_IF_RET_MESSAGE
+    		FROM DUAL
+   		   </foreach>
+	) TB
+	ON 
+	(
+		HDR.WIF_PICK_TOTE_HDR_SEQ = TB.TOTE_UNIQUE_NO
+	)
+	WHEN MATCHED THEN
+		UPDATE
+		<set>
+			TOTE_SCAN_IF_YN =  TB.TOTE_SCAN_IF_YN,
+			TOTE_SCAN_IF_DT =  SYSDATE,
+			TOTE_SCAN_IF_RET_CODE =  TB.TOTE_SCAN_IF_RET_CODE,
+			TOTE_SCAN_IF_RET_MESSAGE = TB.TOTE_SCAN_IF_RET_MESSAGE 
+		</set>
+  </update>
+  
+  
 </mapper>

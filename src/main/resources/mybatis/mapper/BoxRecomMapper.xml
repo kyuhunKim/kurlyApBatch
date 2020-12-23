@@ -22,31 +22,6 @@
 	ORDER BY COM_DTL_CD ASC, ATTR01 ASC
   </select>
   
-  <select id="selectBoxTypeList_bak" resultType="com.lgcns.wcs.kurly.dto.box.BoxTypeVO">
-  	/* [BoxRecomMapper.xml] selectBoxTypeList */
-    SELECT 
-		B.BOX_TYPE_CD  AS boxTypeCd, 
-		B.BOX_TYPE_NM  AS boxTypeName,
-		B.CNTR_CD      AS warehouseKey,
-		B.BOX_TYPE_GRP_CD  AS boxShape,
-		B.BOX_WTH_LEN  AS BoxWidth,
-		B.BOX_VERT_LEN  AS BoxDepth,
-		B.BOX_HGT_LEN  AS BoxHeight,
-		C.fillRate
-	FROM o_wcs.TB_COM_BOX_TYPE_MST  B
-       ,(SELECT 
-    		COM_DTL_CD ,
-    		ATTR01/100 AS fillRate
-  		FROM o_wcs.TB_COM_CODE_MST
-  		WHERE CO_CD = 'MK'
-  		AND COM_HDR_CD ='BOX_PACKING_FACTOR'
-  		AND HDR_FLAG = 'N'
-  		AND USE_YN = 'Y'
-  		) C
-  WHERE B.CNTR_CD = C.COM_DTL_CD
-	ORDER BY CNTR_CD ASC, BOX_TYPE_GRP_CD ASC
-  </select>
-  
   <select id="selectBoxTypeList" resultType="com.lgcns.wcs.kurly.dto.box.BoxTypeVO">
     /* [BoxRecomMapper.xml] selectBoxTypeList */
     SELECT 
@@ -194,6 +169,7 @@
 		DT.SHIP_ORDER_ITEM_SEQ ASC,
 		DT.SKU_CODE ASC
   </select>
+  
   <select id="selectOrdLineListAll" parameterType="com.lgcns.wcs.kurly.dto.box.SearchVO" resultType="com.lgcns.wcs.kurly.dto.box.SearchOrdInfoVO">
   	/* [BoxRecomMapper.xml] selectOrdLineListTest */
 	<![CDATA[ 
