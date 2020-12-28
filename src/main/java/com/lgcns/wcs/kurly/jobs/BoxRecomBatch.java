@@ -70,6 +70,7 @@ public class BoxRecomBatch  {
 		String result = "sucess";
 		String resultMessage = "";
 		int executeCount = 0;
+		int executeCountAll = 0;
 		int insertMaaxCount = 100;
     	
 		Date startDate = Calendar.getInstance().getTime();
@@ -198,6 +199,8 @@ public class BoxRecomBatch  {
     		String apiRunTime1 = StringUtil.formatInterval(runTimeStart1, runTimeEnd1) ;
 
         	log.info("========order select======= apiRunTime1(ms) : "+ apiRunTime1);
+
+    		log.info(">>>ordList : " + ordList.getList().size());
     		
     		runTimeStart1 = System.currentTimeMillis();
     		
@@ -209,6 +212,7 @@ public class BoxRecomBatch  {
         	OrdSplitApp app;
     		for(OrdInfoVO itOrd : ordList.getList())
     		{
+//	    		log.info(">>>itOrd.getShipOrderKey() : ["+executeCount+"]" + itOrd.getShipOrderKey() );
     			int rSplit = 0;
     			
     			//오더박스분할여부확인(Y:오더분할가능, N:오더분할불가능)
@@ -334,7 +338,7 @@ public class BoxRecomBatch  {
 	    				}
 
 //	    	    		log.info(">>>itOrd.getShipOrderKey() : [N]" + itOrd.getShipOrderKey() );
-        				continue;
+//        				continue;
         			}
         			
         			int splitSeqNum = itOrd.getSplitNum(); 
@@ -440,7 +444,7 @@ public class BoxRecomBatch  {
 		        	
     			} //else end
     			executeCount++;
-        		
+
 				//insertMaaxCount = 100 건 도달하면 insert
 				if( (executeCount>2 && executeCount%insertMaaxCount == 0 ) 
 						|| ( executeCount == ordList.getList().size() && wifShipmentVOList.size() > 0) ) {
@@ -449,6 +453,8 @@ public class BoxRecomBatch  {
 					if(wifShipmentVOList.size() > 0) {
 						
 						boxRecomService.insertOrdShipmentListType(wifShipmentVOList, wifShipmentDtlVOList);
+						
+						executeCountAll = executeCount;
 						
 //						try
 //				    	{
@@ -518,7 +524,7 @@ public class BoxRecomBatch  {
             	logBatchExec.setMessageLog(resultMessage);
         	}
         	logBatchExec.setExecuteDirectYn(KurlyConstants.STATUS_N);
-        	logBatchExec.setExecuteCount(executeCount);
+        	logBatchExec.setExecuteCount(executeCountAll);
         	logBatchExec.setStartDate(startDate);
         	
     		
