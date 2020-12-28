@@ -789,16 +789,16 @@ public class BoxRecomBatch  {
 				}
     			
 				if( StringUtil.isEmpty(searchOrdInfoVO.getQtyByUom()) ) {
-					wifShipmentDtlVO.setQtyByUom("");
+					wifShipmentDtlVO.setQtyByUom("0");
 				}
 				if( StringUtil.isEmpty(searchOrdInfoVO.getMeasureKey()) ) {
-					wifShipmentDtlVO.setMeasureKey("");
+					wifShipmentDtlVO.setMeasureKey("STD");
 				}
 				if( StringUtil.isEmpty(searchOrdInfoVO.getUomKey()) ) {
 					wifShipmentDtlVO.setUomKey("");
 				}
 				if( StringUtil.isEmpty(searchOrdInfoVO.getDefaultUomKey()) ) {
-					wifShipmentDtlVO.setDefaultUomKey("");
+					wifShipmentDtlVO.setDefaultUomKey("EA");
 				}
 				if( StringUtil.isEmpty(searchOrdInfoVO.getSkuName()) ) {
 					wifShipmentDtlVO.setSkuName(" ");
