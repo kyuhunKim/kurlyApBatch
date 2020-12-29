@@ -45,8 +45,6 @@ public class LogBatchExecServiceImpl implements LogBatchExecService {
 	 */
 	@Transactional(propagation=Propagation.REQUIRES_NEW, rollbackFor=SQLException.class)
 	public int createLogBatchExec(LogBatchExec logBatchExec) {
-
-		Date endDate = Calendar.getInstance().getTime();
 		
 		if(logBatchExec.getWarehouseKey() ==null ||
 				"".equals(logBatchExec.getWarehouseKey())) {
@@ -60,6 +58,8 @@ public class LogBatchExecServiceImpl implements LogBatchExecService {
 		
 		logBatchExec.setServerIp(serverIp);
 		logBatchExec.setServerHost(serverHostName);
+		
+		Date endDate = Calendar.getInstance().getTime();
 		logBatchExec.setEndDate(endDate);
 		
 		int seqId = logBatchExecRepository.createLogBatchExec(logBatchExec);
