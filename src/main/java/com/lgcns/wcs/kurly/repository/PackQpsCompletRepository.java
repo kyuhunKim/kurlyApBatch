@@ -24,4 +24,6 @@ public interface PackQpsCompletRepository  {
 	List<PackQpsCompletDetailData> selectPackQpsCompletDetail(PackQpsCompletData data) ;
 	
 	void updatePackQpsComplet(Map<String, String> data);
+	
+	void updatePackQpsCompletList(Map<String, Object> data);
 }

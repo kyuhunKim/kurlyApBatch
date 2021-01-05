@@ -71,4 +71,36 @@
 			MODIFIED_USER = #{modifiedUser}
 	WHERE INVOICE_UID_KEY = #{invoiceUidKey}
   </update>
+  
+  <update id="updatePickQpsCompletList" parameterType="map">
+  /* [PickQpsCompletMapper.xml] updatePickQpsCompletList */
+    MERGE INTO o_wcs.TB_DOC_INVOICE_HDR  HDR
+    	USING (
+    		<foreach collection="updateList" item="item" index="index" separator="UNION ALL">
+    		SELECT
+				#{item.invoiceUidKey}  AS INVOICE_UID_KEY,
+				#{item.pickCmptIntfYn}  AS PICK_CMPT_INTF_YN ,  
+				#{item.pickCmptIntfCode}  AS PICK_CMPT_INTF_CODE ,
+				#{item.pickCmptIntfMemo}  AS PICK_CMPT_INTF_MEMO ,
+				#{item.modifiedUser}  AS MODIFIED_USER
+    		FROM DUAL
+   		   </foreach>
+	) TB
+	ON 
+	(
+			HDR.INVOICE_UID_KEY = TB.INVOICE_UID_KEY
+	)
+	WHEN MATCHED THEN
+		UPDATE
+		<set>
+			HDR.PICK_CMPT_INTF_YN =  TB.PICK_CMPT_INTF_YN,
+			HDR.PICK_CMPT_INTF_DT =  SYSDATE,
+			HDR.PICK_CMPT_INTF_CODE =  TB.PICK_CMPT_INTF_CODE,
+			HDR.PICK_CMPT_INTF_MEMO = TB.PICK_CMPT_INTF_MEMO ,
+			HDR.MODIFIED_DATE = TO_CHAR(SYSDATE, 'YYYYMMDD') ,
+			HDR.MODIFIED_TIME = TO_CHAR(SYSDATE, 'HH24MISS') ,
+			HDR.MODIFIED_USER = TB.MODIFIED_USER
+		</set>
+  </update>
+  
 </mapper>

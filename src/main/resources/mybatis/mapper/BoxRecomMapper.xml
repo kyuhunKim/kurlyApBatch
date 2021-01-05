@@ -254,7 +254,7 @@
 		DT.QPS_NUM                AS qpsNum,
 		DT.WMS_BATCH_YMD          AS wmsBatchYmd ,
 		DT.SKU_CODE               AS skuCode,
-		(CASE WHEN NVL(SM.LENGTH ,0)= 0 THEN DT.LENGTH ELSE SM.LENGTH END)    AS skuDepth,
+		(CASE WHEN NVL(SM.LENGTH,0) = 0 THEN DT.LENGTH ELSE SM.LENGTH END)    AS skuDepth,
 		(CASE WHEN NVL(SM.WIDTH,0)  = 0 THEN DT.WIDTH  ELSE SM.WIDTH  END)    AS skuWidth,
 		(CASE WHEN NVL(SM.HEIGHT,0) = 0 THEN DT.HEIGHT ELSE SM.HEIGHT END)    AS skuHeight,
 		SUM(DT.QTY_SHIP_ORDER)    AS ordQty
@@ -412,7 +412,8 @@
 		  PACK_BOX_TYPE_RECOM   ,
 		  SPECIAL_MGNT_CUST_YN  ,
 		  MANUAL_PROC_YN  ,
-		  SHIPMENT_CNCL_YN
+		  SHIPMENT_CNCL_YN , 
+		  DELIVERY_TYPE
 		)
 		SELECT 
 		      #{shipUidKey}, 
@@ -468,7 +469,8 @@
 		      (CASE WHEN HD.MEMBER_GRADE = '0003' 
 		      		THEN 'Y' ELSE 'N' END) AS SPECIAL_MGNT_CUST_YN    ,
 		      HD.MANUAL_PROC_YN        ,
-		      #{shipmentCnclYn}
+		      #{shipmentCnclYn}        ,
+		      'S'     AS DELIVERY_TYPE
 		  FROM o_wcs.TB_WIF_SHIPMENT_HDR HD
 		  WHERE HD.SHIP_ORDER_KEY = #{shipOrderKey}
   </insert>
@@ -836,7 +838,8 @@
 		  SPECIAL_MGNT_CUST_YN  ,
 		  MANUAL_PROC_YN        ,
 		  SHIPMENT_CNCL_YN      ,
-		  ORDER_NO_INVOICE_CNT
+		  ORDER_NO_INVOICE_CNT  ,
+		  DELIVERY_TYPE
 		)
 		SELECT o_wcs.SEQ_ORD_SHIPMENT_HDR.NEXTVAL, A.* 
            from (
@@ -892,8 +895,14 @@
 		      #{item.packBoxTypeRecom, jdbcType=VARCHAR}  AS PACK_BOX_TYPE_RECOM  ,
 		      #{item.specialMgntCustYn, jdbcType=VARCHAR}  AS SPECIAL_MGNT_CUST_YN,
 		      #{item.manualProcYn, jdbcType=VARCHAR}       AS MANUAL_PROC_YN      ,
-		      #{item.shipmentCnclYn, jdbcType=VARCHAR}     AS SHIPMENT_CNCL_YN    ,
-		      #{item.orderNoInvoiceCnt}     AS ORDER_NO_INVOICE_CNT
+			  ( CASE WHEN (SELECT COUNT(CH.SHIP_ORDER_KEY)
+							FROM o_wcs.TB_WIF_SHIPMENT_CHGMGNT CH
+							WHERE CH.SHIP_ORDER_KEY = #{item.shipOrderKey, jdbcType=VARCHAR}
+							AND CH.WAREHOUSE_KEY = #{item.warehouseKey, jdbcType=VARCHAR}
+							AND CH.STATUS_TYPE IN ( 'DELETE' , 'CANCEL' ) ) > 0 THEN 'Y' ELSE 'N' END
+				)  AS SHIPMENT_CNCL_YN    ,
+		      #{item.orderNoInvoiceCnt}     AS ORDER_NO_INVOICE_CNT    ,
+		      'S'     AS DELIVERY_TYPE
 		  FROM DUAL
 		  </foreach> ) A
   </insert>

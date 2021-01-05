@@ -46,4 +46,40 @@
 	  AND SHIP_ORDER_KEY = #{shipOrderKey}
 
   </update>
+  
+  <update id="updateInvoiceSortCompletList" parameterType="map">
+  /* [InvoiceSortCompletMapper.xml] updateInvoiceSortCompletList */
+    MERGE INTO o_wcs.TB_DOC_INVOICE_HDR  HDR
+    	USING (
+    		<foreach collection="updateList" item="item" index="index" separator="UNION ALL">
+    		SELECT
+				#{item.invoiceNo}  AS INVOICE_NO,
+				#{item.warehouseKey}  AS WAREHOUSE_KEY,
+				#{item.shipOrderKey}  AS SHIP_ORDER_KEY ,  
+				#{item.invoiceSortIntfYn}  AS INVOICE_SORT_INTF_YN ,  
+				#{item.invoiceSortIntfCode}  AS INVOICE_SORT_INTF_CODE ,
+				#{item.invoiceSortIntfMemo}  AS INVOICE_SORT_INTF_MEMO ,
+				#{item.modifiedUser}  AS MODIFIED_USER
+    		FROM DUAL
+   		   </foreach>
+	) TB
+	ON 
+	(
+			HDR.INVOICE_NO = TB.INVOICE_NO
+		AND HDR.WAREHOUSE_KEY = TB.WAREHOUSE_KEY
+		AND HDR.SHIP_ORDER_KEY = TB.SHIP_ORDER_KEY
+	)
+	WHEN MATCHED THEN
+		UPDATE
+		<set>
+			HDR.INVOICE_SORT_INTF_YN  = TB.INVOICE_SORT_INTF_YN ,
+			HDR.INVOICE_SORT_INTF_DT = SYSDATE ,
+			HDR.INVOICE_SORT_INTF_CODE = TB.INVOICE_SORT_INTF_CODE ,
+			HDR.INVOICE_SORT_INTF_MEMO = TB.INVOICE_SORT_INTF_MEMO ,
+			HDR.MODIFIED_DATE = TO_CHAR(SYSDATE, 'YYYYMMDD') ,
+			HDR.MODIFIED_TIME = TO_CHAR(SYSDATE, 'HH24MISS') ,
+			HDR.MODIFIED_USER = TB.MODIFIED_USER
+		</set>
+  </update>
+  
 </mapper>

@@ -1,6 +1,7 @@
 package com.lgcns.wcs.kurly.jobs;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -72,11 +73,13 @@ public class ToteReleaseBatch  {
     	try {
         	
 	    	List<ToteReleaseParamData> listToteRelease = toteReleaseService.selectToteRelease();
-	    	
+
 	    	//조회 건수 
-//	    	executeCount = listToteRelease.size();
-	    	
 	    	log.info("toteRelease size ==> "+ listToteRelease.size());
+
+	    		List<Map<String, Object>> updateMapList = new ArrayList<Map<String, Object>>();
+	    	List<LogApiStatus> logApiStatusList = new ArrayList<LogApiStatus>();
+	    	
 	    	for(ToteReleaseParamData toteReleaseData : listToteRelease ) {
 
 	    		//건당 시간 체크용
@@ -105,10 +108,15 @@ public class ToteReleaseBatch  {
 	    			} else {
 	    				r_ifYn = KurlyConstants.STATUS_N;
 	    			}
+	    		} catch (Exception ex) {	
+	    			log.info("== send error == " + toteReleaseData.getToteId());  
+	    			retMessage = ex.getMessage().substring(0, 90);
+    				r_ifYn = KurlyConstants.STATUS_N;
+	    		} finally {
 					
 			    	String r_toteId = toteReleaseData.getToteId();
 			    	int r_toteUniqueNo = toteReleaseData.getToteUniqueNo();
-					Map<String, String> updateMap = new HashMap<String, String>();
+					Map<String, Object> updateMap = new HashMap<String, Object>();
 					
 					if(KurlyConstants.STATUS_N.equals(r_ifYn)) {
 						updateMap.put("toteReleaseIntfYn",KurlyConstants.STATUS_N);
@@ -123,75 +131,61 @@ public class ToteReleaseBatch  {
 //					updateMap.put("toteId",r_toteId);
 					updateMap.put("toteUniqueNo",""+r_toteUniqueNo);
 
-					toteReleaseService.updateToteRelease(updateMap);
+//					toteReleaseService.updateToteRelease(updateMap);
 
-			    	
-	    		} catch (Exception ex) {	
-	    			log.info("== send error == " + toteReleaseData.getToteId());  
-	    			retMessage = ex.getMessage().substring(0, 90);
-    				r_ifYn = KurlyConstants.STATUS_N;
-	    		} finally {
-
-	    			//로그 정보 insert
-			    	LogApiStatus logApiStatus = new LogApiStatus();
-
-			    	logApiStatus.setExecMethod(KurlyConstants.METHOD_TOTERELEASE);
-			    	
-			    	logApiStatus.setGroupNo("");  //그룹배치번호
-			    	logApiStatus.setWorkBatchNo("");  //작업배치번호
-			    	
-			    	logApiStatus.setShipUidWcs("");  //출고오더UID(WCS)
-			    	logApiStatus.setShipUidSeq("");  //출고오더UID순번(WCS)
-			    	logApiStatus.setShipOrderKey("");  //출하문서번호(WMS)
-			    	logApiStatus.setShipOrderItemSeq("");  //출하문서순번(WMS)
-
-			    	logApiStatus.setInvoiceNo("");  //송장번호
-
-			    	logApiStatus.setStatus("");  //상태
-			    	
-			    	logApiStatus.setQtyOrder(0);  //지시수량
-			    	logApiStatus.setQtyComplete(0);  //작업완료수량
-			    	
-			    	logApiStatus.setSkuCode("");  //상품코드
-			    	logApiStatus.setWcsStatus("");  //WCS 작업상태
-			    	
-			    	logApiStatus.setApiUrl(KurlyConstants.METHOD_TOTERELEASE);
-			    	
-			    	String sYyyymmdd = DateUtil.getToday("yyyyMMdd");
-				    logApiStatus.setApiYyyymmdd(sYyyymmdd);
-				    
-					if(toteReleaseData != null) {
-						if(toteReleaseData.getWarehouseKey() ==null ||
-								"".equals(toteReleaseData.getWarehouseKey())) {
-							logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
-						} else {
-							logApiStatus.setWarehouseKey(toteReleaseData.getWarehouseKey());
-						}
-				    	logApiStatus.setApiInfo(toteReleaseData.toString());
-				    	logApiStatus.setToteId(toteReleaseData.getToteId());  //토트ID번호
-					} else {
-				    	logApiStatus.setApiInfo("");
-				    	logApiStatus.setToteId("");  //토트ID번호
-						logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
-					}
-			    	
-			    	logApiStatus.setIntfYn(r_ifYn) ; //'Y': 전송완료, 'N': 미전송
-			    	if(KurlyConstants.STATUS_N.equals(r_ifYn)) {
-			    		logApiStatus.setIntfMemo(retMessage);
-			    	} else {
-			    		logApiStatus.setIntfMemo(KurlyConstants.STATUS_OK);
-			    	}
-
-			    	apiRunTimeEnd = System.currentTimeMillis();
+	    			apiRunTimeEnd = System.currentTimeMillis();
 	    			apiRunTime = StringUtil.formatInterval(apiRunTimeStartFor, apiRunTimeEnd) ;
-			    	logApiStatus.setApiRuntime(apiRunTime);
-			    	
-			    	//로그정보 적재
-			    	logApiStatusService.createLogApiStatus(logApiStatus);
+	    			
+					updateMap.put("apiRunTime",apiRunTime);
+	    			
+					//update list data
+	    			updateMapList.add(updateMap);
+	    	    	
+	    	    	//로그 저장  수집
+	    	    	LogApiStatus logApiStatus = new LogApiStatus();
+	    	    	logApiStatus = logApiStatusVo(updateMap, toteReleaseData);
+					
+	    	    	logApiStatusList.add(logApiStatus);
+
+		    		executeCount++;
 			    	
 	    		}
-	    		executeCount++;
 	    	}
+	    	
+	    	try
+	    	{
+	    		List<Map<String, Object>> u_updateMapList = new ArrayList<Map<String, Object>>();
+    	    	List<LogApiStatus> u_logApiStatusList = new ArrayList<LogApiStatus>();
+    	    	
+        		for(int i=0; i <updateMapList.size(); i++) {
+
+        			u_updateMapList.add(updateMapList.get(i));
+        			u_logApiStatusList.add(logApiStatusList.get(i));
+        			
+        			//100 건 씩 처리
+		    		if( (i>2 && i%100 == 0 ) 
+		    				|| ( i == updateMapList.size()-1 ) ) {
+
+						log.info(">>>ToteReleaseBatch i : ["+i+"]"  );
+						
+						Map<String, Object> upListMap = new HashMap<String, Object>();
+						upListMap.put("updateList",updateMapList);
+				    	
+						//toteRelease update
+						toteReleaseService.updateToteReleaseList(upListMap, logApiStatusList);
+						
+						//초기화
+						u_updateMapList = new ArrayList<Map<String, Object>>();
+				    	u_logApiStatusList = new ArrayList<LogApiStatus>();
+						
+		    		}
+        		}
+	    		
+	    	} catch (Exception e1) {
+        		result = "error";
+    			log.error( " === ToteReleaseBatch update error e1" +e1 );
+    			resultMessage = e1.toString();
+        	}
     	
     	} catch (Exception e) {
     		result = "error";
@@ -225,6 +219,79 @@ public class ToteReleaseBatch  {
     	}
     	log.info("=======ToteReleaseTasklet end======= ");    
 
+    }
+
+    /**
+     * 
+     * @Name : logApiStatusVo
+     * @작성일 : 2020. 12. 22.
+     * @작성자 : jooni
+     * @변경이력 : 2020. 12. 22. 최초작성
+     * @Method 설명 : logApiStatus Vo 생성
+     */
+    public LogApiStatus logApiStatusVo(Map<String, Object> updateMap, ToteReleaseParamData toteReleaseData) {
+		
+    	//로그 정보 insert
+    	LogApiStatus logApiStatus = new LogApiStatus();
+
+    	logApiStatus.setExecMethod(KurlyConstants.METHOD_TOTERELEASE);
+    	
+    	logApiStatus.setGroupNo("");  //그룹배치번호
+    	logApiStatus.setWorkBatchNo("");  //작업배치번호
+    	
+    	logApiStatus.setShipUidWcs("");  //출고오더UID(WCS)
+    	logApiStatus.setShipUidSeq("");  //출고오더UID순번(WCS)
+    	logApiStatus.setShipOrderKey("");  //출하문서번호(WMS)
+    	logApiStatus.setShipOrderItemSeq("");  //출하문서순번(WMS)
+
+    	logApiStatus.setInvoiceNo("");  //송장번호
+
+    	logApiStatus.setStatus("");  //상태
+    	
+    	logApiStatus.setQtyOrder(0);  //지시수량
+    	logApiStatus.setQtyComplete(0);  //작업완료수량
+    	
+    	logApiStatus.setSkuCode("");  //상품코드
+    	logApiStatus.setWcsStatus("");  //WCS 작업상태
+    	
+    	logApiStatus.setApiUrl(KurlyConstants.METHOD_TOTERELEASE);
+    	
+    	String sYyyymmdd = DateUtil.getToday("yyyyMMdd");
+	    logApiStatus.setApiYyyymmdd(sYyyymmdd);
+	    
+		if(toteReleaseData != null) {
+			if(toteReleaseData.getWarehouseKey() ==null ||
+					"".equals(toteReleaseData.getWarehouseKey())) {
+				logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
+			} else {
+				logApiStatus.setWarehouseKey(toteReleaseData.getWarehouseKey());
+			}
+	    	logApiStatus.setApiInfo(toteReleaseData.toString());
+	    	logApiStatus.setToteId(toteReleaseData.getToteId());  //토트ID번호
+		} else {
+	    	logApiStatus.setApiInfo("");
+	    	logApiStatus.setToteId("");  //토트ID번호
+			logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
+		}
+    	
+		String l_apiRunTime = updateMap.get("apiRunTime").toString();
+		
+		String l_intfYn = updateMap.get("toteReleaseIntfYn").toString();
+		String l_intfMemo = updateMap.get("toteReleaseIntfMemo").toString();
+		
+		
+    	logApiStatus.setApiUrl(KurlyConstants.METHOD_TOTERELEASE);
+    	logApiStatus.setApiRuntime(l_apiRunTime);
+    	
+    	logApiStatus.setIntfYn(l_intfYn) ; //'Y': 전송완료, 'N': 미전송
+    	if(KurlyConstants.STATUS_N.equals(l_intfYn)) {
+    		String c_intfMemo = StringUtil.cutString(l_intfMemo, 3500, "");
+			logApiStatus.setIntfMemo(c_intfMemo);
+    	} else {
+    		logApiStatus.setIntfMemo(KurlyConstants.STATUS_OK);
+    	}
+
+		return logApiStatus;
     }
 }
 

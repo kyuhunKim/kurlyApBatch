@@ -1,6 +1,7 @@
 package com.lgcns.wcs.kurly.jobs;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -72,6 +73,9 @@ public class OrdmadeNotfullyReplayBatch {
 	    	//조회 건수 
 //	    	executeCount = listOrdmadeNotfullyReplay.size();
 	    	log.info("listOrdmadeNotfullyReplay size ==> "+ listOrdmadeNotfullyReplay.size());
+
+	    	List<Map<String, Object>> updateMapList = new ArrayList<Map<String, Object>>();
+	    	List<LogApiStatus> logApiStatusList = new ArrayList<LogApiStatus>();
 	    	
 	    	for(OrdmadeNotfullyReplayData ordmadeNotfullyReplayData : listOrdmadeNotfullyReplay ) {
 	    		//건당 시간 체크용
@@ -100,13 +104,18 @@ public class OrdmadeNotfullyReplayBatch {
 	    			} else {
 	    				r_ifYn = KurlyConstants.STATUS_N;
 	    			}
-	    			
+
+	    		} catch (Exception ex) {	
+	    			log.info("== send error == " + ordmadeNotfullyReplayData.getInvoiceNo());  
+	    			retMessage = ex.getMessage().substring(0, 90);
+    				r_ifYn = KurlyConstants.STATUS_N;
+	    		} finally {
 			    	//인터페이스 처리내역 update
 	    			String r_invoiceNo = ordmadeNotfullyReplayData.getInvoiceNo();
 	    			String r_invoiceSeq = ordmadeNotfullyReplayData.getInvoiceSeq();
 	    			double r_qtyNotfullyReqpick = ordmadeNotfullyReplayData.getQtyNotfullyReqpick();
 	    			
-					Map<String, String> updateMap = new HashMap<String, String>();
+					Map<String, Object> updateMap = new HashMap<String, Object>();
 					
 					if(KurlyConstants.STATUS_N.equals(r_ifYn)) {
 						updateMap.put("notfullyReqIfYn",KurlyConstants.STATUS_N);
@@ -122,98 +131,60 @@ public class OrdmadeNotfullyReplayBatch {
 					updateMap.put("qtyNotfullyReqpick",""+r_qtyNotfullyReqpick);
 					updateMap.put("invoiceSeq",r_invoiceSeq);
 
-					ordmadeNotfullyReplayService.updateOrdmadeNotfullyReplay(updateMap);
-
-			    	
-	    		} catch (Exception ex) {	
-	    			log.info("== send error == " + ordmadeNotfullyReplayData.getInvoiceNo());  
-	    			retMessage = ex.getMessage().substring(0, 90);
-    				r_ifYn = KurlyConstants.STATUS_N;
-	    		} finally {
-
-	    			apiRunTimeEnd = System.currentTimeMillis();
+//					ordmadeNotfullyReplayService.updateOrdmadeNotfullyReplay(updateMap);
+					apiRunTimeEnd = System.currentTimeMillis();
 	    			apiRunTime = StringUtil.formatInterval(apiRunTimeStartFor, apiRunTimeEnd) ;
-
-					//전송로그 정보 insert
-			    	LogApiStatus logApiStatus = new LogApiStatus();
-
-			    	String sYyyymmdd = DateUtil.getToday("yyyyMMdd");
-				    logApiStatus.setApiYyyymmdd(sYyyymmdd);
-			    	logApiStatus.setExecMethod(KurlyConstants.METHOD_ORDMADENOTFULLYREPLAY);
-			    	
-			    	logApiStatus.setGroupNo("");  //그룹배치번호
-			    	logApiStatus.setWorkBatchNo("");  //작업배치번호
-			    	
-			    	logApiStatus.setShipUidWcs("");  //출고오더UID(WCS)
-			    	logApiStatus.setShipUidSeq("");  //출고오더UID순번(WCS)
-			    	logApiStatus.setShipOrderKey("");  //출하문서번호(WMS)
-			    	logApiStatus.setShipOrderItemSeq("");  //출하문서순번(WMS)
-
-			    	logApiStatus.setToteId(" ");  //토트ID번호
-			    	logApiStatus.setInvoiceNo("");  //송장번호
-			    	
-			    	logApiStatus.setStatus("");  //상태
-			    	
-			    	logApiStatus.setQtyOrder(0);  //지시수량
-			    	logApiStatus.setQtyComplete(0);  //작업완료수량
-			    	
-			    	logApiStatus.setSkuCode("");  //상품코드
-			    	logApiStatus.setWcsStatus("");  //WCS 작업상태
-			    	logApiStatus.setApiInfo("");
-
-					if(ordmadeNotfullyReplayData != null) {
-						if(ordmadeNotfullyReplayData.getWarehouseKey() ==null ||
-								"".equals(ordmadeNotfullyReplayData.getWarehouseKey())) {
-							logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
-						} else {
-							logApiStatus.setWarehouseKey(ordmadeNotfullyReplayData.getWarehouseKey());
-						}
-						
-				    	logApiStatus.setGroupNo(ordmadeNotfullyReplayData.getGroupNo());  //그룹배치번호
-				    	logApiStatus.setWorkBatchNo(ordmadeNotfullyReplayData.getWorkBatchNo());  //작업배치번호
-				    	
-				    	logApiStatus.setShipUidWcs(ordmadeNotfullyReplayData.getShipUidKey());  //출고오더UID(WCS)
-				    	logApiStatus.setShipUidSeq(ordmadeNotfullyReplayData.getShipUidItemSeq());  //출고오더UID순번(WCS)
-				    	logApiStatus.setShipOrderKey(ordmadeNotfullyReplayData.getShipOrderKey());  //출하문서번호(WMS)
-				    	logApiStatus.setShipOrderItemSeq(ordmadeNotfullyReplayData.getShipOrderItemSeq());  //출하문서순번(WMS)
-				    	logApiStatus.setInvoiceNo(ordmadeNotfullyReplayData.getInvoiceNo());  //송장번호
-
-				    	logApiStatus.setQtyOrder(ordmadeNotfullyReplayData.getQtyNotfullyReqpick());  //지시수량
-				    	logApiStatus.setSkuCode(ordmadeNotfullyReplayData.getSkuCode());  //상품코드
-				    	logApiStatus.setApiInfo(ordmadeNotfullyReplayData.toString());
-					} else {
-						logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
-				    	logApiStatus.setGroupNo("");  //그룹배치번호
-				    	logApiStatus.setWorkBatchNo("");  //작업배치번호
-				    	
-				    	logApiStatus.setShipUidWcs("");  //출고오더UID(WCS)
-				    	logApiStatus.setShipUidSeq("");  //출고오더UID순번(WCS)
-				    	logApiStatus.setShipOrderKey("");  //출하문서번호(WMS)
-				    	logApiStatus.setShipOrderItemSeq("");  //출하문서순번(WMS)
-				    	logApiStatus.setInvoiceNo("");  //송장번호
-
-				    	logApiStatus.setQtyOrder(0);  //지시수량
-				    	logApiStatus.setSkuCode("");  //상품코드
-				    	logApiStatus.setApiInfo("");
-						
-					}
+	    			
+					updateMap.put("apiRunTime",apiRunTime);
+	    			
+					//update list data
+	    			updateMapList.add(updateMap);
+	    	    	
+	    	    	//로그 저장  수집
+	    	    	LogApiStatus logApiStatus = new LogApiStatus();
+	    	    	logApiStatus = logApiStatusVo(updateMap, ordmadeNotfullyReplayData);
 					
-			    	logApiStatus.setApiUrl(KurlyConstants.METHOD_ORDMADENOTFULLYREPLAY);
-			    	logApiStatus.setApiRuntime(apiRunTime);
+	    	    	logApiStatusList.add(logApiStatus);
 
-			    	logApiStatus.setIntfYn(r_ifYn) ; //'Y': 전송완료, 'N': 미전송
-			    	if(KurlyConstants.STATUS_N.equals(r_ifYn)) {
-			    		logApiStatus.setIntfMemo(retMessage);
-			    	} else {
-			    		logApiStatus.setIntfMemo(KurlyConstants.STATUS_OK);
-			    	}
-			    	
-			    	//로그정보 적재
-			    	logApiStatusService.createLogApiStatus(logApiStatus);
-			    	
+		    		executeCount++;
+	
 	    		}
-	    		executeCount++;
 	    	}
+	    	
+	    	try
+	    	{
+	    		List<Map<String, Object>> u_updateMapList = new ArrayList<Map<String, Object>>();
+    	    	List<LogApiStatus> u_logApiStatusList = new ArrayList<LogApiStatus>();
+    	    	
+        		for(int i=0; i <updateMapList.size(); i++) {
+
+        			u_updateMapList.add(updateMapList.get(i));
+        			u_logApiStatusList.add(logApiStatusList.get(i));
+        			
+        			//100 건 씩 처리
+		    		if( (i>2 && i%100 == 0 ) 
+		    				|| ( i == updateMapList.size()-1 ) ) {
+
+						log.info(">>>OrdmadeNotfullyReplayBatch i : ["+i+"]"  );
+						
+						Map<String, Object> upListMap = new HashMap<String, Object>();
+						upListMap.put("updateList",updateMapList);
+				    	
+						//update
+						ordmadeNotfullyReplayService.updateOrdmadeNotfullyReplayList(upListMap, logApiStatusList);
+						
+						//초기화
+						u_updateMapList = new ArrayList<Map<String, Object>>();
+				    	u_logApiStatusList = new ArrayList<LogApiStatus>();
+						
+		    		}
+        		}
+
+	    	} catch (Exception e1) {
+        		result = "error";
+    			log.error( " === OrdmadeNotfullyReplayBatch  error e1" +e1 );
+    			resultMessage = e1.toString();
+        	}
     	} catch (Exception e) {
     		result = "error";
 			log.info( " === OrdmadeNotfullyReplayBatch  error" +e );
@@ -247,5 +218,97 @@ public class OrdmadeNotfullyReplayBatch {
         }
     	log.info("=======OrdmadeNotfullyReplayBatch end=======");
     	
+    }
+
+    /**
+     * 
+     * @Name : logApiStatusVo
+     * @작성일 : 2020. 12. 22.
+     * @작성자 : jooni
+     * @변경이력 : 2020. 12. 22. 최초작성
+     * @Method 설명 : logApiStatus Vo 생성
+     */
+    public LogApiStatus logApiStatusVo(Map<String, Object> updateMap, OrdmadeNotfullyReplayData ordmadeNotfullyReplayData) {
+		
+    	//로그 정보 insert
+    	LogApiStatus logApiStatus = new LogApiStatus();
+
+    	String sYyyymmdd = DateUtil.getToday("yyyyMMdd");
+	    logApiStatus.setApiYyyymmdd(sYyyymmdd);
+    	logApiStatus.setExecMethod(KurlyConstants.METHOD_ORDMADENOTFULLYREPLAY);
+    	
+    	logApiStatus.setGroupNo("");  //그룹배치번호
+    	logApiStatus.setWorkBatchNo("");  //작업배치번호
+    	
+    	logApiStatus.setShipUidWcs("");  //출고오더UID(WCS)
+    	logApiStatus.setShipUidSeq("");  //출고오더UID순번(WCS)
+    	logApiStatus.setShipOrderKey("");  //출하문서번호(WMS)
+    	logApiStatus.setShipOrderItemSeq("");  //출하문서순번(WMS)
+
+    	logApiStatus.setToteId("");  //토트ID번호
+    	logApiStatus.setInvoiceNo("");  //송장번호
+
+    	logApiStatus.setStatus("");  //상태
+    	
+    	logApiStatus.setQtyOrder(0);  //지시수량
+    	logApiStatus.setQtyComplete(0);  //작업완료수량
+    	
+    	logApiStatus.setSkuCode("");  //상품코드
+    	logApiStatus.setWcsStatus("");  //WCS 작업상태
+
+		if(ordmadeNotfullyReplayData != null) {
+
+			if(ordmadeNotfullyReplayData.getWarehouseKey() ==null ||
+					"".equals(ordmadeNotfullyReplayData.getWarehouseKey())) {
+				logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
+			} else {
+				logApiStatus.setWarehouseKey(ordmadeNotfullyReplayData.getWarehouseKey());
+			}
+			
+	    	logApiStatus.setGroupNo(ordmadeNotfullyReplayData.getGroupNo());  //그룹배치번호
+	    	logApiStatus.setWorkBatchNo(ordmadeNotfullyReplayData.getWorkBatchNo());  //작업배치번호
+	    	
+	    	logApiStatus.setShipUidWcs(ordmadeNotfullyReplayData.getShipUidKey());  //출고오더UID(WCS)
+	    	logApiStatus.setShipUidSeq(ordmadeNotfullyReplayData.getShipUidItemSeq());  //출고오더UID순번(WCS)
+	    	logApiStatus.setShipOrderKey(ordmadeNotfullyReplayData.getShipOrderKey());  //출하문서번호(WMS)
+	    	logApiStatus.setShipOrderItemSeq(ordmadeNotfullyReplayData.getShipOrderItemSeq());  //출하문서순번(WMS)
+	    	logApiStatus.setInvoiceNo(ordmadeNotfullyReplayData.getInvoiceNo());  //송장번호
+
+	    	logApiStatus.setQtyOrder(ordmadeNotfullyReplayData.getQtyNotfullyReqpick());  //지시수량
+	    	logApiStatus.setSkuCode(ordmadeNotfullyReplayData.getSkuCode());  //상품코드
+	    	logApiStatus.setApiInfo(ordmadeNotfullyReplayData.toString());
+		} else {
+			logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
+	    	logApiStatus.setGroupNo("");  //그룹배치번호
+	    	logApiStatus.setWorkBatchNo("");  //작업배치번호
+	    	
+	    	logApiStatus.setShipUidWcs("");  //출고오더UID(WCS)
+	    	logApiStatus.setShipUidSeq("");  //출고오더UID순번(WCS)
+	    	logApiStatus.setShipOrderKey("");  //출하문서번호(WMS)
+	    	logApiStatus.setShipOrderItemSeq("");  //출하문서순번(WMS)
+	    	logApiStatus.setInvoiceNo("");  //송장번호
+
+	    	logApiStatus.setQtyOrder(0);  //지시수량
+	    	logApiStatus.setSkuCode("");  //상품코드
+	    	logApiStatus.setApiInfo("");
+		}
+
+		String l_apiRunTime = updateMap.get("apiRunTime").toString();
+		String l_intfYn = updateMap.get("notfullyReqIfYn").toString();
+		String l_intfMemo = updateMap.get("notfullyReqIfRetMessage").toString();
+		
+		
+    	logApiStatus.setApiUrl(KurlyConstants.METHOD_ORDMADENOTFULLYREPLAY);
+    	logApiStatus.setApiRuntime(l_apiRunTime);
+    	
+    	logApiStatus.setIntfYn(l_intfYn) ; //'Y': 전송완료, 'N': 미전송
+    	if(KurlyConstants.STATUS_N.equals(l_intfYn)) {
+    		String c_intfMemo = StringUtil.cutString(l_intfMemo, 3500, "");
+			logApiStatus.setIntfMemo(c_intfMemo);
+    	} else {
+    		logApiStatus.setIntfMemo(KurlyConstants.STATUS_OK);
+    	}
+
+		return logApiStatus;
     }
 }

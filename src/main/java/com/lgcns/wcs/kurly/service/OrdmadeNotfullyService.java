@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.lgcns.wcs.kurly.dto.LogApiStatus;
 import com.lgcns.wcs.kurly.dto.OrdmadeNotfullyData;
 
 /**
@@ -19,4 +20,6 @@ public interface OrdmadeNotfullyService {
 
 	public List<OrdmadeNotfullyData> selectOrdmadeNotfully() ;
 	public void updateOrdmadeNotfully(Map<String, String> data) ;
+	
+	public void updateOrdmadeNotfullyList(Map<String, Object> data, List<LogApiStatus> logApiStatusList)  ;
 }

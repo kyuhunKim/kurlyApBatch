@@ -27,10 +27,10 @@ spring:
   
   datasource:
 #   dev
-##    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-##    url: jdbc:log4jdbc:oracle:thin:@15.15.21.220:1521/wcsdev
-#    driver-class-name: oracle.jdbc.driver.OracleDriver
-#    url: jdbc:oracle:thin:@15.15.21.220:1521/wcsdev
+#    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+#    url: jdbc:log4jdbc:oracle:thin:@15.15.21.220:1521/wcsdev
+##    driver-class-name: oracle.jdbc.driver.OracleDriver
+##    url: jdbc:oracle:thin:@15.15.21.220:1521/wcsdev
 #    username : s_wcs
 #    password : smartAPP9
 #   real

@@ -1,6 +1,7 @@
 package com.lgcns.wcs.kurly.service.impl;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,7 +11,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.lgcns.wcs.kurly.dto.InvoicePrintCompletData;
+import com.lgcns.wcs.kurly.dto.LogApiStatus;
 import com.lgcns.wcs.kurly.repository.InvoicePrintCompletRepository;
+import com.lgcns.wcs.kurly.repository.LogApiStatusRepository;
 import com.lgcns.wcs.kurly.service.InvoicePrintCompletService;
 
 /**
@@ -25,6 +28,9 @@ public class InvoicePrintCompletServiceImpl implements InvoicePrintCompletServic
 
 	@Autowired
 	InvoicePrintCompletRepository invoicePrintCompletRepository;
+
+	@Autowired
+	LogApiStatusRepository logApiStatusRepository;
 	
 	/**
 	 * 
@@ -51,5 +57,24 @@ public class InvoicePrintCompletServiceImpl implements InvoicePrintCompletServic
 	@Transactional(propagation=Propagation.REQUIRES_NEW, rollbackFor=SQLException.class)
 	public void updateInvoicePrintComplet(Map<String, String> data) {
 		invoicePrintCompletRepository.updateInvoicePrintComplet(data);
+	}
+	/**
+	 * 
+	 * @Method Name : updateInvoicePrintCompletList
+	 * @작성일 : 2020. 12. 10.
+	 * @작성자 : jooni
+	 * @변경이력 : 2020. 12. 10. 최초작성
+	 * @Method 설명 : WCS 운송장 발행 정보  처리 와 로그  update
+	 */
+	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=SQLException.class)
+	public void updateInvoicePrintCompletList(Map<String, Object> upListMap, List<LogApiStatus> logApiStatusList)   {
+		
+		invoicePrintCompletRepository.updateInvoicePrintCompletList(upListMap);
+
+		Map<String, Object> logList = new HashMap<String, Object>();
+		logList.put("logApiStatusList",logApiStatusList);
+		
+    	//logApi insert
+		logApiStatusRepository.createLogApiStatusList(logList);
 	}
 }

@@ -1,6 +1,7 @@
 package com.lgcns.wcs.kurly.jobs;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -68,13 +69,15 @@ public class InvoicePrintCompletBatch  {
     	Date startDate = Calendar.getInstance().getTime();
     	try
     	{
-        	
     		//WCS 운송장 발행 정보 데이타 조회
     		List<InvoicePrintCompletData> listInvoicePrintComplet = invoicePrintCompletService.selectInvoicePrintComplet();
 	    	
 	    	//조회 건수 
 //	    	executeCount = listInvoicePrintComplet.size();
 	    	log.info("invoicePrintComplet size ==> "+ listInvoicePrintComplet.size());
+	    	
+	    	List<Map<String, Object>> updateMapList = new ArrayList<Map<String, Object>>();
+	    	List<LogApiStatus> logApiStatusList = new ArrayList<LogApiStatus>();
 	    	
 	    	for(InvoicePrintCompletData invoicePrintCompletData : listInvoicePrintComplet ) {
 
@@ -98,18 +101,22 @@ public class InvoicePrintCompletBatch  {
 //	    			log.info(" >>>>>>"+retMessage);
 //	    	    	log.info(" >>>>>>invoicePrintComplet deferredResult.getResult()="+ deferredResult.getResult());
 	    	    	
-//	    			if(deferredResult.getResult().toString().indexOf("SUCCESS") > -1) {
 	    	    	if(retStatus.equals("SUCCESS")) {
 	    				r_ifYn = KurlyConstants.STATUS_Y;
 	    			} else {
 	    				r_ifYn = KurlyConstants.STATUS_N;
 	    			}
+	    		} catch (Exception ex) {	
+	    			log.info("== send error == " + invoicePrintCompletData.getInvoiceNo());  
+	    			retMessage = ex.getMessage().substring(0, 90);
+    				r_ifYn = KurlyConstants.STATUS_N;
+	    		} finally {
 	    			
 			    	//인터페이스 처리내역 update
 	    			String r_invoiceNo = invoicePrintCompletData.getInvoiceNo();
 	    			String r_warehouseKey = invoicePrintCompletData.getWarehouseKey();
 	    			String r_shipOrderKey = invoicePrintCompletData.getShipOrderKey();
-					Map<String, String> updateMap = new HashMap<String, String>();
+					Map<String, Object> updateMap = new HashMap<String, Object>();
 					
 					if(KurlyConstants.STATUS_N.equals(r_ifYn)) {
 						updateMap.put("invoicePrintIntfYn",KurlyConstants.STATUS_N);
@@ -125,93 +132,60 @@ public class InvoicePrintCompletBatch  {
 					updateMap.put("warehouseKey",r_warehouseKey);
 					updateMap.put("shipOrderKey",r_shipOrderKey);
 					
-			    	invoicePrintCompletService.updateInvoicePrintComplet(updateMap);
-
-			    	
-	    		} catch (Exception ex) {	
-	    			log.info("== send error == " + invoicePrintCompletData.getInvoiceNo());  
-	    			retMessage = ex.getMessage().substring(0, 90);
-    				r_ifYn = KurlyConstants.STATUS_N;
-	    		} finally {
+//			    	invoicePrintCompletService.updateInvoicePrintComplet(updateMap);
 
 	    			apiRunTimeEnd = System.currentTimeMillis();
 	    			apiRunTime = StringUtil.formatInterval(apiRunTimeStartFor, apiRunTimeEnd) ;
+	    			updateMap.put("apiRunTime",apiRunTime);
+	            	
+					//update list data
+	    	    	updateMapList.add(updateMap);
 
-	            	log.info("======= apiRunTime(ms) : "+ apiRunTime);
-
-					//전송로그 정보 insert
-			    	LogApiStatus logApiStatus = new LogApiStatus();
-
-			    	String sYyyymmdd = DateUtil.getToday("yyyyMMdd");
-				    logApiStatus.setApiYyyymmdd(sYyyymmdd);
-			    	logApiStatus.setExecMethod(KurlyConstants.METHOD_INVOICEPRINTCOMPLET);
-			    	
-			    	logApiStatus.setGroupNo("");  //그룹배치번호
-			    	logApiStatus.setWorkBatchNo("");  //작업배치번호
-
-			    	logApiStatus.setShipUidWcs("");  //출고오더UID(WCS)
-			    	logApiStatus.setShipOrderKey("");  //출하문서번호(WMS)
-			    	logApiStatus.setShipUidSeq("");  //출고오더UID순번(WCS)
-			    	logApiStatus.setShipOrderItemSeq("");  //출하문서순번(WMS)
-
-			    	logApiStatus.setToteId("");  //토트ID번호
-			    	logApiStatus.setInvoiceNo("");  //송장번호
-
-			    	logApiStatus.setStatus("");  //상태
-			    	
-			    	logApiStatus.setQtyOrder(0);  //지시수량
-			    	logApiStatus.setQtyComplete(0);  //작업완료수량
-			    	
-			    	logApiStatus.setSkuCode("");  //상품코드
-			    	
-			    	logApiStatus.setShipUidWcs("");  //출고오더UID(WCS)
-			    	logApiStatus.setShipOrderKey("");  //출하문서번호(WMS)
-			    	logApiStatus.setWcsStatus("");  //WCS 작업상태
-			    	
-			    	logApiStatus.setApiInfo("");
-			    	
-					if(invoicePrintCompletData != null) {
-				    	if(invoicePrintCompletData.getWarehouseKey() ==null ||
-								"".equals(invoicePrintCompletData.getWarehouseKey())) {
-							logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
-						} else {
-							logApiStatus.setWarehouseKey(invoicePrintCompletData.getWarehouseKey());
-						}
-				    	
-				    	logApiStatus.setShipUidWcs(invoicePrintCompletData.getShipUidKey());  //출고오더UID(WCS)
-				    	logApiStatus.setShipOrderKey(invoicePrintCompletData.getShipOrderKey());  //출하문서번호(WMS)
-				    	logApiStatus.setWcsStatus(invoicePrintCompletData.getInvoiceStatus());  //WCS 작업상태
-				    	logApiStatus.setInvoiceNo(invoicePrintCompletData.getInvoiceNo());  //송장번호
-
-				    	logApiStatus.setApiInfo(invoicePrintCompletData.toString());
-					} else {
-						logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
-
-				    	logApiStatus.setShipUidWcs("");  //출고오더UID(WCS)
-				    	logApiStatus.setShipOrderKey("");  //출하문서번호(WMS)
-				    	logApiStatus.setWcsStatus("");  //WCS 작업상태
-				    	logApiStatus.setInvoiceNo("");  //송장번호
-				    	
-						logApiStatus.setApiInfo("");
-					}
+	    	    	//로그 저장  수집
+	    	    	LogApiStatus logApiStatus = new LogApiStatus();
+	    	    	logApiStatus = logApiStatusVo(updateMap, invoicePrintCompletData);
 					
-			    	logApiStatus.setApiUrl(KurlyConstants.METHOD_INVOICEPRINTCOMPLET);
-			    	logApiStatus.setApiRuntime(apiRunTime);
-			    	
-			    	logApiStatus.setIntfYn(r_ifYn) ; //'Y': 전송완료, 'N': 미전송
-			    	//전송상태 및 DB 오류 체크
-			    	if(KurlyConstants.STATUS_N.equals(r_ifYn)) {
-			    		logApiStatus.setIntfMemo(retMessage);
-			    	} else {
-			    		logApiStatus.setIntfMemo(KurlyConstants.STATUS_OK);
-			    	}
-			    	
-			    	//로그정보 적재
-			    	logApiStatusService.createLogApiStatus(logApiStatus);
-			    	
+	    	    	logApiStatusList.add(logApiStatus);
+					
+		    		executeCount++;
+
 	    		}
-	    		executeCount++;
 	    	}
+	    	
+	    	try
+	    	{
+	    		List<Map<String, Object>> u_updateMapList = new ArrayList<Map<String, Object>>();
+    	    	List<LogApiStatus> u_logApiStatusList = new ArrayList<LogApiStatus>();
+    	    	
+        		for(int i=0; i <updateMapList.size(); i++) {
+
+        			u_updateMapList.add(updateMapList.get(i));
+        			u_logApiStatusList.add(logApiStatusList.get(i));
+        			
+        			//100 건 씩 처리
+		    		if( (i>2 && i%100 == 0 ) 
+		    				|| ( i == updateMapList.size()-1 ) ) {
+
+						log.info(">>>InvoicePrintCompletBatch i : ["+i+"]"  );
+						
+						Map<String, Object> upListMap = new HashMap<String, Object>();
+						upListMap.put("updateList",updateMapList);
+				    	
+						//invoicePrintComplet update
+						invoicePrintCompletService.updateInvoicePrintCompletList(upListMap, logApiStatusList);
+						
+						//초기화
+						u_updateMapList = new ArrayList<Map<String, Object>>();
+				    	u_logApiStatusList = new ArrayList<LogApiStatus>();
+						
+		    		}
+        		}
+	    		
+	    	} catch (Exception e1) {
+        		result = "error";
+    			log.error( " === InvoicePrintCompletBatch  error e1" +e1 );
+    			resultMessage = e1.toString();
+        	}
     	
     	} catch (Exception e) {
     		result = "error";
@@ -245,6 +219,83 @@ public class InvoicePrintCompletBatch  {
 	    	
     	}
     	log.info("=======InvoicePrintCompletBatch end=======");
+    }
+
+    public LogApiStatus logApiStatusVo(Map<String, Object> updateMap, InvoicePrintCompletData invoicePrintCompletData) {
     	
-                                                                                                                                                                                                                                            }
+    	//전송로그 정보 insert
+		LogApiStatus logApiStatus = new LogApiStatus();
+	
+		String sYyyymmdd = DateUtil.getToday("yyyyMMdd");
+	    logApiStatus.setApiYyyymmdd(sYyyymmdd);
+		logApiStatus.setExecMethod(KurlyConstants.METHOD_INVOICEPRINTCOMPLET);
+		
+		logApiStatus.setGroupNo("");  //그룹배치번호
+		logApiStatus.setWorkBatchNo("");  //작업배치번호
+	
+		logApiStatus.setShipUidWcs("");  //출고오더UID(WCS)
+		logApiStatus.setShipOrderKey("");  //출하문서번호(WMS)
+		logApiStatus.setShipUidSeq("");  //출고오더UID순번(WCS)
+		logApiStatus.setShipOrderItemSeq("");  //출하문서순번(WMS)
+	
+		logApiStatus.setToteId("");  //토트ID번호
+		logApiStatus.setInvoiceNo("");  //송장번호
+	
+		logApiStatus.setStatus("");  //상태
+		
+		logApiStatus.setQtyOrder(0);  //지시수량
+		logApiStatus.setQtyComplete(0);  //작업완료수량
+		
+		logApiStatus.setSkuCode("");  //상품코드
+		
+		logApiStatus.setShipUidWcs("");  //출고오더UID(WCS)
+		logApiStatus.setShipOrderKey("");  //출하문서번호(WMS)
+		logApiStatus.setWcsStatus("");  //WCS 작업상태
+		
+		logApiStatus.setApiInfo("");
+				
+		if(invoicePrintCompletData != null) {
+	    	if(invoicePrintCompletData.getWarehouseKey() ==null ||
+					"".equals(invoicePrintCompletData.getWarehouseKey())) {
+				logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
+			} else {
+				logApiStatus.setWarehouseKey(invoicePrintCompletData.getWarehouseKey());
+			}
+	    	
+	    	logApiStatus.setShipUidWcs(invoicePrintCompletData.getShipUidKey());  //출고오더UID(WCS)
+	    	logApiStatus.setShipOrderKey(invoicePrintCompletData.getShipOrderKey());  //출하문서번호(WMS)
+	    	logApiStatus.setWcsStatus(invoicePrintCompletData.getInvoiceStatus());  //WCS 작업상태
+	    	logApiStatus.setInvoiceNo(invoicePrintCompletData.getInvoiceNo());  //송장번호
+
+	    	logApiStatus.setApiInfo(invoicePrintCompletData.toString());
+		} else {
+			logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
+
+	    	logApiStatus.setShipUidWcs("");  //출고오더UID(WCS)
+	    	logApiStatus.setShipOrderKey("");  //출하문서번호(WMS)
+	    	logApiStatus.setWcsStatus("");  //WCS 작업상태
+	    	logApiStatus.setInvoiceNo("");  //송장번호
+	    	
+			logApiStatus.setApiInfo("");
+		}
+		
+		String l_apiRunTime = updateMap.get("apiRunTime").toString();
+		String l_intfYn = updateMap.get("invoicePrintIntfYn").toString();
+		String l_intfMemo = updateMap.get("invoicePrintIntfMemo").toString();
+		
+		logApiStatus.setApiUrl(KurlyConstants.METHOD_INVOICEPRINTCOMPLET);
+		logApiStatus.setApiRuntime(l_apiRunTime);
+		
+		logApiStatus.setIntfYn(l_intfYn) ; //'Y': 전송완료, 'N': 미전송
+		
+		//전송상태 및 DB 오류 체크
+		if(KurlyConstants.STATUS_N.equals(l_intfYn)) {
+			String c_intfMemo = StringUtil.cutString(l_intfMemo, 3500, "");
+			logApiStatus.setIntfMemo(c_intfMemo);
+		} else {
+			logApiStatus.setIntfMemo(KurlyConstants.STATUS_OK);
+		}
+		
+		return logApiStatus;
+    }
 }

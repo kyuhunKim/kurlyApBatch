@@ -45,4 +45,41 @@
 	  AND WAREHOUSE_KEY = #{warehouseKey}
 	  AND SHIP_ORDER_KEY = #{shipOrderKey}
   </update>
+    
+  <update id="updateInvoicePrintCompletList" parameterType="map">
+  /* [InvoicePrintCompletMapper.xml] updateInvoicePrintCompletList */
+    MERGE INTO o_wcs.TB_DOC_INVOICE_HDR  DIH
+    	USING (
+    		<foreach collection="updateList" item="item" index="index" separator="UNION ALL">
+    		SELECT
+				#{item.invoiceNo}  AS INVOICE_NO ,  
+				#{item.warehouseKey}  AS WAREHOUSE_KEY ,
+				#{item.shipOrderKey}  AS SHIP_ORDER_KEY ,
+    			#{item.invoicePrintIntfYn}  AS INVOICE_PRINT_INTF_YN ,
+				#{item.invoicePrintIntfCode}  AS INVOICE_PRINT_INTF_CODE ,
+				#{item.invoicePrintIntfMemo}  AS INVOICE_PRINT_INTF_MEMO ,
+				#{item.modifiedUser}  AS MODIFIED_USER
+    		FROM DUAL
+   		   </foreach>
+	) TB
+	ON 
+	(
+			DIH.INVOICE_NO = TB.INVOICE_NO 
+		AND DIH.WAREHOUSE_KEY = TB.WAREHOUSE_KEY
+		AND DIH.SHIP_ORDER_KEY = TB.SHIP_ORDER_KEY
+	)
+	WHEN MATCHED THEN
+		UPDATE
+		<set>
+			DIH.INVOICE_PRINT_INTF_YN =  TB.INVOICE_PRINT_INTF_YN,
+			DIH.INVOICE_PRINT_INTF_DT =  SYSDATE,
+			DIH.INVOICE_PRINT_INTF_CODE =  TB.INVOICE_PRINT_INTF_CODE,
+			DIH.INVOICE_PRINT_INTF_MEMO = TB.INVOICE_PRINT_INTF_MEMO ,
+			DIH.MODIFIED_DATE = TO_CHAR(SYSDATE, 'YYYYMMDD') ,
+			DIH.MODIFIED_TIME = TO_CHAR(SYSDATE, 'HH24MISS') ,
+			DIH.MODIFIED_USER = TB.MODIFIED_USER
+		</set>
+
+  </update>
+  
 </mapper>

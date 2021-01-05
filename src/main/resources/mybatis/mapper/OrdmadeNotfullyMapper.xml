@@ -44,5 +44,38 @@
 	WHERE INVOICE_NO = #{invoiceNo}
 	  AND INVOICE_SEQ = #{invoiceSeq}
   </update>
+  
+  <update id="updateOrdmadeNotfullyList" parameterType="map">
+  /* [OrdmadeNotfullyMapper.xml] updateOrdmadeNotfullyList */
+    MERGE INTO o_wcs.TB_QPS_ORDER_DTL  HDR
+    	USING (
+    		<foreach collection="updateList" item="item" index="index" separator="UNION ALL">
+    		SELECT
+				#{item.invoiceNo}  AS INVOICE_NO,
+				#{item.invoiceSeq}  AS INVOICE_SEQ,
+				#{item.notfullyIfYn}  AS NOTFULLY_IF_YN ,  
+				#{item.notfullyIfRetCode}  AS NOTFULLY_IF_RET_CODE ,
+				#{item.notfullyIfRetMessage}  AS NOTFULLY_IF_RET_MESSAGE ,
+				#{item.modifiedUser}  AS MODIFIED_USER
+    		FROM DUAL
+   		   </foreach>
+	) TB
+	ON 
+	(
+			HDR.INVOICE_NO = TB.INVOICE_NO
+		AND HDR.INVOICE_SEQ = TB.INVOICE_SEQ
+	)
+	WHEN MATCHED THEN
+		UPDATE
+		<set>
+			HDR.NOTFULLY_IF_YN  = TB.NOTFULLY_IF_YN ,
+			HDR.NOTFULLY_IF_YMD = TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS') ,
+			HDR.NOTFULLY_IF_RET_CODE = TB.NOTFULLY_IF_RET_CODE ,
+			HDR.NOTFULLY_IF_RET_MESSAGE = TB.NOTFULLY_IF_RET_MESSAGE ,
+			HDR.MODIFIED_DATE = TO_CHAR(SYSDATE, 'YYYYMMDD') ,
+			HDR.MODIFIED_TIME = TO_CHAR(SYSDATE, 'HH24MISS') ,
+			HDR.MODIFIED_USER = TB.MODIFIED_USER
+		</set>
+  </update>
 
 </mapper>

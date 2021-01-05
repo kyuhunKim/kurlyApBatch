@@ -59,5 +59,40 @@
 	  AND TOTE_ID_SEQ = #{toteIdSeq}
 	  AND CELL_EXCEPT_SEQ = #{cellExceptSeq}
   </update>
+  
+  <update id="updateToteCellExceptTxnList" parameterType="map">
+  /* [ToteCellExceptTxnMapper.xml] updateToteCellExceptTxnList */
+    MERGE INTO o_wcs.TB_QPS_CELL_EXCEPT_TXN  HDR
+    	USING (
+    		<foreach collection="updateList" item="item" index="index" separator="UNION ALL">
+    		SELECT
+				#{item.toteId}  AS TOTE_ID,
+				#{item.toteIdSeq}  AS TOTE_ID_SEQ,
+				#{item.cellExceptSeq}  AS CELL_EXCEPT_SEQ,
+				#{item.exceptIfYn}  AS EXCEPT_IF_YN ,  
+				#{item.exceptIfRetCode}  AS EXCEPT_IF_RET_CODE ,
+				#{item.exceptIfRetMessage}  AS EXCEPT_IF_RET_MESSAGE ,
+				#{item.modifiedUser}  AS MODIFIED_USER
+    		FROM DUAL
+   		   </foreach>
+	) TB
+	ON 
+	(
+			HDR.TOTE_ID = TB.TOTE_ID
+		AND HDR.TOTE_ID_SEQ = TB.TOTE_ID_SEQ
+		AND HDR.CELL_EXCEPT_SEQ = TB.CELL_EXCEPT_SEQ
+	)
+	WHEN MATCHED THEN
+		UPDATE
+		<set>
+			HDR.EXCEPT_IF_YN =  TB.EXCEPT_IF_YN,
+			HDR.EXCEPT_IF_DT =  SYSDATE,
+			HDR.EXCEPT_IF_RET_CODE =  TB.EXCEPT_IF_RET_CODE,
+			HDR.EXCEPT_IF_RET_MESSAGE =  TB.EXCEPT_IF_RET_MESSAGE,
+			HDR.MODIFIED_DATE = TO_CHAR(SYSDATE, 'YYYYMMDD') ,
+			HDR.MODIFIED_TIME = TO_CHAR(SYSDATE, 'HH24MISS') ,
+			HDR.MODIFIED_USER =  TB.MODIFIED_USER
+		</set>
+  </update>
 
 </mapper>
