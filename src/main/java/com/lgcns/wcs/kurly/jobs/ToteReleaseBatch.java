@@ -1,5 +1,6 @@
 package com.lgcns.wcs.kurly.jobs;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.async.DeferredResult;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lgcns.wcs.kurly.dto.KurlyConstants;
 import com.lgcns.wcs.kurly.dto.LogApiStatus;
 import com.lgcns.wcs.kurly.dto.LogBatchExec;
@@ -266,8 +268,19 @@ public class ToteReleaseBatch  {
 			} else {
 				logApiStatus.setWarehouseKey(toteReleaseData.getWarehouseKey());
 			}
-	    	logApiStatus.setApiInfo(toteReleaseData.toString());
 	    	logApiStatus.setToteId(toteReleaseData.getToteId());  //토트ID번호
+	    	
+//	    	logApiStatus.setApiInfo(toteReleaseData.toString());
+	    	//##20210106  json 타입으로 저장 
+			try {
+				ObjectMapper mapper = new ObjectMapper();
+				String jsonStr = mapper.writeValueAsString(toteReleaseData);
+
+				logApiStatus.setApiInfo(jsonStr);
+			} catch (IOException e) {
+//	            e.printStackTrace();
+				logApiStatus.setApiInfo(toteReleaseData.toString());
+	        }
 		} else {
 	    	logApiStatus.setApiInfo("");
 	    	logApiStatus.setToteId("");  //토트ID번호

@@ -1,5 +1,6 @@
 package com.lgcns.wcs.kurly.jobs;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.async.DeferredResult;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lgcns.wcs.kurly.dto.KurlyConstants;
 import com.lgcns.wcs.kurly.dto.LogApiStatus;
 import com.lgcns.wcs.kurly.dto.LogBatchExec;
@@ -279,7 +281,18 @@ public class PackQpsCompletBatch  {
 	    	logApiStatus.setShipUidWcs(packQpsCompletData.getShipUidKey());  //출고오더UID(WCS)
 	    	logApiStatus.setShipOrderKey(packQpsCompletData.getShipOrderKey());  //출하문서번호(WMS)
 	    	logApiStatus.setInvoiceNo(packQpsCompletData.getInvoiceNo());  //송장번호
-	    	logApiStatus.setApiInfo(packQpsCompletData.toString());
+	    	
+//	    	logApiStatus.setApiInfo(packQpsCompletData.toString());
+	    	//##20210106  json 타입으로 저장 
+			try {
+				ObjectMapper mapper = new ObjectMapper();
+				String jsonStr = mapper.writeValueAsString(packQpsCompletData);
+
+				logApiStatus.setApiInfo(jsonStr);
+			} catch (IOException e) {
+//	            e.printStackTrace();
+				logApiStatus.setApiInfo(packQpsCompletData.toString());
+	        }
 			
 		} else {
 			logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);

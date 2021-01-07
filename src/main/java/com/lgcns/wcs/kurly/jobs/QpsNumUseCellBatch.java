@@ -1,5 +1,6 @@
 package com.lgcns.wcs.kurly.jobs;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.async.DeferredResult;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lgcns.wcs.kurly.dto.KurlyConstants;
 import com.lgcns.wcs.kurly.dto.LogApiStatus;
 import com.lgcns.wcs.kurly.dto.LogBatchExec;
@@ -138,7 +140,18 @@ public class QpsNumUseCellBatch  {
 						} else {
 							logApiStatus.setWarehouseKey(qpsNumUseCellData.getWarehouseKey());
 						}
-				    	logApiStatus.setApiInfo(qpsNumUseCellData.toString());
+				    	
+//				    	logApiStatus.setApiInfo(qpsNumUseCellData.toString());
+				    	//##20210106  json 타입으로 저장 
+						try {
+							ObjectMapper mapper = new ObjectMapper();
+							String jsonStr = mapper.writeValueAsString(qpsNumUseCellData);
+
+							logApiStatus.setApiInfo(jsonStr);
+						} catch (IOException e) {
+//				            e.printStackTrace();
+							logApiStatus.setApiInfo(qpsNumUseCellData.toString());
+				        }
 					} else {
 						logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
 				    	logApiStatus.setApiInfo("");

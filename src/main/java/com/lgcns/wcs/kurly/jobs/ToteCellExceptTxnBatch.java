@@ -1,5 +1,6 @@
 package com.lgcns.wcs.kurly.jobs;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.async.DeferredResult;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lgcns.wcs.kurly.dto.KurlyConstants;
 import com.lgcns.wcs.kurly.dto.LogApiStatus;
 import com.lgcns.wcs.kurly.dto.LogBatchExec;
@@ -309,7 +311,18 @@ public class ToteCellExceptTxnBatch {
 	    	logApiStatus.setQtyComplete(toteCellExceptTxnSelectData.getQtyQpsExcept());  //작업완료수량
 	    	
 	    	logApiStatus.setSkuCode(toteCellExceptTxnSelectData.getSkuCode());  //상품코드
-	    	logApiStatus.setApiInfo(toteCellExceptTxnSelectData.toString());
+	    	
+//	    	logApiStatus.setApiInfo(toteCellExceptTxnSelectData.toString());
+	    	//##20210106  json 타입으로 저장 
+			try {
+				ObjectMapper mapper = new ObjectMapper();
+				String jsonStr = mapper.writeValueAsString(toteCellExceptTxnSelectData);
+
+				logApiStatus.setApiInfo(jsonStr);
+			} catch (IOException e) {
+//	            e.printStackTrace();
+				logApiStatus.setApiInfo(toteCellExceptTxnSelectData.toString());
+	        }
 	    	
 	    	if(toteCellExceptTxnSelectData.getWarehouseKey() ==null ||
 					"".equals(toteCellExceptTxnSelectData.getWarehouseKey())) {

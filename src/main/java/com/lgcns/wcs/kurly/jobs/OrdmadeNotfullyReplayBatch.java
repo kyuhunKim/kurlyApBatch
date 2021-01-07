@@ -1,5 +1,6 @@
 package com.lgcns.wcs.kurly.jobs;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.async.DeferredResult;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lgcns.wcs.kurly.dto.KurlyConstants;
 import com.lgcns.wcs.kurly.dto.LogApiStatus;
 import com.lgcns.wcs.kurly.dto.LogBatchExec;
@@ -276,7 +278,19 @@ public class OrdmadeNotfullyReplayBatch {
 
 	    	logApiStatus.setQtyOrder(ordmadeNotfullyReplayData.getQtyNotfullyReqpick());  //지시수량
 	    	logApiStatus.setSkuCode(ordmadeNotfullyReplayData.getSkuCode());  //상품코드
-	    	logApiStatus.setApiInfo(ordmadeNotfullyReplayData.toString());
+	    	
+//	    	logApiStatus.setApiInfo(ordmadeNotfullyReplayData.toString());
+	    	//##20210106  json 타입으로 저장 
+			try {
+				ObjectMapper mapper = new ObjectMapper();
+				String jsonStr = mapper.writeValueAsString(ordmadeNotfullyReplayData);
+
+				logApiStatus.setApiInfo(jsonStr);
+			} catch (IOException e) {
+//	            e.printStackTrace();
+				logApiStatus.setApiInfo(ordmadeNotfullyReplayData.toString());
+	        }
+			
 		} else {
 			logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
 	    	logApiStatus.setGroupNo("");  //그룹배치번호
