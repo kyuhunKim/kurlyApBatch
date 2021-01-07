@@ -60,4 +60,8 @@ public class PickQpsCompletData {
 	 * */
 	private List<PickQpsCompletDetailData> detail ;
 	
+	/*마지막출하문서번호여부
+	 * */
+	private String shipOrderLastYn ;
+	
 }
