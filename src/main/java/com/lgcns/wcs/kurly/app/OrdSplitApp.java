@@ -97,6 +97,7 @@ public class OrdSplitApp {
 
 		} // 여기까지. ableCellList에 가능 셀만 꽂힘.
 		
+		
 		if(minCellCBM == Double.MAX_VALUE)
 		{
 			minCellCBM = maxCellCBM;
@@ -108,6 +109,11 @@ public class OrdSplitApp {
 			return -1;		
 			*/
 		}
+		
+		
+		
+		minCellCBM = maxCellCBM; //20210108 수정
+	
 
 		//오더라인 분해.
 		//라인 분할여부 결정.

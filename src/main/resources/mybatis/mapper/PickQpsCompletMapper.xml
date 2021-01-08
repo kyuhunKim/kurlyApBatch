@@ -19,8 +19,7 @@
 		OH.ORDMADE_SPLIT_YN    AS ordmadeSplitYn,
 		OH.PACK_BOX_SPLIT_YN   AS packBoxSplitYn,
 		OH.PACK_BOX_TYPE_RECOM AS packBoxTypeRecom,
-		(CASE WHEN OH.ALLOC_TYPE = 'S' THEN 'Y' 
-			  ELSE QH.SHIP_ORDER_LAST_YN END)  AS shipOrderLastYn,
+		 'Y'  AS shipOrderLastYn,
     	TO_CHAR(SYSDATE, 'YYYYMMDD') AS insertedDate,
 		TO_CHAR(SYSDATE, 'HH24MISS') AS insertedTime,
 		OH.MODIFIED_USER AS insertedUser
