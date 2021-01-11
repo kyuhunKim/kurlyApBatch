@@ -289,5 +289,6 @@ public class SearchOrdInfoVO {
 	private String workBatchNo ;
 	private String qpsNum ;
 	private String wmsBatchYmd ;
-
+	
+	private String skuNotYn ;
 }

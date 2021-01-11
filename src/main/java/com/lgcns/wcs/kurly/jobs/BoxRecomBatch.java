@@ -4,9 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -16,6 +14,7 @@ import com.lgcns.wcs.kurly.app.BoxRecommendApp;
 import com.lgcns.wcs.kurly.app.OrdSplitApp;
 import com.lgcns.wcs.kurly.dto.KurlyConstants;
 import com.lgcns.wcs.kurly.dto.LogBatchExec;
+import com.lgcns.wcs.kurly.dto.SkuMasterData;
 import com.lgcns.wcs.kurly.dto.box.BoxTypeList;
 import com.lgcns.wcs.kurly.dto.box.BoxTypeVO;
 import com.lgcns.wcs.kurly.dto.box.CellTypeList;
@@ -30,6 +29,7 @@ import com.lgcns.wcs.kurly.dto.box.WifShipmentVO;
 import com.lgcns.wcs.kurly.service.BoxRecomService;
 import com.lgcns.wcs.kurly.service.LogApiStatusService;
 import com.lgcns.wcs.kurly.service.LogBatchExecService;
+import com.lgcns.wcs.kurly.service.SkuMasterService;
 import com.lgcns.wcs.kurly.util.StringUtil;
 
 import lombok.extern.slf4j.Slf4j;
@@ -54,6 +54,9 @@ public class BoxRecomBatch  {
     
     @Autowired
     BoxRecomService boxRecomService;
+    
+    @Autowired
+    SkuMasterService skuMasterService;
 
     @Autowired
     DataSourceTransactionManager transactionManager;
@@ -124,6 +127,8 @@ public class BoxRecomBatch  {
     		
     		//order 정보 조회
     		OrdInfoList ordList = new OrdInfoList();
+    		
+    		List<SkuMasterData> skuMastList = new ArrayList<SkuMasterData>();
 
 			String bf_shipOrderKey = "";
 			String af_shipOrderKey = "";
@@ -150,6 +155,13 @@ public class BoxRecomBatch  {
 						searchOrdInfoVO.getOwnerKey(), searchOrdInfoVO.getOrderNo(), searchOrdInfoVO.getShipOrderItemSeq(),
     					searchOrdInfoVO.getSkuDepth(), searchOrdInfoVO.getSkuHeight(), searchOrdInfoVO.getSkuWidth());
 
+    			//##20210108  상품마스터에 없을 경우 등록
+    			if("Y".equals(searchOrdInfoVO.getSkuNotYn())) {
+    				SkuMasterData skuMasterData = new SkuMasterData(); 
+    				skuMasterData = getSkuMasterData(searchOrdInfoVO);
+    				skuMastList.add(skuMasterData);
+    			}
+    			
     			bf_shipOrderKey = af_shipOrderKey;
     			
     			/*
@@ -456,35 +468,6 @@ public class BoxRecomBatch  {
 						
 						executeCountAll = executeCount;
 						
-//						try
-//				    	{
-//							boxRecomService.insertOrdShipmentListType(wifShipmentVOList, wifShipmentDtlVOList);
-//						
-//				    	} catch (Exception e) {
-//				    		result = "error";
-//							log.info( " === BoxRecomBatch 1 error >> " +e );
-//							resultMessage = e.toString();
-//							r_ifYn = KurlyConstants.STATUS_N;
-//							    				
-//							e.printStackTrace();
-//							
-//				    	} finally {
-//				    		
-//				    		//상태 업데이트
-//				    		HashMap<String, Object> uParam = new HashMap<String, Object>();
-//				    		uParam.put("hdList",wifShipmentVOList);
-//				    		uParam.put("receiveIntfYn", r_ifYn);
-//				    		if(KurlyConstants.STATUS_N.equals(r_ifYn)) {
-//				    			uParam.put("receiveIntfCode", "");
-//					    	} else {
-//					    		uParam.put("receiveIntfCode", KurlyConstants.STATUS_OK);
-//					    	}
-//							uParam.put("receiveIntfMemo", "");
-//
-////							log.info( "----------uParam " + uParam + "------------------------ " );
-//							boxRecomService.updateWifShipmentHdrList(uParam);
-//
-//				    	} //finally end
 					}// wifShipmentVOList.size end
 					
 					//초기화
@@ -493,6 +476,15 @@ public class BoxRecomBatch  {
 					
 				}
     		}	//for end
+
+    		//##20210108  상품마스터에 없을 경우 등록
+    		if(skuMastList.size() > 0 ) {
+//				for(SkuMasterData skuMasterData : skuMastList )
+//				{
+//					skuMasterService.insertSkuMaster(skuMasterData);
+//				}
+    			skuMasterService.insertSkuMasterList(skuMastList);
+    		}
     		
     		runTimeEnd1 = System.currentTimeMillis();
     		apiRunTime1 = StringUtil.formatInterval(runTimeStart1, runTimeEnd1) ;
@@ -857,4 +849,47 @@ public class BoxRecomBatch  {
 			}
 		}
     }
+
+	/**
+	 * 
+	 * @Method Name : getSkuMasterData
+	 * @작성일 : 2021. 01. 08.
+	 * @작성자 : jooni
+	 * @변경이력 : 2021. 01. 08. 최초작성
+	 * @Method 설명 : SkuMasterData 필요한 값 설정
+	 */
+    public SkuMasterData getSkuMasterData(SearchOrdInfoVO searchOrdInfoVO) {
+	    SkuMasterData skuMasterData = new SkuMasterData();  
+	
+		skuMasterData.setOwner(searchOrdInfoVO.getOwner()); 
+		skuMasterData.setSkuCode(searchOrdInfoVO.getSkuCode()); 
+		skuMasterData.setSkuName(searchOrdInfoVO.getSkuName());
+		skuMasterData.setSkuSubName(searchOrdInfoVO.getSkuSubName());
+		skuMasterData.setUomKey(searchOrdInfoVO.getUomKey());
+		skuMasterData.setUomQty(searchOrdInfoVO.getUomQty());
+		skuMasterData.setLength(searchOrdInfoVO.getLength()); 
+		skuMasterData.setWidth(searchOrdInfoVO.getWidth());
+		skuMasterData.setHeight(searchOrdInfoVO.getHeight());
+		skuMasterData.setCbm(searchOrdInfoVO.getCbm());
+		skuMasterData.setGrossWeight(searchOrdInfoVO.getGrossWeight());
+		skuMasterData.setNetWeight(searchOrdInfoVO.getNetWeight());
+		skuMasterData.setBoxLength(0);
+		skuMasterData.setBoxWidth(0);
+		skuMasterData.setBoxHeight(0);
+		skuMasterData.setBoxCbm(0);
+		skuMasterData.setBoxGrossWeight(0);
+		skuMasterData.setBoxNetWeight(0);
+		skuMasterData.setUomLen("");
+		skuMasterData.setUomCbm(""); 
+		skuMasterData.setUomWeight(""); 
+		skuMasterData.setSkuGroup01(searchOrdInfoVO.getSkuGroup01()); 
+		skuMasterData.setLotAttr11(""); 
+		skuMasterData.setBoxPerQnty(0); 
+		skuMasterData.setUnusalSize(""); 
+		skuMasterData.setUseYn("Y");
+		skuMasterData.setInsertedUser("REC_BATCH");
+		skuMasterData.setSkuAlterCode(searchOrdInfoVO.getSkuAlterCode());
+		return skuMasterData;
+    }
+	
 }

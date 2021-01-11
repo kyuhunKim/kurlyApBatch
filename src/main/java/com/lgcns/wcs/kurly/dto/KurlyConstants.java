@@ -19,6 +19,13 @@ public final class KurlyConstants {
   	//센터
     public static final String DEFAULT_WAREHOUSEKEY = "0000";
     public static final String DEFAULT_REGION_CENTERCODE = "SJM2";
+	
+	public static final String DEFAULT_OWNER = "TF";
+	
+	//sku barcode type
+	public static final String BARCODETYPE_DEFAULT = "SKUCODE";
+	
+	public static final String BARCODETYPE_KANCODE = "KANCODE";
 
 	/**
      * 토트 마스터 초기화(Release) 정보 연계
