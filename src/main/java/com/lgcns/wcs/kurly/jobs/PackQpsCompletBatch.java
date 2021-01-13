@@ -182,10 +182,10 @@ public class PackQpsCompletBatch  {
 						log.info(">>>PackQpsCompletBatch i : ["+i+"]"  );
 						
 						Map<String, Object> upListMap = new HashMap<String, Object>();
-						upListMap.put("updateList",updateMapList);
+						upListMap.put("updateList",u_updateMapList);
 				    	
 						//update
-						packQpsCompletService.updatePackQpsCompletList(upListMap, logApiStatusList);
+						packQpsCompletService.updatePackQpsCompletList(upListMap, u_logApiStatusList);
 						
 						//초기화
 						u_updateMapList = new ArrayList<Map<String, Object>>();

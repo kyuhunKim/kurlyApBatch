@@ -182,10 +182,10 @@ public class PickQpsCompletBatch  {
 						log.info(">>>PickQpsCompletBatch i : ["+i+"]"  );
 						
 						Map<String, Object> upListMap = new HashMap<String, Object>();
-						upListMap.put("updateList",updateMapList);
+						upListMap.put("updateList",u_updateMapList);
 				    	
 						//update
-						pickQpsCompletService.updatePickQpsCompletList(upListMap, logApiStatusList);
+						pickQpsCompletService.updatePickQpsCompletList(upListMap, u_logApiStatusList);
 						
 						//초기화
 						u_updateMapList = new ArrayList<Map<String, Object>>();

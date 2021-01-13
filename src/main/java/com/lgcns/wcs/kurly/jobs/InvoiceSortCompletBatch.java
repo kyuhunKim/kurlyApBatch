@@ -170,10 +170,10 @@ public class InvoiceSortCompletBatch  {
 						log.info(">>>InvoiceSortCompletBatch i : ["+i+"]"  );
 						
 						Map<String, Object> upListMap = new HashMap<String, Object>();
-						upListMap.put("updateList",updateMapList);
+						upListMap.put("updateList",u_updateMapList);
 				    	
 						//update
-						invoiceSortCompletService.updateInvoiceSortCompletList(upListMap, logApiStatusList);
+						invoiceSortCompletService.updateInvoiceSortCompletList(upListMap, u_logApiStatusList);
 						
 						//초기화
 						u_updateMapList = new ArrayList<Map<String, Object>>();

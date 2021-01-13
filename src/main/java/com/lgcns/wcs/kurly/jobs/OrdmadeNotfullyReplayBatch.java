@@ -170,10 +170,10 @@ public class OrdmadeNotfullyReplayBatch {
 						log.info(">>>OrdmadeNotfullyReplayBatch i : ["+i+"]"  );
 						
 						Map<String, Object> upListMap = new HashMap<String, Object>();
-						upListMap.put("updateList",updateMapList);
+						upListMap.put("updateList",u_updateMapList);
 				    	
 						//update
-						ordmadeNotfullyReplayService.updateOrdmadeNotfullyReplayList(upListMap, logApiStatusList);
+						ordmadeNotfullyReplayService.updateOrdmadeNotfullyReplayList(upListMap, u_logApiStatusList);
 						
 						//초기화
 						u_updateMapList = new ArrayList<Map<String, Object>>();
