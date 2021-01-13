@@ -163,8 +163,8 @@ public class OrdmadeNotfullyReplayBatch {
         			u_updateMapList.add(updateMapList.get(i));
         			u_logApiStatusList.add(logApiStatusList.get(i));
         			
-        			//100 건 씩 처리
-		    		if( (i>2 && i%100 == 0 ) 
+        			//100 건 씩 처리 ##2021.01.13 50건으로 변경
+		    		if( (i>2 && i%50 == 0 ) 
 		    				|| ( i == updateMapList.size()-1 ) ) {
 
 						log.info(">>>OrdmadeNotfullyReplayBatch i : ["+i+"]"  );
