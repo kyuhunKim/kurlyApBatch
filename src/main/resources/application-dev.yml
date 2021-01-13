@@ -51,7 +51,6 @@ spring:
   batch:
     job: 
       enabled: false
-#      names : toteReleaseJob,toteScanJob,toteCellExceptTxnJob,ordmadeNotfullyReplayConfirmJob,ordmadeNotfullyReplayJob,ordmadeNotfullyJob,pickQpsCompletJob,packQpsCompletJob,invoicePrintCompletJob,invoiceSortCompletJob
 
   task:
     scheduling:
@@ -59,6 +58,11 @@ spring:
         size: 13
         
 spring.main.allow-bean-definition-overriding: true
+
+#   dev
+wms.regionMasterUrl: https://tms.api.dev.kurly.com/tms/v1/common/wms/region/items
+#   real
+#wms.regionMasterUrl: https://tms.api.dev.kurly.com/tms/v1/common/wms/region/items
 
 
 # mybatis 설정.

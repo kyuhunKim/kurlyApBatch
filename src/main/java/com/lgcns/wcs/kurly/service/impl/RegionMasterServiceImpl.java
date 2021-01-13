@@ -1,6 +1,7 @@
 package com.lgcns.wcs.kurly.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,11 +29,14 @@ public class RegionMasterServiceImpl implements RegionMasterService {
 
 	@Autowired
 	RegionMasterRepository regionMasterRepository;
+
+	@Value("${wms.regionMasterUrl}")
+	private String REGION_MASTER_URL;
 	
 	public String insertRegionMaster() {
 
 		String result = "";
-		String inputUrl = "https://tms.api.dev.kurly.com/tms/v1/common/wms/region/items"; 
+		String inputUrl = REGION_MASTER_URL; 
 		StringBuffer insertData = new StringBuffer();
 		try
 		{

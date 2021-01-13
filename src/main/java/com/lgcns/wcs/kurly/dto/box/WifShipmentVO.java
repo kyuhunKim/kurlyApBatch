@@ -165,5 +165,6 @@ public class WifShipmentVO {
 	private String shipmentCnclYn ;
 	//주문번호별운송장총갯수
 	private int orderNoInvoiceCnt = 0;
+	private String wmsBatchYmd ;
 
 }

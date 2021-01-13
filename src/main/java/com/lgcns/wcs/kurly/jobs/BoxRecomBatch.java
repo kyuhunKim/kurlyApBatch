@@ -479,10 +479,6 @@ public class BoxRecomBatch  {
 
     		//##20210108  상품마스터에 없을 경우 등록
     		if(skuMastList.size() > 0 ) {
-//				for(SkuMasterData skuMasterData : skuMastList )
-//				{
-//					skuMasterService.insertSkuMaster(skuMasterData);
-//				}
     			skuMasterService.insertSkuMasterList(skuMastList);
     		}
     		
@@ -601,6 +597,7 @@ public class BoxRecomBatch  {
 				wifShipmentVO.setOriginInvoiceNo(searchOrdInfoVO.getOriginInvoiceNo());
 				wifShipmentVO.setSpecialMgntCustYn(searchOrdInfoVO.getSpecialMgntCustYn());
 				wifShipmentVO.setManualProcYn(searchOrdInfoVO.getManualProcYn());
+				wifShipmentVO.setWmsBatchYmd(searchOrdInfoVO.getHdWmsBatchYmd());
 				
     			if( StringUtil.isEmpty(wifShipmentVO.getShipType()) ) {
     				wifShipmentVO.setShipType(" ");
@@ -715,6 +712,9 @@ public class BoxRecomBatch  {
 				}
 		    	if( StringUtil.isEmpty(wifShipmentVO.getAllocType()) ) {
 		    		wifShipmentVO.setAllocType("");  
+				}
+				if( StringUtil.isEmpty(wifShipmentVO.getWmsBatchYmd()) ) {
+					wifShipmentVO.setWmsBatchYmd("");
 				}
 				
 			} else {

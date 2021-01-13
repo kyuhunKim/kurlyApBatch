@@ -291,4 +291,5 @@ public class SearchOrdInfoVO {
 	private String wmsBatchYmd ;
 	
 	private String skuNotYn ;
+	private String hdWmsBatchYmd ;
 }

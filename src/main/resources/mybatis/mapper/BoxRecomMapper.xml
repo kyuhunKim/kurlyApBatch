@@ -171,7 +171,7 @@
   </select>
   
   <select id="selectOrdLineListAll" parameterType="com.lgcns.wcs.kurly.dto.box.SearchVO" resultType="com.lgcns.wcs.kurly.dto.box.SearchOrdInfoVO">
-  	/* [BoxRecomMapper.xml] selectOrdLineListTest */
+  	/* [BoxRecomMapper.xml] selectOrdLineListAll */
 	<![CDATA[ 
 	SELECT
 		HD.SHIP_ORDER_KEY         AS shipOrderKey,
@@ -258,6 +258,7 @@
 		(CASE WHEN NVL(SM.WIDTH,0)  = 0 THEN DT.WIDTH  ELSE SM.WIDTH  END)    AS skuWidth,
 		(CASE WHEN NVL(SM.HEIGHT,0) = 0 THEN DT.HEIGHT ELSE SM.HEIGHT END)    AS skuHeight,
 		(CASE WHEN SM.LENGTH IS NULL THEN 'Y' ELSE 'N' END)    AS skuNotYn,
+		MIN(DT.WMS_BATCH_YMD) as hdWmsBatchYmd,
 		SUM(DT.QTY_SHIP_ORDER)    AS ordQty
 	FROM o_wcs.TB_WIF_SHIPMENT_HDR HD,
 		 o_wcs.TB_WIF_SHIPMENT_DTL DT
@@ -652,6 +653,7 @@
 		OWNER               ,
 		GROUP_NO            ,
 		WORK_BATCH_NO       ,
+		PICKING_WAVE_NO     ,
 		QPS_NUM             ,
 		WMS_BATCH_YMD
 	)
@@ -703,6 +705,7 @@
 	      #{owner}               ,
 		  DT.GROUP_NO            ,
 		  DT.WORK_BATCH_NO       ,
+		  DT.WORK_BATCH_NO  ,
 		  DT.QPS_NUM             ,
 		  DT.WMS_BATCH_YMD
 	  FROM o_wcs.TB_WIF_SHIPMENT_DTL DT
@@ -841,6 +844,7 @@
 		  MANUAL_PROC_YN        ,
 		  SHIPMENT_CNCL_YN      ,
 		  ORDER_NO_INVOICE_CNT  ,
+		  WMS_BATCH_YMD         ,
 		  DELIVERY_TYPE
 		)
 		SELECT o_wcs.SEQ_ORD_SHIPMENT_HDR.NEXTVAL, A.* 
@@ -904,6 +908,7 @@
 							AND CH.STATUS_TYPE IN ( 'DELETE' , 'CANCEL' ) ) > 0 THEN 'Y' ELSE 'N' END
 				)  AS SHIPMENT_CNCL_YN    ,
 		      #{item.orderNoInvoiceCnt}     AS ORDER_NO_INVOICE_CNT    ,
+			  #{item.wmsBatchYmd, jdbcType=VARCHAR}       AS  WMS_BATCH_YMD  ,
 		      'S'     AS DELIVERY_TYPE
 		  FROM DUAL
 		  </foreach> ) A
@@ -960,6 +965,7 @@
 		OWNER               ,
 		GROUP_NO            ,
 		WORK_BATCH_NO       ,
+		PICKING_WAVE_NO     ,
 		QPS_NUM             ,
 		WMS_BATCH_YMD
 	)
@@ -1009,6 +1015,7 @@
 		    A.OWNER               ,
 		    A.GROUP_NO            ,
 		    A.WORK_BATCH_NO       ,
+		    A.PICKING_WAVE_NO     ,
 		    A.QPS_NUM             ,
 		    A.WMS_BATCH_YMD 
            from (
@@ -1060,6 +1067,7 @@
 		      #{item.owner, jdbcType=VARCHAR}             AS  OWNER          ,
 			  #{item.groupNo, jdbcType=VARCHAR}           AS  GROUP_NO       ,
 			  #{item.workBatchNo, jdbcType=VARCHAR}       AS  WORK_BATCH_NO  ,
+			  #{item.workBatchNo, jdbcType=VARCHAR}       AS  PICKING_WAVE_NO  ,
 			  #{item.qpsNum, jdbcType=VARCHAR}            AS  QPS_NUM        ,
 			  #{item.wmsBatchYmd, jdbcType=VARCHAR}       AS  WMS_BATCH_YMD  ,
 			  #{item.invoiceNo, jdbcType=VARCHAR}         AS INVOICE_NO
@@ -1082,10 +1090,10 @@
 			MODIFIED_TIME = TO_CHAR(SYSDATE, 'HH24MISS') ,
 			MODIFIED_USER = 'REC_BATCH'
 		WHERE HD.RECEIVE_INTF_YN = 'N'
-		  AND EXISTS (
-			  SELECT 1
-			  	from o_wcs.TB_ORD_SHIPMENT_HDR OHD
-			 WHERE OHD.SHIP_ORDER_KEY = HD.SHIP_ORDER_KEY 
-			)
+		  AND HD.SHIP_ORDER_KEY IN 
+         <foreach collection="hdList" item="item" index="index" open="(" close=")" separator="," >
+         	#{item.shipOrderKey, jdbcType=VARCHAR}
+         </foreach>
+		  
   </update>
 </mapper>
