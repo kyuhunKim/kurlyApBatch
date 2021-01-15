@@ -214,11 +214,11 @@
 		CASE WHEN HD.ORIGIN_INVOICE_NO IS NULL THEN  HD.INVOICE_NO || '-0001' 
 		      		ELSE HD.ORIGIN_INVOICE_NO || '-0001' END    AS originInvoiceNo ,
 		NVL( HD.ALLOC_TYPE, '')   AS allocType,
-		(CASE WHEN HD.MEMBER_GRADE = '0003' 
-              THEN 'Y' ELSE 'N' END) AS specialMgntCustYn    ,
 		HD.MANUAL_PROC_YN         AS manualProcYn,
 		HD.BOX_SPLIT_CHECK_YN     AS boxSplitCheckYn,
 		HD.INVOICE_NO             AS invoiceNo ,
+		HD.SPECIAL_MGNT_CUST_YN    AS specialMgntCustYn,
+		HD.REUSABLE_PACKAGE_YN     AS reusablePackageYn,
 		DT.SHIP_ORDER_ITEM_SEQ    AS shipOrderItemSeq,
 		DT.ITEM_STATUS            AS itemStatus,
 		DT.QTY_ORIGIN_ORDER       AS qtyOriginOrder,
@@ -311,6 +311,8 @@
 		HD.MANUAL_PROC_YN      ,
 		HD.BOX_SPLIT_CHECK_YN  ,
 		HD.INVOICE_NO          ,
+		HD.SPECIAL_MGNT_CUST_YN  ,
+		HD.REUSABLE_PACKAGE_YN   ,
 		DT.SHIP_ORDER_ITEM_SEQ ,
 		DT.ITEM_STATUS         ,
 		DT.QTY_ORIGIN_ORDER    ,
@@ -416,7 +418,8 @@
 		  SPECIAL_MGNT_CUST_YN  ,
 		  MANUAL_PROC_YN  ,
 		  SHIPMENT_CNCL_YN , 
-		  DELIVERY_TYPE
+		  DELIVERY_TYPE  ,
+		  REUSABLE_PACKAGE_YN   
 		)
 		SELECT 
 		      #{shipUidKey}, 
@@ -469,11 +472,11 @@
 		      HD.ALLOC_TYPE             ,
 		      #{packBoxSplitYn}         ,
 		      #{packBoxTypeRecom}       ,
-		      (CASE WHEN HD.MEMBER_GRADE = '0003' 
-		      		THEN 'Y' ELSE 'N' END) AS SPECIAL_MGNT_CUST_YN    ,
+		      SPECIAL_MGNT_CUST_YN AS SPECIAL_MGNT_CUST_YN    ,
 		      HD.MANUAL_PROC_YN        ,
 		      #{shipmentCnclYn}        ,
-		      'S'     AS DELIVERY_TYPE
+		      'S'     AS DELIVERY_TYPE ,
+		      REUSABLE_PACKAGE_YN   
 		  FROM o_wcs.TB_WIF_SHIPMENT_HDR HD
 		  WHERE HD.SHIP_ORDER_KEY = #{shipOrderKey}
   </insert>
@@ -845,7 +848,8 @@
 		  SHIPMENT_CNCL_YN      ,
 		  ORDER_NO_INVOICE_CNT  ,
 		  WMS_BATCH_YMD         ,
-		  DELIVERY_TYPE
+		  DELIVERY_TYPE         ,
+		  REUSABLE_PACKAGE_YN   
 		)
 		SELECT o_wcs.SEQ_ORD_SHIPMENT_HDR.NEXTVAL, A.* 
            from (
@@ -909,7 +913,8 @@
 				)  AS SHIPMENT_CNCL_YN    ,
 		      #{item.orderNoInvoiceCnt}     AS ORDER_NO_INVOICE_CNT    ,
 			  #{item.wmsBatchYmd, jdbcType=VARCHAR}       AS  WMS_BATCH_YMD  ,
-		      'S'     AS DELIVERY_TYPE
+		      'S'     AS DELIVERY_TYPE ,
+			  #{item.reusablePackageYn, jdbcType=VARCHAR}       AS  REUSABLE_PACKAGE_YN  
 		  FROM DUAL
 		  </foreach> ) A
   </insert>

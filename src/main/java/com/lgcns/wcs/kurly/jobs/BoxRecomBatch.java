@@ -598,6 +598,7 @@ public class BoxRecomBatch  {
 				wifShipmentVO.setSpecialMgntCustYn(searchOrdInfoVO.getSpecialMgntCustYn());
 				wifShipmentVO.setManualProcYn(searchOrdInfoVO.getManualProcYn());
 				wifShipmentVO.setWmsBatchYmd(searchOrdInfoVO.getHdWmsBatchYmd());
+				wifShipmentVO.setReusablePackageYn(searchOrdInfoVO.getReusablePackageYn());
 				
     			if( StringUtil.isEmpty(wifShipmentVO.getShipType()) ) {
     				wifShipmentVO.setShipType(" ");
@@ -716,6 +717,10 @@ public class BoxRecomBatch  {
 				if( StringUtil.isEmpty(wifShipmentVO.getWmsBatchYmd()) ) {
 					wifShipmentVO.setWmsBatchYmd("");
 				}
+				if( StringUtil.isEmpty(wifShipmentVO.getReusablePackageYn()) ) {
+					wifShipmentVO.setReusablePackageYn("N");
+				}
+				
 				
 			} else {
 				continue;
