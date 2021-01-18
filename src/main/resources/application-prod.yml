@@ -11,17 +11,17 @@ spring:
     topics:
       wcs-out:
         destination:
-          tote-release:  MSG-WCS_AP_TOTE_RELEASE
-          tote-scan:  MSG-WCS_AP_TOTE_SCAN
-          tote-cellExceptTxn:  MSG-WCS_AP_TOTE_CELL_EXCEPTION
-          ordmadeNotfullyReplay:  MSG-WCS_AP_ORDMADE_NOTFULLY_REPL_REQ
-          ordmadeNotfully:  MSG-WCS_AP_ORDMADE_NOTFULLY
-          pickQpsComplet:  MSG-WCS_AP_PICKING_QPS_COMP
-          packQpsComplet:  MSG-WCS_AP_PACKING_QPS_COMP
-          invoicePrintComplet:  MSG-WCS_AP_INVOICE_PRINT_COMP
-          invoiceSortComplet:  MSG-WCS_AP_SHIP_SORT_COMP
-          qpsNumUseCell:  MSG-WCS_AP_QPS_NUM_USECELL
-          dasNumUseCell:  MSG-WCS_AP_DAS_NUM_USECELL
+          tote-scan:  PROD-MSG-OUTBOUND-WMS-WCS_AP_TOTE_SCAN
+          tote-release:  PROD-MSG-OUTBOUND-WMS-WCS_AP_TOTE_RELEASE
+          tote-cellExceptTxn:  PROD-MSG-OUTBOUND-WMS-WCS_AP_TOTE_CELL_EXCEPTION
+          packQpsComplet:  PROD-MSG-OUTBOUND-WMS-WCS_AP_PACKING_QPS_COMPLETE
+          pickQpsComplet:  PROD-MSG-OUTBOUND-WMS-WCS_AP_PICKING_QPS_COMPLETE
+          invoiceSortComplet:  PROD-MSG-OUTBOUND-WMS-WCS_AP_SHIP_SORT_COMPLETE
+          ordmadeNotfullyReplay:  PROD-MSG-OUTBOUND-WMS-WCS_AP_ADDITIONAL_ITEM_PICKING
+          invoicePrintComplet:  PROD-MSG-OUTBOUND-WMS-WCS_AP_INVOICE_PRINT_COMPLETE
+          ordmadeNotfully:  PROD-MSG-OUTBOUND-WMS-WCS_AP_INCOMPLETE_ORDER_PICKING_STOP
+          qpsNumUseCell:  PROD-MSG-OUTBOUND-WMS-WCS_AP_QPS_CELL_AVAILABLE
+          dasNumUseCell:  PROD-MSG-OUTBOUND-WMS-WCS_AP_DAS_CELL_AVAILABLE
   
   datasource:
 #    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
