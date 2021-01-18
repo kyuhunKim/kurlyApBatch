@@ -62,6 +62,9 @@ public class RegionMasterBatch  {
 		int executeCount = 0;
     	Date startDate = Calendar.getInstance().getTime();
 		List<RegionMasterData> updateMapList = new ArrayList<RegionMasterData>();
+
+		String r_ifYn = KurlyConstants.STATUS_Y;
+		
     	try {
     		
     		RegionMasterHeaderData reqData = regionMasterService.insertRegionMaster();
@@ -108,10 +111,10 @@ public class RegionMasterBatch  {
 		    			u_updateMapList.add(updateMapList.get(i));
 		    			
 		    			//100 건 씩 처리
-			    		if( (i>2 && i%100 == 0 ) 
+			    		if( (i>2 && i%50 == 0 ) 
 			    				|| ( i == updateMapList.size()-1 ) ) {
 		
-							log.info(">>>RegionMaster i : ["+i+"]"  );
+//							log.info(">>>RegionMaster i : ["+i+"]"  );
 		
 							Map<String, Object> uList = new HashMap<String, Object>();
 							uList.put("regionMasterList",u_updateMapList);
@@ -127,13 +130,23 @@ public class RegionMasterBatch  {
             		result = "error";
         			log.error( " === RegionMaster insert  error e1" +e1 );
         			resultMessage = e1.toString();
+        			r_ifYn = KurlyConstants.STATUS_N;
             	}
         		
     		}
-			//로그 정보 insert
+			
+			    	
+    	} catch (Exception e) {
+    		result = "error";
+			log.error( " === RegionMasterBatch  error" +e );
+			resultMessage = e.toString();
+			r_ifYn = KurlyConstants.STATUS_N;
+    	} finally {
+    		
+    		//로그 정보 insert
 			LogApiStatus logApiStatus = new LogApiStatus();
 
-//			logApiStatus.setWarehouseKey(" ");
+	    	logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
 
 	    	String sYyyymmdd = DateUtil.getToday("yyyyMMdd");
 		    logApiStatus.setApiYyyymmdd(sYyyymmdd);
@@ -170,10 +183,14 @@ public class RegionMasterBatch  {
 					logApiStatus.setApiInfo(updateMapList.toString());
 		        }
 	    	}
-	    	
-	    	logApiStatus.setIntfYn("Y") ; //'Y': 전송완료, 'N': 미전송
-	    	
-	    	logApiStatus.setIntfMemo(KurlyConstants.STATUS_OK);
+
+	    	logApiStatus.setIntfYn(r_ifYn) ; //'Y': 전송완료, 'N': 미전송
+	    	if(KurlyConstants.STATUS_N.equals(r_ifYn)) {
+	    		String c_intfMemo = StringUtil.cutString(resultMessage, 3500, "");
+				logApiStatus.setIntfMemo(c_intfMemo);
+	    	} else {
+		    	logApiStatus.setIntfMemo(KurlyConstants.STATUS_OK);
+	    	}
 
     		apiRunTimeEnd = System.currentTimeMillis();
 			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
@@ -181,13 +198,7 @@ public class RegionMasterBatch  {
 			logApiStatus.setApiRuntime(apiRunTime);
 	    	
 	    	logApiStatusService.createLogApiStatus(logApiStatus);
-			    	
-    	} catch (Exception e) {
-    		result = "error";
-			log.error( " === RegionMasterBatch  error" +e );
-			resultMessage = e.toString();
-    	} finally {
-
+	    	
     		apiRunTimeEnd = System.currentTimeMillis();
 			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
 
