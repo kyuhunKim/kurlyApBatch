@@ -19,6 +19,7 @@ public final class KurlyConstants {
   	//센터
     public static final String DEFAULT_WAREHOUSEKEY = "0000";
     public static final String DEFAULT_REGION_CENTERCODE = "SJM2";
+    public static final String DEFAULT_REGION_CCCODE = "CC02";
 	
 	public static final String DEFAULT_OWNER = "TF";
 	

@@ -1,13 +1,15 @@
 package com.lgcns.wcs.kurly.service.impl;
 
+import java.sql.SQLException;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lgcns.wcs.kurly.dto.KurlyConstants;
-import com.lgcns.wcs.kurly.dto.RegionMasterData;
-import com.lgcns.wcs.kurly.dto.RegionMasterDetailData;
 import com.lgcns.wcs.kurly.dto.RegionMasterHeaderData;
 import com.lgcns.wcs.kurly.repository.RegionMasterRepository;
 import com.lgcns.wcs.kurly.service.RegionMasterService;
@@ -33,57 +35,39 @@ public class RegionMasterServiceImpl implements RegionMasterService {
 	@Value("${wms.regionMasterUrl}")
 	private String REGION_MASTER_URL;
 	
-	public String insertRegionMaster() {
+	public RegionMasterHeaderData insertRegionMaster() {
 
 		String result = "";
 		String inputUrl = REGION_MASTER_URL; 
-		StringBuffer insertData = new StringBuffer();
+		RegionMasterHeaderData reqData = new RegionMasterHeaderData();
 		try
 		{
 			String method = "GET";
 			result = HttpUtil.getUrlToJson(inputUrl, "", method);
-
-			RegionMasterHeaderData reqData = new RegionMasterHeaderData();
 			
 			ObjectMapper mapper = new ObjectMapper();
 			reqData = mapper.readValue(result, RegionMasterHeaderData.class);
-			if(reqData.getError_code() == 0 ) {
-				int vvv =0 ;
-		    	for(RegionMasterDetailData master : reqData.getData() ) {
-		    		
-//		    		if(vvv > 1) break;  //테스트용
-		    		log.info("master='{}'", master.toString());
-		    		
-		    		if(KurlyConstants.DEFAULT_REGION_CENTERCODE.equals(master.getCenter_code())) {
-		    			
-		    			RegionMasterData rMaster = new RegionMasterData();
-		    			rMaster.setCoCd("MK");
-		    			rMaster.setRgnCd(master.getRegncd());
-		    			rMaster.setRgnNm(master.getRegnnm());
-		    			rMaster.setRegionGroupCode(master.getRegnky_group_code());
-		    			rMaster.setDeliveryRound(master.getDelivery_round());
-		    			rMaster.setRgnKy(master.getRegnky());
-		    			rMaster.setUseYn(KurlyConstants.STATUS_Y);
-		    			rMaster.setRegId(KurlyConstants.DEFAULT_USERID);
-		    			rMaster.setUpdId(KurlyConstants.DEFAULT_USERID);
-		    			
-		    			regionMasterRepository.insertRegionMaster(rMaster);
-		    			
-		    			insertData.append(rMaster);
-		    			vvv++;	
-		    		}
-		    	}
-
-	    		log.info("insert Data count = "+ vvv);
-	    		
-			}
 			
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
 		
-		return insertData.toString();
+		return reqData;
 		
+	}
+	/**
+	 * 
+	 * @Method Name : insertRegionMasterList
+	 * @작성일 : 2020. 12. 22.
+	 * @작성자 : jooni
+	 * @변경이력 : 2020. 12. 22. 최초작성
+	 * @Method 설명 : 토트 문제 처리용 피킹정보 연계  처리 와 로그  update
+	 */
+	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=SQLException.class)
+	public void insertRegionMasterList(Map<String, Object> upListMap)   {
+						
+    	//RegionMaster insert
+		regionMasterRepository.insertRegionMasterList(upListMap);
 	}
 
 }

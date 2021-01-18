@@ -81,19 +81,19 @@ public class ScheduleTask {
 		log.info("Current Thread : {}", Thread.currentThread().getName());
 		boxRecom.BoxRecomBatchTask();
 	}
-  //토트 마스터 초기화(Release) 정보 연계 - 10초
+	//토트 마스터 초기화(Release) 정보 연계 - 10초
 	@Scheduled(fixedDelay = 10000)
 	public void ToteRelease() {
 		System.out.println("The current date (3) ToteRelease : " + LocalDateTime.now());
 		tote.ToteReleaseTask();
 	}
-////  //분류 권역 정보  - 10초
-////	@Scheduled(fixedDelay = 10000)
-////	public void RegionMasterTask() {
-////		System.out.println("The current date (4) RegionMasterTask : " + LocalDateTime.now());
-////		regionMaster.RegionMasterTask();
-////	}
-  //WCS 토트 자동화 설비 투입 정보 (토트 기준) - 10초
+	//분류 권역 정보  - 확인필요
+	@Scheduled(fixedDelay = 3600000)
+	public void RegionMasterTask() {
+		System.out.println("The current date (4) RegionMasterTask : " + LocalDateTime.now());
+		regionMaster.RegionMasterTask();
+	}
+	//WCS 토트 자동화 설비 투입 정보 (토트 기준) - 10초
 	@Scheduled(fixedDelay = 10000)
 	public void ToteScan() {
 		System.out.println("The current date (5) ToteRelease : " + LocalDateTime.now());
@@ -112,32 +112,32 @@ public class ScheduleTask {
 		ordmadeNotfully.OrdmadeNotfullyTask();
 	}
 	
-  //WCS 미출오더 상품보충용 추가피킹정보 연계 - 10초
+	//WCS 미출오더 상품보충용 추가피킹정보 연계 - 10초
 	@Scheduled(fixedDelay = 10000)
 	public void OrdmadeNotfullyReplay() {
 		System.out.println("The current date (8) ToteRelease : " + LocalDateTime.now());
 		ordmadeNotfullyReplay.OrdmadeNotfullyReplayTask();
 	}
-  //WCS 오더 피킹 완료 정보 - 1분
+	//WCS 오더 피킹 완료 정보 - 1분
 	@Scheduled(fixedDelay = 60000)
 	public void PickQpsComplet() {
 		System.out.println("The current date (10) ToteRelease : " + LocalDateTime.now());
 		pickQpsComplet.PickQpsCompletTask();
 	}
-  //WCS 오더 패킹 완료 정보 - 1분
+	//WCS 오더 패킹 완료 정보 - 1분
 	@Scheduled(fixedDelay = 60000)
 	public void PackQpsComplet() {
 		System.out.println("The current date (9) ToteRelease : " + LocalDateTime.now());
 		 packQpsComplet.PackQpsCompletTask();
 	}
 	
-  //WCS 운송장 발행 정보 - 1분
+	//WCS 운송장 발행 정보 - 1분
 	@Scheduled(fixedDelay = 60000)
 	public void InvoicePrintComplet() {
 		System.out.println("The current date (11) ToteRelease : " + LocalDateTime.now());
 		invoicePrintComplet.InvoicePrintCompletTask();
 	}
-  //WCS 방면 분류 완료 정보 - 1분
+	//WCS 방면 분류 완료 정보 - 1분
 	@Scheduled(fixedDelay = 60000) 
 	public void InvoiceSortComplet() {
 		System.out.println("The current date (12) ToteRelease : " + LocalDateTime.now());

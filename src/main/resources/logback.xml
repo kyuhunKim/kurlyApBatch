@@ -5,10 +5,10 @@
     <include resource="org/springframework/boot/logging/logback/defaults.xml" />
     <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
     
-    <!-- <property name="LOG_DIR" value="D://logs/spring-boot-log/kruly_gradle_test" />
-    <property name="FILE_NAME" value="gimpoWcsApBatch" /> -->
-    <property name="LOG_DIR" value="/logs/wcs/gimpoWcsApBatch" />
+    <property name="LOG_DIR" value="D://logs/spring-boot-log/kruly_gradle_test" />
     <property name="FILE_NAME" value="gimpoWcsApBatch" />
+    <!-- <property name="LOG_DIR" value="/logs/wcs/gimpoWcsApBatch" />
+    <property name="FILE_NAME" value="gimpoWcsApBatch" /> -->
  
     <!--파일에 로그를 남깁니다.-->
     <appender name="File" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -24,19 +24,19 @@
             <MaxFileSize>10MB</MaxFileSize>
         </triggeringPolicy>
 
-        <!-- 파일을 덮어쓰는 정책 -->
+         <!-- 파일을 덮어쓰는 정책 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-            <FileNamePattern>${LOG_DIR}/archived/${FILE_NAME}.%i.log.zip</FileNamePattern>
+            <FileNamePattern>${LOG_DIR}/${FILE_NAME}.%i.log.zip</FileNamePattern>
             <!--
                 10MB단위로 로그 압축 파일이 생성된다. (1 ~ 10)
                 10개가 넘어가면 오래된순으로 덮어쓰기 됩니다.
             -->
             <MinIndex>1</MinIndex>
-            <MaxIndex>10</MaxIndex>
+            <MaxIndex>5</MaxIndex>
         </rollingPolicy>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${LOG_DIR}/${FILE_NAME}.%d{yyyy-MM-dd}.log</fileNamePattern>
-            <maxHistory>30</maxHistory>
+            <maxHistory>5</maxHistory>
         </rollingPolicy>
     </appender>   
    
