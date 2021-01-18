@@ -94,7 +94,7 @@ public class RegionMasterBatch  {
     	    			rMaster.setRgnKyGroupCode(master.getRegzky_group_code());
     	    			rMaster.setCcCode(master.getCc_code());
     	    			
-//    	    			regionMasterRepository.insertRegionMaster(rMaster);
+//    	    			regionMasterService.insertRegionMaster(rMaster);
     	    			
     	    			updateMapList.add(rMaster);
 
@@ -111,7 +111,7 @@ public class RegionMasterBatch  {
 		    			u_updateMapList.add(updateMapList.get(i));
 		    			
 		    			//100 건 씩 처리
-			    		if( (i>2 && i%50 == 0 ) 
+			    		if( (i>2 && i%100 == 0 ) 
 			    				|| ( i == updateMapList.size()-1 ) ) {
 		
 //							log.info(">>>RegionMaster i : ["+i+"]"  );
@@ -134,8 +134,7 @@ public class RegionMasterBatch  {
             	}
         		
     		}
-			
-			    	
+
     	} catch (Exception e) {
     		result = "error";
 			log.error( " === RegionMasterBatch  error" +e );

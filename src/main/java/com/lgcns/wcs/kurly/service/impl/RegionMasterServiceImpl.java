@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lgcns.wcs.kurly.dto.RegionMasterData;
 import com.lgcns.wcs.kurly.dto.RegionMasterHeaderData;
 import com.lgcns.wcs.kurly.repository.RegionMasterRepository;
 import com.lgcns.wcs.kurly.service.RegionMasterService;
@@ -58,10 +59,10 @@ public class RegionMasterServiceImpl implements RegionMasterService {
 	/**
 	 * 
 	 * @Method Name : insertRegionMasterList
-	 * @작성일 : 2020. 12. 22.
+	 * @작성일 : 2021. 01. 18.
 	 * @작성자 : jooni
-	 * @변경이력 : 2020. 12. 22. 최초작성
-	 * @Method 설명 : 토트 문제 처리용 피킹정보 연계  처리 와 로그  update
+	 * @변경이력 : 2021. 01. 18. 최초작성
+	 * @Method 설명 : 토트 문제 처리용 피킹정보 연계  처리  update
 	 */
 	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=SQLException.class)
 	public void insertRegionMasterList(Map<String, Object> upListMap)   {
@@ -69,5 +70,18 @@ public class RegionMasterServiceImpl implements RegionMasterService {
     	//RegionMaster insert
 		regionMasterRepository.insertRegionMasterList(upListMap);
 	}
-
+	/**
+	 * 
+	 * @Method Name : insertRegionMaster
+	 * @작성일 : 2021. 01. 18.
+	 * @작성자 : jooni
+	 * @변경이력 : 2021. 01. 18. 최초작성
+	 * @Method 설명 : 토트 문제 처리용 피킹정보 연계  처리   update
+	 */
+	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=SQLException.class)
+	public void insertRegionMaster(RegionMasterData data)   {
+						
+    	//RegionMaster insert
+		regionMasterRepository.insertRegionMaster(data);
+	}
 }

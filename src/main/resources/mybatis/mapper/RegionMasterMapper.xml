@@ -58,7 +58,7 @@
 	    ) 
   </update>
   <update id="insertRegionMasterList"  parameterType="map">
-	/* [RegionMasterMapper.xml] insertRegionMaster */
+	/* [RegionMasterMapper.xml] insertRegionMasterList */
 	MERGE INTO o_wcs.TB_COM_RGN_MST RM
     USING  
     (
@@ -93,7 +93,6 @@
 			RM.USE_YN   =  TB.USE_YN ,
 			RM.UPD_DT   =  SYSDATE ,
 			RM.UPD_ID   = TB.UPD_ID
-			
     WHEN NOT MATCHED THEN
 	    INSERT
 	    ( 
