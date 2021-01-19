@@ -77,8 +77,8 @@ public class RegionMasterBatch  {
 //    	    		log.info("master='{}'", master.toString());
     	    		
     	    		//##2021.01.18 센터코드 상관없이 cc_code : CC02 인 값만 처리 
-    	    		if(KurlyConstants.DEFAULT_REGION_CCCODE.equals(master.getCc_code())
-    	    				&& "1".equals(master.getDelivery_round())) {
+    	    		//##2021.01.19 Delivery_round 상관없이 update
+    	    		if(KurlyConstants.DEFAULT_REGION_CCCODE.equals(master.getCc_code())) {
 //    	    		if(KurlyConstants.DEFAULT_REGION_CENTERCODE.equals(master.getCenter_code())) {
     	    			
     	    			RegionMasterData rMaster = new RegionMasterData();
