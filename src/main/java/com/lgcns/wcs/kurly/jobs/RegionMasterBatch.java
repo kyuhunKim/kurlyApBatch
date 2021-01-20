@@ -77,8 +77,8 @@ public class RegionMasterBatch  {
 //    	    		log.info("master='{}'", master.toString());
     	    		
     	    		//##2021.01.18 센터코드 상관없이 cc_code : CC02 인 값만 처리 
-    	    		if(KurlyConstants.DEFAULT_REGION_CCCODE.equals(master.getCc_code())
-    	    				&& "1".equals(master.getDelivery_round())) {
+    	    		if(KurlyConstants.DEFAULT_REGION_CCCODE.equals(master.getCc_code()) ) {
+//    	    				&& "1".equals(master.getDelivery_round())) {
 //    	    		if(KurlyConstants.DEFAULT_REGION_CENTERCODE.equals(master.getCenter_code())) {
     	    			
     	    			RegionMasterData rMaster = new RegionMasterData();
@@ -95,13 +95,19 @@ public class RegionMasterBatch  {
     	    			rMaster.setCcCode(master.getCc_code());
     	    			
 //    	    			regionMasterService.insertRegionMaster(rMaster);
-    	    			
-    	    			updateMapList.add(rMaster);
 
-    		    		executeCount++;	
+    	    			//중복체크
+    	    			if(!checkRgnCd( updateMapList,  master.getRegzcd())) {
+
+        	    			updateMapList.add(rMaster);
+        		    		executeCount++;    	    				
+    	    			}
+	
     	    		}
     	    	}
 
+//    	    	log.info("=======updateMapList size======="+updateMapList.size());
+//    			log.error( " === executeCount===" + executeCount );
     	    	try
     	    	{
 		    		List<RegionMasterData> u_updateMapList = new ArrayList<RegionMasterData>();
@@ -225,5 +231,24 @@ public class RegionMasterBatch  {
     	
     }
 
+	/**
+	 * 
+	 * @Method Name : checkRgnCd
+	 * @작성일 : 2021. 01. 19.
+	 * @작성자 : jooni
+	 * @변경이력 : 2021. 01. 19. 최초작성
+	 * @Method 설명 : 중복값 체크
+	 */
+    public boolean checkRgnCd(List<RegionMasterData> updateMapList, String regzcd) {
+	    boolean reVal = false;
+    	for(int k=0; k <updateMapList.size(); k++) {
+			if(updateMapList.get(k).getRgnCd().equals(regzcd))
+			{
+				reVal = true;
+				break;
+			}
+		}
+    	return reVal;
+    }
 }
 
