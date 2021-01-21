@@ -2,6 +2,7 @@ package com.lgcns.wcs.kurly.jobs;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -65,6 +66,10 @@ public class DasNumUseCellBatch  {
 		String resultMessage = "";
 		int executeCount = 0;
     	Date startDate = Calendar.getInstance().getTime();
+
+    	List<Map<String, Object>> updateMapList = new ArrayList<Map<String, Object>>();
+    	List<LogApiStatus> logApiStatusList = new ArrayList<LogApiStatus>();
+    	
     	try {
     		List<DasNumUseCellData> dasNumUseCellList = dasNumUseCellService.selectDasNumUseCellList();
 	    	
@@ -121,7 +126,7 @@ public class DasNumUseCellBatch  {
     				r_ifYn = KurlyConstants.STATUS_N;
 	    		} finally {
 	    			
-	    			Map<String, String> updateMap = new HashMap<String, String>();
+	    			Map<String, Object> updateMap = new HashMap<String, Object>();
 					
 					if(KurlyConstants.STATUS_N.equals(r_ifYn)) {
 						updateMap.put("useCellIntfYn",KurlyConstants.STATUS_N);
@@ -136,78 +141,60 @@ public class DasNumUseCellBatch  {
 					updateMap.put("dasCellGroupId",dasNumUseCellData.getDasCellGroupId());
 					updateMap.put("cellTypeStatus",dasNumUseCellData.getCellTypeStatus());
 
-					dasNumUseCellService.updateDasNumUseCell(updateMap);
+//					dasNumUseCellService.updateDasNumUseCell(updateMap);
 			    	
 	    			apiRunTimeEnd = System.currentTimeMillis();
 	    			apiRunTime = StringUtil.formatInterval(apiRunTimeStartFor, apiRunTimeEnd) ;
 
-					//로그 정보 insert
-			    	LogApiStatus logApiStatus = new LogApiStatus();
-
-			    	String sYyyymmdd = DateUtil.getToday("yyyyMMdd");
-				    logApiStatus.setApiYyyymmdd(sYyyymmdd);
-			    	logApiStatus.setExecMethod(KurlyConstants.METHOD_DASNUMUSECELL);
-			    	
-			    	logApiStatus.setGroupNo("");  //그룹배치번호
-			    	logApiStatus.setWorkBatchNo("");  //작업배치번호
-			    	
-			    	logApiStatus.setShipUidWcs("");  //출고오더UID(WCS)
-			    	logApiStatus.setShipUidSeq("");  //출고오더UID순번(WCS)
-			    	logApiStatus.setShipOrderKey("");  //출하문서번호(WMS)
-			    	logApiStatus.setShipOrderItemSeq("");  //출하문서순번(WMS)
-
-			    	logApiStatus.setToteId("");  //토트ID번호
-			    	logApiStatus.setInvoiceNo("");  //송장번호
-
-			    	logApiStatus.setStatus("");  //상태
-			    	
-			    	logApiStatus.setQtyOrder(0);  //지시수량
-			    	logApiStatus.setQtyComplete(0);  //작업완료수량
-			    	
-			    	logApiStatus.setSkuCode("");  //상품코드
-			    	logApiStatus.setWcsStatus("");  //WCS 작업상태
-			    	logApiStatus.setApiInfo("");
-
-					if(dasNumUseCellData != null) {
-				    	if(dasNumUseCellData.getWarehouseKey() ==null ||
-								"".equals(dasNumUseCellData.getWarehouseKey())) {
-							logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
-						} else {
-							logApiStatus.setWarehouseKey(dasNumUseCellData.getWarehouseKey());
-						}
-//				    	logApiStatus.setApiInfo(dasNumUseCellData.toString());
-						
-				    	//##20210106  json 타입으로 저장 
-						try {
-							ObjectMapper mapper = new ObjectMapper();
-							String jsonStr = mapper.writeValueAsString(dasNumUseCellData);
-			
-							logApiStatus.setApiInfo(jsonStr);
-						} catch (IOException e) {
-//				            e.printStackTrace();
-							logApiStatus.setApiInfo(dasNumUseCellData.toString());
-				        }
-					} else {
-						logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
-						logApiStatus.setApiInfo("");
-					}
+					updateMap.put("apiRunTime",apiRunTime);
 					
-			    	logApiStatus.setApiUrl(KurlyConstants.METHOD_DASNUMUSECELL);
-			    	logApiStatus.setApiRuntime(apiRunTime);
-			    	
-			    	logApiStatus.setIntfYn(r_ifYn) ; //'Y': 전송완료, 'N': 미전송
-			    	if(KurlyConstants.STATUS_N.equals(r_ifYn)) {
-			    		logApiStatus.setIntfMemo(retMessage);
-			    	} else {
-			    		logApiStatus.setIntfMemo(KurlyConstants.STATUS_OK);
-			    	}
-			    	
-			    	logApiStatusService.createLogApiStatus(logApiStatus);
+					//update list data
+	    			updateMapList.add(updateMap);
+					
+	    	    	//로그 저장  수집
+	    	    	LogApiStatus logApiStatus = new LogApiStatus();
+	    	    	logApiStatus = logApiStatusVo(updateMap, dasNumUseCellData);
+					
+	    	    	logApiStatusList.add(logApiStatus);
+
+		    		executeCount++;
 			    	
 	    		}
-	    		executeCount++;
         	}	
-        	
+
+        	try 
+        	{
+
+    	    	List<Map<String, Object>> u_updateMapList = new ArrayList<Map<String, Object>>();
+    	    	List<LogApiStatus> u_logApiStatusList = new ArrayList<LogApiStatus>();
+    	    	
+        		for(int i=0; i <updateMapList.size(); i++) {
+        			
+        			u_updateMapList.add(updateMapList.get(i));
+        			u_logApiStatusList.add(logApiStatusList.get(i));
+        			
+        			//50 건 씩 처리 
+    	    		if( (i>2 && i%50 == 0 ) 
+    	    				|| ( i == updateMapList.size()-1 ) ) {
+    					
+    					Map<String, Object> upListMap = new HashMap<String, Object>();
+    					upListMap.put("updateList",u_updateMapList);
+    			    	
+    					//update
+    					dasNumUseCellService.updateDasNumUseCellList(upListMap, u_logApiStatusList);
+    					
+    					//초기화
+    					u_updateMapList = new ArrayList<Map<String, Object>>();
+    					u_logApiStatusList = new ArrayList<LogApiStatus>();
+    					
+    	    		}
+        		}
+        		
+        	} catch (Exception e1) {
+        		result = "error";
+    			log.error( " === DasNumUseCellBatch update error " +e1 );
+    			resultMessage = e1.toString();
+        	}
     	} catch (Exception e) {
     		result = "error";
 			log.error( " === DasNumUseCellBatch  error" +e );
@@ -242,5 +229,83 @@ public class DasNumUseCellBatch  {
     	
     }
 
+    /**
+     * 
+     * @Name : logApiStatusVo
+     * @작성일 : 2021. 01. 21.
+     * @작성자 : jooni
+     * @변경이력 : 2021. 01. 21. 최초작성
+     * @Method 설명 : logApiStatus Vo 생성
+     */
+    public LogApiStatus logApiStatusVo(Map<String, Object> updateMap, DasNumUseCellData dasNumUseCellData) {
+		
+    	//로그 정보 insert
+    	LogApiStatus logApiStatus = new LogApiStatus();
+
+    	String sYyyymmdd = DateUtil.getToday("yyyyMMdd");
+	    logApiStatus.setApiYyyymmdd(sYyyymmdd);
+    	logApiStatus.setExecMethod(KurlyConstants.METHOD_DASNUMUSECELL);
+    	
+    	logApiStatus.setGroupNo("");  //그룹배치번호
+    	logApiStatus.setWorkBatchNo("");  //작업배치번호
+    	
+    	logApiStatus.setShipUidWcs("");  //출고오더UID(WCS)
+    	logApiStatus.setShipUidSeq("");  //출고오더UID순번(WCS)
+    	logApiStatus.setShipOrderKey("");  //출하문서번호(WMS)
+    	logApiStatus.setShipOrderItemSeq("");  //출하문서순번(WMS)
+
+    	logApiStatus.setToteId("");  //토트ID번호
+    	logApiStatus.setInvoiceNo("");  //송장번호
+
+    	logApiStatus.setStatus("");  //상태
+    	
+    	logApiStatus.setQtyOrder(0);  //지시수량
+    	logApiStatus.setQtyComplete(0);  //작업완료수량
+    	
+    	logApiStatus.setSkuCode("");  //상품코드
+    	logApiStatus.setWcsStatus("");  //WCS 작업상태
+
+    	if(dasNumUseCellData != null) {
+	    	if(dasNumUseCellData.getWarehouseKey() ==null ||
+					"".equals(dasNumUseCellData.getWarehouseKey())) {
+				logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
+			} else {
+				logApiStatus.setWarehouseKey(dasNumUseCellData.getWarehouseKey());
+			}
+//	    	logApiStatus.setApiInfo(dasNumUseCellData.toString());
+			
+	    	//##20210106  json 타입으로 저장 
+			try {
+				ObjectMapper mapper = new ObjectMapper();
+				String jsonStr = mapper.writeValueAsString(dasNumUseCellData);
+
+				logApiStatus.setApiInfo(jsonStr);
+			} catch (IOException e) {
+//	            e.printStackTrace();
+				logApiStatus.setApiInfo(dasNumUseCellData.toString());
+	        }
+		} else {
+			logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
+			logApiStatus.setApiInfo("");
+		}
+
+		String l_apiRunTime = updateMap.get("apiRunTime").toString();
+		String l_intfYn = updateMap.get("useCellIntfYn").toString();
+		String l_intfMemo = updateMap.get("useCellIntfMemo").toString();
+		
+		
+    	logApiStatus.setApiUrl(KurlyConstants.METHOD_DASNUMUSECELL);
+    	logApiStatus.setApiRuntime(l_apiRunTime);
+    	
+    	logApiStatus.setIntfYn(l_intfYn) ; //'Y': 전송완료, 'N': 미전송
+    	if(KurlyConstants.STATUS_N.equals(l_intfYn)) {
+    		String c_intfMemo = StringUtil.cutString(l_intfMemo, 3500, "");
+			logApiStatus.setIntfMemo(c_intfMemo);
+    	} else {
+    		logApiStatus.setIntfMemo(KurlyConstants.STATUS_OK);
+    	}
+
+		return logApiStatus;
+    }
 }
 

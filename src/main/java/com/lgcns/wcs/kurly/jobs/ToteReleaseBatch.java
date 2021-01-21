@@ -20,6 +20,7 @@ import com.lgcns.wcs.kurly.dto.LogApiStatus;
 import com.lgcns.wcs.kurly.dto.LogBatchExec;
 import com.lgcns.wcs.kurly.dto.ResponseMesssage;
 import com.lgcns.wcs.kurly.dto.ToteReleaseParamData;
+import com.lgcns.wcs.kurly.dto.ToteReleaseSendData;
 import com.lgcns.wcs.kurly.producer.KurlyWcsToWmsProducer;
 import com.lgcns.wcs.kurly.service.LogApiStatusService;
 import com.lgcns.wcs.kurly.service.LogBatchExecService;
@@ -83,7 +84,18 @@ public class ToteReleaseBatch  {
 	    	List<LogApiStatus> logApiStatusList = new ArrayList<LogApiStatus>();
 	    	
 	    	for(ToteReleaseParamData toteReleaseData : listToteRelease ) {
-
+	    		
+	    		ToteReleaseSendData toteReleaseSendData =  new ToteReleaseSendData();
+	    		toteReleaseSendData.setToteId(toteReleaseData.getToteId());
+	    		toteReleaseSendData.setReleaseType(toteReleaseData.getReleaseType());
+	    		toteReleaseSendData.setReleaseDate(toteReleaseData.getReleaseDate());
+	    		toteReleaseSendData.setReleaseTime(toteReleaseData.getReleaseTime());
+	    		toteReleaseSendData.setReleaseUser(toteReleaseData.getReleaseUser());
+	    		toteReleaseSendData.setToteUniqueNo(toteReleaseData.getToteUniqueNo());
+	    		toteReleaseSendData.setInsertedDate(toteReleaseData.getInsertedDate());
+	    		toteReleaseSendData.setInsertedTime(toteReleaseData.getInsertedTime());
+	    		toteReleaseSendData.setInsertedUser(toteReleaseData.getInsertedUser());
+	    		
 	    		//건당 시간 체크용
 	    		long apiRunTimeStartFor = System.currentTimeMillis();
 
@@ -94,9 +106,10 @@ public class ToteReleaseBatch  {
     			String retMessage = "";
 	    		try {
 	    			
-	    			log.info("==toteId=="+toteReleaseData.getToteId());
+	    			
+	    			log.info("==toteId=="+toteReleaseSendData.getToteId());
 	    			//kafka 전송
-	    			deferredResult = wcsProducer.sendToteReleaseObject(toteReleaseData);
+	    			deferredResult = wcsProducer.sendToteReleaseObject(toteReleaseSendData);
 	    			ResponseEntity<ResponseMesssage> res = (ResponseEntity<ResponseMesssage>)deferredResult.getResult();
 	    			retStatus = (String)res.getBody().getStatus();
 	    			retMessage = (String)res.getBody().getMessage();

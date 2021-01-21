@@ -19,6 +19,7 @@ import com.lgcns.wcs.kurly.dto.KurlyConstants;
 import com.lgcns.wcs.kurly.dto.LogApiStatus;
 import com.lgcns.wcs.kurly.dto.LogBatchExec;
 import com.lgcns.wcs.kurly.dto.OrdmadeNotfullyData;
+import com.lgcns.wcs.kurly.dto.OrdmadeNotfullySendData;
 import com.lgcns.wcs.kurly.dto.ResponseMesssage;
 import com.lgcns.wcs.kurly.producer.KurlyWcsToWmsProducer;
 import com.lgcns.wcs.kurly.service.LogApiStatusService;
@@ -80,7 +81,24 @@ public class OrdmadeNotfullyBatch  {
 	    	List<LogApiStatus> logApiStatusList = new ArrayList<LogApiStatus>();
 	    	
 	    	for(OrdmadeNotfullyData ordmadeNotfullyData : listOrdmadeNotfully ) {
-
+	    		
+	    		OrdmadeNotfullySendData ordmadeNotfullySendData = new OrdmadeNotfullySendData();
+	    		
+	    		ordmadeNotfullySendData.setWarehouseKey(ordmadeNotfullyData.getWarehouseKey()) ;
+	    		ordmadeNotfullySendData.setDocDate(ordmadeNotfullyData.getDocDate()) ;
+	    		ordmadeNotfullySendData.setGroupNo(ordmadeNotfullyData.getGroupNo()) ;
+	    		ordmadeNotfullySendData.setWorkBatchNo(ordmadeNotfullyData.getWorkBatchNo()) ;
+	    		ordmadeNotfullySendData.setPickingBatchNo(ordmadeNotfullyData.getPickingBatchNo()) ;
+	    		ordmadeNotfullySendData.setShipOrderKey(ordmadeNotfullyData.getShipOrderKey()) ;
+	    		ordmadeNotfullySendData.setShipOrderItemSeq(ordmadeNotfullyData.getShipOrderItemSeq()) ;
+	    		ordmadeNotfullySendData.setSkuCode(ordmadeNotfullyData.getSkuCode()) ;
+	    		ordmadeNotfullySendData.setSkuName(ordmadeNotfullyData.getSkuName()) ;
+	    		ordmadeNotfullySendData.setSkuSubName(ordmadeNotfullyData.getSkuSubName()) ;
+	    		ordmadeNotfullySendData.setQtyNotfully(ordmadeNotfullyData.getQtyNotfully()) ;
+	    		ordmadeNotfullySendData.setInsertedDate(ordmadeNotfullyData.getInsertedDate()) ;
+	    		ordmadeNotfullySendData.setInsertedTime(ordmadeNotfullyData.getInsertedTime()) ;
+	    		ordmadeNotfullySendData.setInsertedUser(ordmadeNotfullyData.getInsertedUser()) ;
+	    		
 	    		//건당 시간 체크용
 	    		long apiRunTimeStartFor = System.currentTimeMillis();
 
@@ -92,7 +110,7 @@ public class OrdmadeNotfullyBatch  {
 	    		try {
 	    			
 	    			//kafka 전송
-	    			deferredResult = wcsProducer.sendOrdmadeNotfullyObject(ordmadeNotfullyData);
+	    			deferredResult = wcsProducer.sendOrdmadeNotfullyObject(ordmadeNotfullySendData);
 	    			
 	    			ResponseEntity<ResponseMesssage> res = (ResponseEntity<ResponseMesssage>)deferredResult.getResult();
 	    			retStatus = (String)res.getBody().getStatus();

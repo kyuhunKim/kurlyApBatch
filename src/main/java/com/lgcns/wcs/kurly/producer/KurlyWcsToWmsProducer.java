@@ -13,14 +13,14 @@ import org.springframework.web.context.request.async.DeferredResult;
 import com.lgcns.wcs.kurly.dto.DasNumUseCellData;
 import com.lgcns.wcs.kurly.dto.InvoicePrintCompletData;
 import com.lgcns.wcs.kurly.dto.InvoiceSortCompletData;
-import com.lgcns.wcs.kurly.dto.OrdmadeNotfullyData;
-import com.lgcns.wcs.kurly.dto.OrdmadeNotfullyReplayData;
-import com.lgcns.wcs.kurly.dto.PackQpsCompletData;
-import com.lgcns.wcs.kurly.dto.PickQpsCompletData;
+import com.lgcns.wcs.kurly.dto.OrdmadeNotfullyReplaySendData;
+import com.lgcns.wcs.kurly.dto.OrdmadeNotfullySendData;
+import com.lgcns.wcs.kurly.dto.PackQpsCompletSendData;
+import com.lgcns.wcs.kurly.dto.PickQpsCompletSendData;
 import com.lgcns.wcs.kurly.dto.QpsNumUseCellData;
 import com.lgcns.wcs.kurly.dto.ResponseMesssage;
 import com.lgcns.wcs.kurly.dto.ToteCellExceptTxnData;
-import com.lgcns.wcs.kurly.dto.ToteReleaseParamData;
+import com.lgcns.wcs.kurly.dto.ToteReleaseSendData;
 import com.lgcns.wcs.kurly.dto.ToteScanData;
 import com.lgcns.wcs.kurly.service.ToteReleaseService;
 
@@ -32,7 +32,7 @@ public class KurlyWcsToWmsProducer {
 
 	//토트 마스트 초기화 연계 
 	@Qualifier("toteReleaseKafkaTemplate")
-    private KafkaTemplate<String, ToteReleaseParamData> toteReleaseKafkaTemplate;
+    private KafkaTemplate<String, ToteReleaseSendData> toteReleaseKafkaTemplate;
 	
 	@Qualifier("toteScanKafkaTemplate")
     private KafkaTemplate<String, ToteScanData> toteScanKafkaTemplate;
@@ -41,13 +41,13 @@ public class KurlyWcsToWmsProducer {
     private KafkaTemplate<String, ToteCellExceptTxnData> toteCellExceptTxnKafkaTemplate;
 
     @Qualifier("ordmadeNotfullyReplayKafkaTemplate")
-    private KafkaTemplate<String, OrdmadeNotfullyReplayData> ordmadeNotfullyReplayKafkaTemplate;
+    private KafkaTemplate<String, OrdmadeNotfullyReplaySendData> ordmadeNotfullyReplayKafkaTemplate;
     @Qualifier("ordmadeNotfullyKafkaTemplate")
-    private KafkaTemplate<String, OrdmadeNotfullyData> ordmadeNotfullyKafkaTemplate;
+    private KafkaTemplate<String, OrdmadeNotfullySendData> ordmadeNotfullyKafkaTemplate;
     @Qualifier("pickQpsCompletKafkaTemplate")
-    private KafkaTemplate<String, PickQpsCompletData> pickQpsCompletKafkaTemplate;
+    private KafkaTemplate<String, PickQpsCompletSendData> pickQpsCompletKafkaTemplate;
     @Qualifier("packQpsCompletKafkaTemplate")
-    private KafkaTemplate<String, PackQpsCompletData> packQpsCompletKafkaTemplate;
+    private KafkaTemplate<String, PackQpsCompletSendData> packQpsCompletKafkaTemplate;
     @Qualifier("invoicePrintCompletKafkaTemplate")
     private KafkaTemplate<String, InvoicePrintCompletData> invoicePrintCompletKafkaTemplate;
     @Qualifier("invoiceSortCompletKafkaTemplate")
@@ -85,13 +85,13 @@ public class KurlyWcsToWmsProducer {
     ToteReleaseService toteReleaseService;
 
     public KurlyWcsToWmsProducer(
-    		KafkaTemplate<String, ToteReleaseParamData> toteReleaseKafkaTemplate,
+    		KafkaTemplate<String, ToteReleaseSendData> toteReleaseKafkaTemplate,
     		KafkaTemplate<String, ToteScanData> toteScanKafkaTemplate,
     		KafkaTemplate<String, ToteCellExceptTxnData> toteCellExceptTxnKafkaTemplate,
-    	    KafkaTemplate<String, OrdmadeNotfullyReplayData> ordmadeNotfullyReplayKafkaTemplate,
-    	    KafkaTemplate<String, OrdmadeNotfullyData> ordmadeNotfullyKafkaTemplate,
-    	    KafkaTemplate<String, PickQpsCompletData> pickQpsCompletKafkaTemplate,
-    	    KafkaTemplate<String, PackQpsCompletData> packQpsCompletKafkaTemplate,
+    	    KafkaTemplate<String, OrdmadeNotfullyReplaySendData> ordmadeNotfullyReplayKafkaTemplate,
+    	    KafkaTemplate<String, OrdmadeNotfullySendData> ordmadeNotfullyKafkaTemplate,
+    	    KafkaTemplate<String, PickQpsCompletSendData> pickQpsCompletKafkaTemplate,
+    	    KafkaTemplate<String, PackQpsCompletSendData> packQpsCompletKafkaTemplate,
     	    KafkaTemplate<String, InvoicePrintCompletData> invoicePrintCompletKafkaTemplate,
     	    KafkaTemplate<String, InvoiceSortCompletData> invoiceSortCompletKafkaTemplate,
     	    KafkaTemplate<String, QpsNumUseCellData> qpsNumUseCellKafkaTemplate,
@@ -118,15 +118,15 @@ public class KurlyWcsToWmsProducer {
 	 * @변경이력 : 2020. 07. 14. 최초작성
 	 * @Method 설명 : 토트 마스트 초기화 연계  (WCS => WMS)
 	 */
-    public DeferredResult<ResponseEntity<?>> sendToteReleaseObject(ToteReleaseParamData toteReleaseParamData){
+    public DeferredResult<ResponseEntity<?>> sendToteReleaseObject(ToteReleaseSendData toteReleaseSendData){
     	log.info("=======sendToteReleaseObject start=======");
-    	log.info("======="+toteReleaseParamData.toString());
+    	log.info("======="+toteReleaseSendData.toString());
     		
 		DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
 
         try {
 
-        	SendResult<String, ToteReleaseParamData> result =  toteReleaseKafkaTemplate.send(WMS_TOTE_RELEASE,  toteReleaseParamData).get();
+        	SendResult<String, ToteReleaseSendData> result =  toteReleaseKafkaTemplate.send(WMS_TOTE_RELEASE,  toteReleaseSendData).get();
         	log.info("=======Producer send result [key = {}, value = {}]", result.getProducerRecord().key(),
                     result.getProducerRecord().value());
 
@@ -139,7 +139,7 @@ public class KurlyWcsToWmsProducer {
         } catch (Exception e) {
             e.printStackTrace();
             log.error("======= Kafka  [topic = {}, value = {}] Exception: {}",
-            		WMS_TOTE_RELEASE,  toteReleaseParamData, e.getMessage());
+            		WMS_TOTE_RELEASE,  toteReleaseSendData, e.getMessage());
 
 	    	ResponseMesssage resMessage = new ResponseMesssage();
 	    	resMessage.setStatus("FAILURE");
@@ -239,15 +239,15 @@ public class KurlyWcsToWmsProducer {
 	 * @변경이력 : 2020. 07. 14. 최초작성
 	 * @Method 설명 : WCS 미출오더 상품보충용 추가피킹정보 연계  (WCS => WMS)
      */
-    public DeferredResult<ResponseEntity<?>> sendOrdmadeNotfullyReplayObject(OrdmadeNotfullyReplayData ordmadeNotfullyReplayData){
+    public DeferredResult<ResponseEntity<?>> sendOrdmadeNotfullyReplayObject(OrdmadeNotfullyReplaySendData ordmadeNotfullyReplaySendData){
     	log.info("=======sendOrdmadeNotfullyReplayObject start=======");
-    	log.info("======="+ordmadeNotfullyReplayData.toString());
+    	log.info("======="+ordmadeNotfullyReplaySendData.toString());
     		
 		DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
 
         try {
 
-        	SendResult<String, OrdmadeNotfullyReplayData> result =  ordmadeNotfullyReplayKafkaTemplate.send(WMS_ORDMADE_NOTFULLYREPLAY,  ordmadeNotfullyReplayData).get();
+        	SendResult<String, OrdmadeNotfullyReplaySendData> result =  ordmadeNotfullyReplayKafkaTemplate.send(WMS_ORDMADE_NOTFULLYREPLAY,  ordmadeNotfullyReplaySendData).get();
         	log.info("=======Producer send result [key = {}, value = {}]", result.getProducerRecord().key(),
                     result.getProducerRecord().value());
 
@@ -259,7 +259,7 @@ public class KurlyWcsToWmsProducer {
         } catch (Exception e) {
             e.printStackTrace();
             log.error("======= Kafka  [topic = {}, value = {}] Exception: {}",
-            		WMS_ORDMADE_NOTFULLYREPLAY,  ordmadeNotfullyReplayData, e.getMessage());
+            		WMS_ORDMADE_NOTFULLYREPLAY,  ordmadeNotfullyReplaySendData, e.getMessage());
 
 	    	ResponseMesssage resMessage = new ResponseMesssage();
 	    	resMessage.setStatus("FAILURE");
@@ -280,15 +280,15 @@ public class KurlyWcsToWmsProducer {
 	 * @변경이력 : 2020. 07. 14. 최초작성
 	 * @Method 설명 : WCS 미출오더 처리시 WMS 피킹지시 금지 정보 연계  (WCS => WMS)
      */
-    public DeferredResult<ResponseEntity<?>> sendOrdmadeNotfullyObject(OrdmadeNotfullyData ordmadeNotfullyData){
+    public DeferredResult<ResponseEntity<?>> sendOrdmadeNotfullyObject(OrdmadeNotfullySendData ordmadeNotfullySendData){
     	log.info("=======sendOrdmadeNotfullyObject start=======");
-    	log.info("======="+ordmadeNotfullyData.toString());
+    	log.info("======="+ordmadeNotfullySendData.toString());
     		
 		DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
 
         try {
 
-        	SendResult<String, OrdmadeNotfullyData> result =  ordmadeNotfullyKafkaTemplate.send(WMS_ORDMADE_NOTFULLY,  ordmadeNotfullyData).get();
+        	SendResult<String, OrdmadeNotfullySendData> result =  ordmadeNotfullyKafkaTemplate.send(WMS_ORDMADE_NOTFULLY,  ordmadeNotfullySendData).get();
         	log.info("=======Producer send result [key = {}, value = {}]", result.getProducerRecord().key(),
                     result.getProducerRecord().value());
 
@@ -300,7 +300,7 @@ public class KurlyWcsToWmsProducer {
         } catch (Exception e) {
             e.printStackTrace();
             log.error("======= Kafka  [topic = {}, value = {}] Exception: {}",
-            		WMS_ORDMADE_NOTFULLY,  ordmadeNotfullyData, e.getMessage());
+            		WMS_ORDMADE_NOTFULLY,  ordmadeNotfullySendData, e.getMessage());
 
 	    	ResponseMesssage resMessage = new ResponseMesssage();
 	    	resMessage.setStatus("FAILURE");
@@ -320,15 +320,15 @@ public class KurlyWcsToWmsProducer {
 	 * @변경이력 : 2020. 07. 14. 최초작성
 	 * @Method 설명 : WCS 오더 패킹 완료 정보  (WCS => WMS)
      */
-    public DeferredResult<ResponseEntity<?>> sendPackQpsCompletObject(PackQpsCompletData packQpsCompletData){
+    public DeferredResult<ResponseEntity<?>> sendPackQpsCompletObject(PackQpsCompletSendData packQpsCompletSendData){
     	log.info("=======sendPackQpsCompletObject start=======");
-    	log.info("======="+packQpsCompletData.toString());
+    	log.info("======="+packQpsCompletSendData.toString());
     		
 		DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
 
         try {
 
-        	SendResult<String, PackQpsCompletData> result =  packQpsCompletKafkaTemplate.send(WMS_PACK_QPSCOMPLET,  packQpsCompletData).get();
+        	SendResult<String, PackQpsCompletSendData> result =  packQpsCompletKafkaTemplate.send(WMS_PACK_QPSCOMPLET,  packQpsCompletSendData).get();
         	log.info("=======Producer send result [key = {}, value = {}]", result.getProducerRecord().key(),
                     result.getProducerRecord().value());
 
@@ -340,7 +340,7 @@ public class KurlyWcsToWmsProducer {
         } catch (Exception e) {
             e.printStackTrace();
             log.error("======= Kafka  [topic = {}, value = {}] Exception: {}",
-            		WMS_PACK_QPSCOMPLET,  packQpsCompletData, e.getMessage());
+            		WMS_PACK_QPSCOMPLET,  packQpsCompletSendData, e.getMessage());
 
 	    	ResponseMesssage resMessage = new ResponseMesssage();
 	    	resMessage.setStatus("FAILURE");
@@ -361,15 +361,15 @@ public class KurlyWcsToWmsProducer {
 	 * @변경이력 : 2020. 07. 14. 최초작성
 	 * @Method 설명 : WCS 오더 피킹 완료 정보  (WCS => WMS)
      */
-    public DeferredResult<ResponseEntity<?>> sendPickQpsCompletObject(PickQpsCompletData pickQpsCompletData){
+    public DeferredResult<ResponseEntity<?>> sendPickQpsCompletObject(PickQpsCompletSendData pickQpsCompletSendData){
     	log.info("=======sendPickQpsCompletObject start=======");
-    	log.info("======="+pickQpsCompletData.toString());
+    	log.info("======="+pickQpsCompletSendData.toString());
     		
 		DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
 
         try {
 
-        	SendResult<String, PickQpsCompletData> result =  pickQpsCompletKafkaTemplate.send(WMS_PICK_QPSCOMPLET,  pickQpsCompletData).get();
+        	SendResult<String, PickQpsCompletSendData> result =  pickQpsCompletKafkaTemplate.send(WMS_PICK_QPSCOMPLET,  pickQpsCompletSendData).get();
         	log.info("=======Producer send result [key = {}, value = {}]", result.getProducerRecord().key(),
                     result.getProducerRecord().value());
 
@@ -381,7 +381,7 @@ public class KurlyWcsToWmsProducer {
         } catch (Exception e) {
             e.printStackTrace();
             log.error("======= Kafka  [topic = {}, value = {}] Exception: {}",
-            		WMS_PICK_QPSCOMPLET,  pickQpsCompletData, e.getMessage());
+            		WMS_PICK_QPSCOMPLET,  pickQpsCompletSendData, e.getMessage());
 
 	    	ResponseMesssage resMessage = new ResponseMesssage();
 	    	resMessage.setStatus("FAILURE");

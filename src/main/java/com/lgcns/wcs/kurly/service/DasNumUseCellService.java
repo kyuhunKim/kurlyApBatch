@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 import com.lgcns.wcs.kurly.dto.DasNumUseCellData;
+import com.lgcns.wcs.kurly.dto.LogApiStatus;
 
 /**
  * 
@@ -20,4 +21,6 @@ public interface DasNumUseCellService {
 	public List<DasNumUseCellData> selectDasNumUseCellList();
 	public void updateDasNumUseCell(Map<String, String> data);
 	public int selectDasNumUseCellCount(Map<String, String> data);
+
+	public void updateDasNumUseCellList(Map<String, Object> upListMap, List<LogApiStatus> logApiStatusList) ;
 }

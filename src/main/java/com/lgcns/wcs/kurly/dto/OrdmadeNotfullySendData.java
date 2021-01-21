@@ -1,21 +1,13 @@
 package com.lgcns.wcs.kurly.dto;
 
-import org.apache.ibatis.type.Alias;
-
 import lombok.Data;
 
 /*
  * WCS 미출오더 처리시 WMS 피킹지시 금지 정보 연계
  * */
 @Data
-@Alias("OrdmadeNotfullyData")
-public class OrdmadeNotfullyData {
-	/*송장번호
-	 * */
-	private String invoiceNo ;
-	/*송장번호 순번
-	 * */
-	private String invoiceSeq ;
+public class OrdmadeNotfullySendData {
+	
 	/*센터
 	 * */
 	private String warehouseKey ;

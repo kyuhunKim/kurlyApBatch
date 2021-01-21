@@ -38,7 +38,7 @@
 			, MODIFIED_TIME  = TO_CHAR(SYSDATE,'HH24MISS')
 			, MODIFIED_USER  = 'WCS_BATCH'
 	WHERE WAREHOUSE_KEY        = #{warehouseKey}
-		AND CELL_DAS_GROUP_ID  = #{dasCellGroupId}
+		AND DAS_CELL_GROUP_ID  = #{dasCellGroupId}
 		AND CELL_TYPE_STATUS   = #{cellTypeStatus}
 		AND USE_CELL_INTF_YN   = 'N'  
   </update>
@@ -49,9 +49,43 @@
 		COUNT(*)
 	FROM o_wcs.TB_DAS_GROUPID_USE_CELL UC
 	WHERE UC.WAREHOUSE_KEY         = #{warehouseKey}
-		AND UC.CELL_DAS_GROUP_ID   = #{dasCellGroupId}
+		AND UC.DAS_CELL_GROUP_ID   = #{dasCellGroupId}
 		AND UC.CELL_TYPE_STATUS    = 'MAKE'
 		AND UC.USE_CELL_INTF_YN = 'Y' 
   </select>
   
+  <update id="updateDasNumUseCellList" parameterType="map">
+  /* [DasNumUseCellMapper.xml] updateDasNumUseCellList */
+    MERGE INTO o_wcs.TB_DAS_GROUPID_USE_CELL  HDR
+    	USING (
+    		<foreach collection="updateList" item="item" index="index" separator="UNION ALL">
+    		SELECT
+				#{warehouseKey}     AS  WAREHOUSE_KEY ,
+				#{dasCellGroupId}   AS  DAS_CELL_GROUP_ID  ,
+				#{cellTypeStatus}   AS  CELL_TYPE_STATUS   ,
+				#{useCellIntfYn}    AS  USE_CELL_INTF_YN   , 
+				#{useCellIntfCode}  AS  USE_CELL_INTF_CODE ,
+				#{useCellIntfMemo}  AS  USE_CELL_INTF_MEMO
+    		FROM DUAL
+   		   </foreach>
+	) TB
+	ON 
+	(
+			HDR.WAREHOUSE_KEY      = TB.WAREHOUSE_KEY
+		AND HDR.DAS_CELL_GROUP_ID  = TB.DAS_CELL_GROUP_ID
+		AND HDR.CELL_TYPE_STATUS   = TB.CELL_TYPE_STATUS
+		AND HDR.USE_CELL_INTF_YN   = 'N' 
+	)
+	WHEN MATCHED THEN
+		UPDATE
+		<set>
+			HDR.USE_CELL_INTF_YN  = TB.USE_CELL_INTF_YN  ,
+			HDR.USE_CELL_INTF_DT   = SYSDATE  ,
+			HDR.USE_CELL_INTF_CODE  = TB.USE_CELL_INTF_YN  ,
+			HDR.USE_CELL_INTF_MEMO  = TB.USE_CELL_INTF_YN  ,
+			HDR.MODIFIED_DATE  = TO_CHAR(SYSDATE,'YYYYMMDD')  ,
+			HDR.MODIFIED_TIME  = TO_CHAR(SYSDATE,'HH24MISS')  ,
+			HDR.MODIFIED_USER  = 'WCS_BATCH'
+		</set>
+  </update>
 </mapper>

@@ -20,6 +20,7 @@ import com.lgcns.wcs.kurly.dto.LogApiStatus;
 import com.lgcns.wcs.kurly.dto.LogBatchExec;
 import com.lgcns.wcs.kurly.dto.PickQpsCompletData;
 import com.lgcns.wcs.kurly.dto.PickQpsCompletDetailData;
+import com.lgcns.wcs.kurly.dto.PickQpsCompletSendData;
 import com.lgcns.wcs.kurly.dto.ResponseMesssage;
 import com.lgcns.wcs.kurly.producer.KurlyWcsToWmsProducer;
 import com.lgcns.wcs.kurly.service.LogApiStatusService;
@@ -85,7 +86,23 @@ public class PickQpsCompletBatch  {
 	    	List<PickQpsCompletDetailData> detailList = new ArrayList<PickQpsCompletDetailData>();
     		
 	    	for(PickQpsCompletData pickQpsCompletData : listPickQpsComplet ) {
-
+	    		
+	    		PickQpsCompletSendData pickQpsCompletSendData = new PickQpsCompletSendData();
+	    		pickQpsCompletSendData.setShipOrderKey(pickQpsCompletData.getShipOrderKey());
+	    		pickQpsCompletSendData.setInvoiceNo(pickQpsCompletData.getInvoiceNo());
+	    		pickQpsCompletSendData.setWarehouseKey(pickQpsCompletData.getWarehouseKey());
+	    		pickQpsCompletSendData.setShipUidKey(pickQpsCompletData.getShipUidKey());
+	    		pickQpsCompletSendData.setCellId(pickQpsCompletData.getCellId());
+	    		pickQpsCompletSendData.setOriginInvoiceNo(pickQpsCompletData.getOriginInvoiceNo());
+	    		pickQpsCompletSendData.setOrdmadeSplitYn(pickQpsCompletData.getOrdmadeSplitYn());
+	    		pickQpsCompletSendData.setPackBoxSplitYn(pickQpsCompletData.getPackBoxSplitYn());
+	    		pickQpsCompletSendData.setPackBoxTypeRecom(pickQpsCompletData.getPackBoxTypeRecom());
+	    		pickQpsCompletSendData.setShipOrderLastYn(pickQpsCompletData.getShipOrderLastYn());
+//	    		pickQpsCompletSendData.setDtlCnt(pickQpsCompletData.getDtlCnt());
+	    		pickQpsCompletSendData.setInsertedDate(pickQpsCompletData.getInsertedDate());
+	    		pickQpsCompletSendData.setInsertedTime(pickQpsCompletData.getInsertedTime());
+	    		pickQpsCompletSendData.setInsertedUser(pickQpsCompletData.getInsertedUser());
+	    		
 	    		//건당 시간 체크용
 	    		long apiRunTimeStartFor = System.currentTimeMillis();
 	    		
@@ -93,6 +110,10 @@ public class PickQpsCompletBatch  {
 	    		pickQpsCompletData.setDtlCnt(detailList.size());
 	    		pickQpsCompletData.setDetail(detailList);
 
+	    		pickQpsCompletSendData.setDtlCnt(detailList.size());
+	    		pickQpsCompletSendData.setDetail(detailList);
+
+	    		
     			String r_ifYn = KurlyConstants.STATUS_N;
     			DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
 
@@ -101,7 +122,7 @@ public class PickQpsCompletBatch  {
 	    		try {
 	    			
 	    			//kafka 전송
-	    			deferredResult = wcsProducer.sendPickQpsCompletObject(pickQpsCompletData);
+	    			deferredResult = wcsProducer.sendPickQpsCompletObject(pickQpsCompletSendData);
 	    			
 	    			ResponseEntity<ResponseMesssage> res = (ResponseEntity<ResponseMesssage>)deferredResult.getResult();
 	    			retStatus = (String)res.getBody().getStatus();

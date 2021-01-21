@@ -15,13 +15,13 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 import com.lgcns.wcs.kurly.dto.DasNumUseCellData;
 import com.lgcns.wcs.kurly.dto.InvoicePrintCompletData;
 import com.lgcns.wcs.kurly.dto.InvoiceSortCompletData;
-import com.lgcns.wcs.kurly.dto.OrdmadeNotfullyData;
-import com.lgcns.wcs.kurly.dto.OrdmadeNotfullyReplayData;
-import com.lgcns.wcs.kurly.dto.PackQpsCompletData;
-import com.lgcns.wcs.kurly.dto.PickQpsCompletData;
+import com.lgcns.wcs.kurly.dto.OrdmadeNotfullyReplaySendData;
+import com.lgcns.wcs.kurly.dto.OrdmadeNotfullySendData;
+import com.lgcns.wcs.kurly.dto.PackQpsCompletSendData;
+import com.lgcns.wcs.kurly.dto.PickQpsCompletSendData;
 import com.lgcns.wcs.kurly.dto.QpsNumUseCellData;
 import com.lgcns.wcs.kurly.dto.ToteCellExceptTxnData;
-import com.lgcns.wcs.kurly.dto.ToteReleaseParamData;
+import com.lgcns.wcs.kurly.dto.ToteReleaseSendData;
 import com.lgcns.wcs.kurly.dto.ToteScanData;
 
 @Configuration
@@ -39,7 +39,7 @@ public class KurlyProducerConfig {
 	 * @Method 설명 : 토트 마스트 초기화 연계  kafkaTemplate
 	 */
     @Bean("toteReleaseKafkaTemplate")
-    public KafkaTemplate<String, ToteReleaseParamData> toteReleaseKafkaTemplate(){
+    public KafkaTemplate<String, ToteReleaseSendData> toteReleaseKafkaTemplate(){
         Map<String, Object> configPros = new HashMap<>();
 
         configPros.put(ProducerConfig.RETRIES_CONFIG, 1);
@@ -100,7 +100,7 @@ public class KurlyProducerConfig {
    	 * @Method 설명 :  WCS 미출오더 상품보충용 추가피킹정보 연계 kafkaTemplate
 	 */
     @Bean("ordmadeNotfullyReplayKafkaTemplate")
-    public KafkaTemplate<String, OrdmadeNotfullyReplayData> ordmadeNotfullyReplayKafkaTemplate(){
+    public KafkaTemplate<String, OrdmadeNotfullyReplaySendData> ordmadeNotfullyReplayKafkaTemplate(){
         Map<String, Object> configPros = new HashMap<>();
 
         configPros.put(ProducerConfig.RETRIES_CONFIG, 1);
@@ -119,7 +119,7 @@ public class KurlyProducerConfig {
    	 * @Method 설명 :  WCS 미출오더 처리시 WMS 피킹지시 금지 정보 연계 kafkaTemplate
 	 */
     @Bean("ordmadeNotfullyKafkaTemplate")
-    public KafkaTemplate<String, OrdmadeNotfullyData> ordmadeNotfullyKafkaTemplate(){
+    public KafkaTemplate<String, OrdmadeNotfullySendData> ordmadeNotfullyKafkaTemplate(){
         Map<String, Object> configPros = new HashMap<>();
 
         configPros.put(ProducerConfig.RETRIES_CONFIG, 1);
@@ -138,7 +138,7 @@ public class KurlyProducerConfig {
    	 * @Method 설명 : WCS 오더 피킹 완료 정보 kafkaTemplate
 	 */
     @Bean("pickQpsCompletKafkaTemplate")
-    public KafkaTemplate<String, PickQpsCompletData> pickQpsCompletKafkaTemplate(){
+    public KafkaTemplate<String, PickQpsCompletSendData> pickQpsCompletKafkaTemplate(){
         Map<String, Object> configPros = new HashMap<>();
 
         configPros.put(ProducerConfig.RETRIES_CONFIG, 1);
@@ -157,7 +157,7 @@ public class KurlyProducerConfig {
    	 * @Method 설명 : WCS 오더 패킹 완료 정보 kafkaTemplate
 	 */
     @Bean("packQpsCompletKafkaTemplate")
-    public KafkaTemplate<String, PackQpsCompletData> packQpsCompletKafkaTemplate(){
+    public KafkaTemplate<String, PackQpsCompletSendData> packQpsCompletKafkaTemplate(){
         Map<String, Object> configPros = new HashMap<>();
 
         configPros.put(ProducerConfig.RETRIES_CONFIG, 1);

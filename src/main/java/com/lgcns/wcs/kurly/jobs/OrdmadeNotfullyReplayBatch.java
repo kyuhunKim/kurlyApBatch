@@ -19,6 +19,7 @@ import com.lgcns.wcs.kurly.dto.KurlyConstants;
 import com.lgcns.wcs.kurly.dto.LogApiStatus;
 import com.lgcns.wcs.kurly.dto.LogBatchExec;
 import com.lgcns.wcs.kurly.dto.OrdmadeNotfullyReplayData;
+import com.lgcns.wcs.kurly.dto.OrdmadeNotfullyReplaySendData;
 import com.lgcns.wcs.kurly.dto.ResponseMesssage;
 import com.lgcns.wcs.kurly.producer.KurlyWcsToWmsProducer;
 import com.lgcns.wcs.kurly.service.LogApiStatusService;
@@ -80,6 +81,27 @@ public class OrdmadeNotfullyReplayBatch {
 	    	List<LogApiStatus> logApiStatusList = new ArrayList<LogApiStatus>();
 	    	
 	    	for(OrdmadeNotfullyReplayData ordmadeNotfullyReplayData : listOrdmadeNotfullyReplay ) {
+	    		
+	    		OrdmadeNotfullyReplaySendData ordmadeNotfullyReplaySendData = new OrdmadeNotfullyReplaySendData();
+	    		
+	    		ordmadeNotfullyReplaySendData.setShipOrderKey(ordmadeNotfullyReplaySendData.getShipOrderKey());
+	    		ordmadeNotfullyReplaySendData.setShipOrderItemSeq(ordmadeNotfullyReplaySendData.getShipOrderItemSeq());
+	    		ordmadeNotfullyReplaySendData.setWarehouseKey(ordmadeNotfullyReplaySendData.getWarehouseKey());
+	    		ordmadeNotfullyReplaySendData.setShipUidKey(ordmadeNotfullyReplaySendData.getShipUidKey());
+	    		ordmadeNotfullyReplaySendData.setShipUidItemSeq(ordmadeNotfullyReplaySendData.getShipUidItemSeq());
+	    		ordmadeNotfullyReplaySendData.setPickingType(ordmadeNotfullyReplaySendData.getPickingType());
+	    		ordmadeNotfullyReplaySendData.setInvoiceNo(ordmadeNotfullyReplaySendData.getInvoiceNo());
+	    		ordmadeNotfullyReplaySendData.setGroupNo(ordmadeNotfullyReplaySendData.getGroupNo());
+	    		ordmadeNotfullyReplaySendData.setWorkBatchNo(ordmadeNotfullyReplaySendData.getWorkBatchNo());
+	    		ordmadeNotfullyReplaySendData.setSkuCode(ordmadeNotfullyReplaySendData.getSkuCode());
+	    		ordmadeNotfullyReplaySendData.setSkuName(ordmadeNotfullyReplaySendData.getSkuName());
+	    		ordmadeNotfullyReplaySendData.setSkuSubName(ordmadeNotfullyReplaySendData.getSkuSubName());
+	    		ordmadeNotfullyReplaySendData.setQtyNotfullyReqpick(ordmadeNotfullyReplaySendData.getQtyNotfullyReqpick());
+	    		ordmadeNotfullyReplaySendData.setInsertedDate(ordmadeNotfullyReplaySendData.getInsertedDate());
+	    		ordmadeNotfullyReplaySendData.setInsertedTime(ordmadeNotfullyReplaySendData.getInsertedTime());
+	    		ordmadeNotfullyReplaySendData.setInsertedUser(ordmadeNotfullyReplaySendData.getInsertedUser());
+	    		
+	    		
 	    		//건당 시간 체크용
 	    		long apiRunTimeStartFor = System.currentTimeMillis();
 
@@ -91,7 +113,7 @@ public class OrdmadeNotfullyReplayBatch {
 	    		try {
 	    			
 	    			//kafka 전송
-	    			deferredResult = wcsProducer.sendOrdmadeNotfullyReplayObject(ordmadeNotfullyReplayData);
+	    			deferredResult = wcsProducer.sendOrdmadeNotfullyReplayObject(ordmadeNotfullyReplaySendData);
 	    			
 	    			ResponseEntity<ResponseMesssage> res = (ResponseEntity<ResponseMesssage>)deferredResult.getResult();
 	    			retStatus = (String)res.getBody().getStatus();

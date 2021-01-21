@@ -25,4 +25,6 @@ public interface DasNumUseCellRepository  {
 	
 	void updateDasNumUseCell(Map<String, String> data);
 	int selectDasNumUseCellCount(Map<String, String> data);
+	
+	void updateDasNumUseCellList(Map<String, Object> data);
 }

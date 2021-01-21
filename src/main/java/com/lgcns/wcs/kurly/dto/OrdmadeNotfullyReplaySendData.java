@@ -1,34 +1,40 @@
 package com.lgcns.wcs.kurly.dto;
 
-import org.apache.ibatis.type.Alias;
-
 import lombok.Data;
 
 /*
- * WCS 미출오더 처리시 WMS 피킹지시 금지 정보 연계
+ * WCS 미출오더 상품보충용 추가피킹정보 연계
  * */
 @Data
-@Alias("OrdmadeNotfullyData")
-public class OrdmadeNotfullyData {
-	/*송장번호
+public class OrdmadeNotfullyReplaySendData {
+	/*출하문서번호(WMS)
 	 * */
-	private String invoiceNo ;
-	/*송장번호 순번
+	private String shipOrderKey ;
+	/*출하문서순번(WMS)
 	 * */
-	private String invoiceSeq ;
+	private String shipOrderItemSeq ;
 	/*센터
 	 * */
 	private String warehouseKey ;
-	private String docDate ;
+	/*출고오더UID(WCS)
+	 * */
+	private String shipUidKey ;
+	/*출고오더UID순번(WCS)
+	 * */
+	private String shipUidItemSeq ;
+	/*피킹구분
+	 * 미출오더추가피킹:SUPPLY
+	 * */
+	private String pickingType ;
+	/*송장번호(Ship order number from external system)
+	 * */
+	private String invoiceNo ;
 	/*그룹배치번호
 	 * */
 	private String groupNo ;
 	/*작업배치번호
 	 * */
 	private String workBatchNo ;
-	/*WMS피킹지시그룹
-	 * */
-	private String pickingBatchNo ;
 	/*상품코드
 	 * */
 	private String skuCode ;
@@ -38,9 +44,9 @@ public class OrdmadeNotfullyData {
 	/*Description(센터상품명)
 	 * */
 	private String skuSubName ;
-	/*QPS미출오더수량
+	/*QPS미출오더재피킹요청수량
 	 * */
-	private double qtyNotfully ;
+	private double qtyNotfullyReqpick ;
 
 	/*데이터생성일자
 	 * */
@@ -51,10 +57,4 @@ public class OrdmadeNotfullyData {
 	/*데이터생성자
 	 * */
 	private String insertedUser ;
-	/*출하문서번호(WMS)
-	 * */
-	private String shipOrderKey ;
-	/*출하문서순번(WMS)
-	 * */
-	private String shipOrderItemSeq ;
 }
