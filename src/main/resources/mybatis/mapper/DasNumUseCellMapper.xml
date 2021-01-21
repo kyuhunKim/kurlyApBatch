@@ -60,12 +60,12 @@
     	USING (
     		<foreach collection="updateList" item="item" index="index" separator="UNION ALL">
     		SELECT
-				#{warehouseKey}     AS  WAREHOUSE_KEY ,
-				#{dasCellGroupId}   AS  DAS_CELL_GROUP_ID  ,
-				#{cellTypeStatus}   AS  CELL_TYPE_STATUS   ,
-				#{useCellIntfYn}    AS  USE_CELL_INTF_YN   , 
-				#{useCellIntfCode}  AS  USE_CELL_INTF_CODE ,
-				#{useCellIntfMemo}  AS  USE_CELL_INTF_MEMO
+				#{item.warehouseKey}     AS  WAREHOUSE_KEY ,
+				#{item.dasCellGroupId}   AS  DAS_CELL_GROUP_ID  ,
+				#{item.cellTypeStatus}   AS  CELL_TYPE_STATUS   ,
+				#{item.useCellIntfYn}    AS  USE_CELL_INTF_YN   , 
+				#{item.useCellIntfCode}  AS  USE_CELL_INTF_CODE ,
+				#{item.useCellIntfMemo}  AS  USE_CELL_INTF_MEMO
     		FROM DUAL
    		   </foreach>
 	) TB
@@ -74,7 +74,6 @@
 			HDR.WAREHOUSE_KEY      = TB.WAREHOUSE_KEY
 		AND HDR.DAS_CELL_GROUP_ID  = TB.DAS_CELL_GROUP_ID
 		AND HDR.CELL_TYPE_STATUS   = TB.CELL_TYPE_STATUS
-		AND HDR.USE_CELL_INTF_YN   = 'N' 
 	)
 	WHEN MATCHED THEN
 		UPDATE
