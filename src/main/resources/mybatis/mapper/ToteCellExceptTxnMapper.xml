@@ -33,7 +33,7 @@
 		ET.FROM_SKU_CODE    AS fromSkuCode,
 		ET.FROM_SKU_NAME    AS fromSkuName,
 		ET.FROM_SKU_SUB_NAME AS fromSkuSubName,
-		ET.PICKING_BATCH_NO  AS pickBatchGroup,
+		ET.PICKING_BATCH_NO  AS pickingBatchNo,
 		TO_CHAR(SYSDATE, 'YYYYMMDD') AS insertedDate,
 		TO_CHAR(SYSDATE, 'HH24MISS') AS insertedTime,
 		ET.MODIFIED_USER   AS insertedUser

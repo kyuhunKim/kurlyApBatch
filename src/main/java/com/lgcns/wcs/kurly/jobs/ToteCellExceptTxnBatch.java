@@ -117,7 +117,7 @@ public class ToteCellExceptTxnBatch {
 	    			toteCellExceptTxnData.setFromSkuCode(toteCellExceptTxnSelectData.getFromSkuCode());
 	    			toteCellExceptTxnData.setFromSkuName(toteCellExceptTxnSelectData.getFromSkuName());
 	    			toteCellExceptTxnData.setFromSkuSubName(toteCellExceptTxnSelectData.getFromSkuSubName());
-	    			toteCellExceptTxnData.setPickBatchGroup(toteCellExceptTxnSelectData.getPickBatchGroup());
+	    			toteCellExceptTxnData.setPickingBatchNo(toteCellExceptTxnSelectData.getPickingBatchNo());
 	    			toteCellExceptTxnData.setInsertedDate(toteCellExceptTxnSelectData.getInsertedDate());
 	    			toteCellExceptTxnData.setInsertedTime(toteCellExceptTxnSelectData.getInsertedTime());
 	    			toteCellExceptTxnData.setInsertedUser(toteCellExceptTxnSelectData.getInsertedUser());

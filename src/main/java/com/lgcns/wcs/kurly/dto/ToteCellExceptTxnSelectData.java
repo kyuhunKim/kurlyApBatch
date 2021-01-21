@@ -74,7 +74,7 @@ public class ToteCellExceptTxnSelectData {
 	private String fromSkuSubName;
 	/*WMS피킹지시그룹
 	 * */
-	private String pickBatchGroup;
+	private String pickingBatchNo;
 
 	/*데이터생성일자
 	 * */
