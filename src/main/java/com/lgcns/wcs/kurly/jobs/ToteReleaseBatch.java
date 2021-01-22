@@ -106,8 +106,6 @@ public class ToteReleaseBatch  {
     			String retMessage = "";
 	    		try {
 	    			
-	    			
-	    			log.info("==toteId=="+toteReleaseSendData.getToteId());
 	    			//kafka 전송
 	    			deferredResult = wcsProducer.sendToteReleaseObject(toteReleaseSendData);
 	    			ResponseEntity<ResponseMesssage> res = (ResponseEntity<ResponseMesssage>)deferredResult.getResult();

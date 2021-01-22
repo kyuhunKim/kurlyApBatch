@@ -88,20 +88,20 @@ public class PackQpsCompletBatch  {
 	    	for(PackQpsCompletData packQpsCompletData : listPackQpsComplet ) {
 	    		
 	    		PackQpsCompletSendData packQpsCompletSendData = new PackQpsCompletSendData();
-	    		packQpsCompletSendData.setShipOrderKey(packQpsCompletSendData.getShipOrderKey());
-	    		packQpsCompletSendData.setInvoiceNo(packQpsCompletSendData.getInvoiceNo());
-	    		packQpsCompletSendData.setWarehouseKey(packQpsCompletSendData.getWarehouseKey());
-	    		packQpsCompletSendData.setShipUidKey(packQpsCompletSendData.getShipUidKey());
-	    		packQpsCompletSendData.setCellId(packQpsCompletSendData.getCellId());
-	    		packQpsCompletSendData.setOriginInvoiceNo(packQpsCompletSendData.getOriginInvoiceNo());
-	    		packQpsCompletSendData.setOrdmadeSplitYn(packQpsCompletSendData.getOrdmadeSplitYn());
-	    		packQpsCompletSendData.setPackBoxSplitYn(packQpsCompletSendData.getPackBoxSplitYn());
-	    		packQpsCompletSendData.setPackBoxTypeRecom(packQpsCompletSendData.getPackBoxTypeRecom());
-	    		packQpsCompletSendData.setShipOrderLastYn(packQpsCompletSendData.getShipOrderLastYn());
-//	    		packQpsCompletSendData.setDtlCnt(packQpsCompletSendData.getDtlCnt());
-	    		packQpsCompletSendData.setInsertedDate(packQpsCompletSendData.getInsertedDate());
-	    		packQpsCompletSendData.setInsertedTime(packQpsCompletSendData.getInsertedTime());
-	    		packQpsCompletSendData.setInsertedUser(packQpsCompletSendData.getInsertedUser());
+	    		packQpsCompletSendData.setShipOrderKey(packQpsCompletData.getShipOrderKey());
+	    		packQpsCompletSendData.setInvoiceNo(packQpsCompletData.getInvoiceNo());
+	    		packQpsCompletSendData.setWarehouseKey(packQpsCompletData.getWarehouseKey());
+	    		packQpsCompletSendData.setShipUidKey(packQpsCompletData.getShipUidKey());
+	    		packQpsCompletSendData.setCellId(packQpsCompletData.getCellId());
+	    		packQpsCompletSendData.setOriginInvoiceNo(packQpsCompletData.getOriginInvoiceNo());
+	    		packQpsCompletSendData.setOrdmadeSplitYn(packQpsCompletData.getOrdmadeSplitYn());
+	    		packQpsCompletSendData.setPackBoxSplitYn(packQpsCompletData.getPackBoxSplitYn());
+	    		packQpsCompletSendData.setPackBoxTypeRecom(packQpsCompletData.getPackBoxTypeRecom());
+	    		packQpsCompletSendData.setShipOrderLastYn(packQpsCompletData.getShipOrderLastYn());
+//	    		packQpsCompletSendData.setDtlCnt(packQpsCompletData.getDtlCnt());
+	    		packQpsCompletSendData.setInsertedDate(packQpsCompletData.getInsertedDate());
+	    		packQpsCompletSendData.setInsertedTime(packQpsCompletData.getInsertedTime());
+	    		packQpsCompletSendData.setInsertedUser(packQpsCompletData.getInsertedUser());
 	    		
 	    		//건당 시간 체크용
 	    		long apiRunTimeStartFor = System.currentTimeMillis();

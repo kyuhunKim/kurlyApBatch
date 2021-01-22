@@ -84,22 +84,22 @@ public class OrdmadeNotfullyReplayBatch {
 	    		
 	    		OrdmadeNotfullyReplaySendData ordmadeNotfullyReplaySendData = new OrdmadeNotfullyReplaySendData();
 	    		
-	    		ordmadeNotfullyReplaySendData.setShipOrderKey(ordmadeNotfullyReplaySendData.getShipOrderKey());
-	    		ordmadeNotfullyReplaySendData.setShipOrderItemSeq(ordmadeNotfullyReplaySendData.getShipOrderItemSeq());
-	    		ordmadeNotfullyReplaySendData.setWarehouseKey(ordmadeNotfullyReplaySendData.getWarehouseKey());
-	    		ordmadeNotfullyReplaySendData.setShipUidKey(ordmadeNotfullyReplaySendData.getShipUidKey());
-	    		ordmadeNotfullyReplaySendData.setShipUidItemSeq(ordmadeNotfullyReplaySendData.getShipUidItemSeq());
-	    		ordmadeNotfullyReplaySendData.setPickingType(ordmadeNotfullyReplaySendData.getPickingType());
-	    		ordmadeNotfullyReplaySendData.setInvoiceNo(ordmadeNotfullyReplaySendData.getInvoiceNo());
-	    		ordmadeNotfullyReplaySendData.setGroupNo(ordmadeNotfullyReplaySendData.getGroupNo());
-	    		ordmadeNotfullyReplaySendData.setWorkBatchNo(ordmadeNotfullyReplaySendData.getWorkBatchNo());
-	    		ordmadeNotfullyReplaySendData.setSkuCode(ordmadeNotfullyReplaySendData.getSkuCode());
-	    		ordmadeNotfullyReplaySendData.setSkuName(ordmadeNotfullyReplaySendData.getSkuName());
-	    		ordmadeNotfullyReplaySendData.setSkuSubName(ordmadeNotfullyReplaySendData.getSkuSubName());
-	    		ordmadeNotfullyReplaySendData.setQtyNotfullyReqpick(ordmadeNotfullyReplaySendData.getQtyNotfullyReqpick());
-	    		ordmadeNotfullyReplaySendData.setInsertedDate(ordmadeNotfullyReplaySendData.getInsertedDate());
-	    		ordmadeNotfullyReplaySendData.setInsertedTime(ordmadeNotfullyReplaySendData.getInsertedTime());
-	    		ordmadeNotfullyReplaySendData.setInsertedUser(ordmadeNotfullyReplaySendData.getInsertedUser());
+	    		ordmadeNotfullyReplaySendData.setShipOrderKey(ordmadeNotfullyReplayData.getShipOrderKey());
+	    		ordmadeNotfullyReplaySendData.setShipOrderItemSeq(ordmadeNotfullyReplayData.getShipOrderItemSeq());
+	    		ordmadeNotfullyReplaySendData.setWarehouseKey(ordmadeNotfullyReplayData.getWarehouseKey());
+	    		ordmadeNotfullyReplaySendData.setShipUidKey(ordmadeNotfullyReplayData.getShipUidKey());
+	    		ordmadeNotfullyReplaySendData.setShipUidItemSeq(ordmadeNotfullyReplayData.getShipUidItemSeq());
+	    		ordmadeNotfullyReplaySendData.setPickingType(ordmadeNotfullyReplayData.getPickingType());
+	    		ordmadeNotfullyReplaySendData.setInvoiceNo(ordmadeNotfullyReplayData.getInvoiceNo());
+	    		ordmadeNotfullyReplaySendData.setGroupNo(ordmadeNotfullyReplayData.getGroupNo());
+	    		ordmadeNotfullyReplaySendData.setWorkBatchNo(ordmadeNotfullyReplayData.getWorkBatchNo());
+	    		ordmadeNotfullyReplaySendData.setSkuCode(ordmadeNotfullyReplayData.getSkuCode());
+	    		ordmadeNotfullyReplaySendData.setSkuName(ordmadeNotfullyReplayData.getSkuName());
+	    		ordmadeNotfullyReplaySendData.setSkuSubName(ordmadeNotfullyReplayData.getSkuSubName());
+	    		ordmadeNotfullyReplaySendData.setQtyNotfullyReqpick(ordmadeNotfullyReplayData.getQtyNotfullyReqpick());
+	    		ordmadeNotfullyReplaySendData.setInsertedDate(ordmadeNotfullyReplayData.getInsertedDate());
+	    		ordmadeNotfullyReplaySendData.setInsertedTime(ordmadeNotfullyReplayData.getInsertedTime());
+	    		ordmadeNotfullyReplaySendData.setInsertedUser(ordmadeNotfullyReplayData.getInsertedUser());
 	    		
 	    		
 	    		//건당 시간 체크용
