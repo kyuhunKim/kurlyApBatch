@@ -6,8 +6,10 @@ spring:
     brokers:
 #      producer: b-1.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-2.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-3.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-4.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092
 #      consumer: b-1.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-2.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-3.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-4.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092
-      producer: logistics-2cc.kafka.stage.kurly.services:9092
-      consumer: logistics-2cc.kafka.stage.kurly.services:9092
+#      producer: logistics-2cc.kafka.stage.kurly.services:9092
+#      consumer: logistics-2cc.kafka.stage.kurly.services:9092
+      producer: b-1.prod-msk-wms-01.o1u6vb.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-2.prod-msk-wms-01.o1u6vb.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-3.prod-msk-wms-01.o1u6vb.c2.kafka.ap-northeast-2.amazonaws.com:9092
+      consumer: b-1.prod-msk-wms-01.o1u6vb.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-2.prod-msk-wms-01.o1u6vb.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-3.prod-msk-wms-01.o1u6vb.c2.kafka.ap-northeast-2.amazonaws.com:9092
     topics:
       wcs-out:
         destination:
