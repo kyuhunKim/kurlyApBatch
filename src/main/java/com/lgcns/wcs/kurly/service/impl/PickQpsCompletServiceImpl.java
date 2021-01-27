@@ -91,6 +91,6 @@ public class PickQpsCompletServiceImpl implements PickQpsCompletService {
 		logList.put("logApiStatusList",logApiStatusList);
 		
     	//logApi insert
-		logApiStatusRepository.createLogApiStatusList(logList);
+//		logApiStatusRepository.createLogApiStatusList(logList);
 	}
 }

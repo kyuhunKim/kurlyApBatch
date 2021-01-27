@@ -76,6 +76,6 @@ public class OrdmadeNotfullyServiceImpl implements OrdmadeNotfullyService {
 		logList.put("logApiStatusList",logApiStatusList);
 		
     	//logApi insert
-		logApiStatusRepository.createLogApiStatusList(logList);
+//		logApiStatusRepository.createLogApiStatusList(logList);
 	}
 }

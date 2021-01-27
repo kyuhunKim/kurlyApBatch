@@ -90,6 +90,6 @@ public class PackQpsCompletServiceImpl implements PackQpsCompletService {
 		logList.put("logApiStatusList",logApiStatusList);
 		
     	//logApi insert
-		logApiStatusRepository.createLogApiStatusList(logList);
+//		logApiStatusRepository.createLogApiStatusList(logList);
 	}
 }
