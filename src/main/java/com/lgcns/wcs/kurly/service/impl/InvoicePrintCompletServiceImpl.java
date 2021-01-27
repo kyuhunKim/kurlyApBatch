@@ -75,6 +75,6 @@ public class InvoicePrintCompletServiceImpl implements InvoicePrintCompletServic
 		logList.put("logApiStatusList",logApiStatusList);
 		
     	//logApi insert
-		logApiStatusRepository.createLogApiStatusList(logList);
+//		logApiStatusRepository.createLogApiStatusList(logList);
 	}
 }

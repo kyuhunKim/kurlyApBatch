@@ -79,7 +79,7 @@ public class ToteReleaseServiceImpl implements ToteReleaseService {
 		logList.put("logApiStatusList",logApiStatusList);
 		
     	//logApi insert
-		logApiStatusRepository.createLogApiStatusList(logList);
+//		logApiStatusRepository.createLogApiStatusList(logList);
 	}
 	
 }

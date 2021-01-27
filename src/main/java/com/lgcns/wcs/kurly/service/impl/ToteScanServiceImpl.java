@@ -76,6 +76,6 @@ public class ToteScanServiceImpl implements ToteScanService {
 		logList.put("logApiStatusList",logApiStatusList);
 		
     	//logApi insert
-		logApiStatusRepository.createLogApiStatusList(logList);
+//		logApiStatusRepository.createLogApiStatusList(logList);
 	}
 }
