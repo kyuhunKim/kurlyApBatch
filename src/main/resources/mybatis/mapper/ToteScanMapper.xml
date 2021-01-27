@@ -24,7 +24,6 @@
 	FROM o_wcs.TB_WIF_PICK_TOTE_HDR
 	WHERE TOTE_INITIAL_SCAN_YN = 'Y'
 	  AND TOTE_SCAN_IF_YN = 'N'
-	ORDER BY WIF_PICK_TOTE_HDR_SEQ ASC
   </select>
   
   <update id="updateToteScan" parameterType="Map">
