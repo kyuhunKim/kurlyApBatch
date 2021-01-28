@@ -76,6 +76,6 @@ public class InvoiceSortCompletServiceImpl implements InvoiceSortCompletService 
 		logList.put("logApiStatusList",logApiStatusList);
 		
     	//logApi insert
-//		logApiStatusRepository.createLogApiStatusList(logList);
+		logApiStatusRepository.createLogApiStatusList(logList);
 	}
 }

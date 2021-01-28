@@ -89,6 +89,6 @@ public class DasNumUseCellServiceImpl implements DasNumUseCellService {
 		logList.put("logApiStatusList",logApiStatusList);
 		
     	//logApi insert
-//		logApiStatusRepository.createLogApiStatusList(logList);
+		logApiStatusRepository.createLogApiStatusList(logList);
 	}
 }

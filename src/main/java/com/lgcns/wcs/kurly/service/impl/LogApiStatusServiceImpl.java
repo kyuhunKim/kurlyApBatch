@@ -89,8 +89,8 @@ public class LogApiStatusServiceImpl implements LogApiStatusService {
 		String c_intfMemo = StringUtil.cutString(v_intfMemo, 3500, "");
     	logApiStatus.setIntfMemo(c_intfMemo);
     	
-//		int seqId = logApiStatusRepository.createLogApiStatus(logApiStatus);
-    	int seqId = 0;
+		int seqId = logApiStatusRepository.createLogApiStatus(logApiStatus);
+    	
 		return seqId;
 	}
 
@@ -100,7 +100,7 @@ public class LogApiStatusServiceImpl implements LogApiStatusService {
 		HashMap<String, Object> hdMap = new HashMap<String, Object>();
 		hdMap.put("logApiStatusList",logApiStatus);
 		
-//		logApiStatusRepository.createLogApiStatusList(hdMap);
+		logApiStatusRepository.createLogApiStatusList(hdMap);
 		
 	}
 }

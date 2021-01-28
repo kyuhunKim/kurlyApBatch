@@ -76,6 +76,6 @@ public class OrdmadeNotfullyReplayServiceImpl implements OrdmadeNotfullyReplaySe
 		logList.put("logApiStatusList",logApiStatusList);
 		
     	//logApi insert
-//		logApiStatusRepository.createLogApiStatusList(logList);
+		logApiStatusRepository.createLogApiStatusList(logList);
 	}
 }
