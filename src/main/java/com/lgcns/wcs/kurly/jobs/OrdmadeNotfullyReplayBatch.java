@@ -71,6 +71,7 @@ public class OrdmadeNotfullyReplayBatch {
     	try
     	{
     		//WCS 미출오더 상품보충용 추가피킹정보  데이타 조회
+    		//##2021.02.03 (OD.QTY_NOTFULLY_REQPICK - OD.NOTFULLY_REQ_IF_REQPICK ) > 0 인건 만 인터페이스 함
     		List<OrdmadeNotfullyReplayData> listOrdmadeNotfullyReplay = ordmadeNotfullyReplayService.selectOrdmadeNotfullyReplay();
 
 	    	//조회 건수 

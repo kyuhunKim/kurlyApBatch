@@ -71,6 +71,7 @@ public class OrdmadeNotfullyBatch  {
     	try
     	{
     		//WCS 미출오더 처리시 WMS 피킹지시 금지 정보 데이타 조회
+    		//##2021.02.03 QTY_NOTFULLY > 0 인건 만 인터페이스 함
     		List<OrdmadeNotfullyData> listOrdmadeNotfully = ordmadeNotfullyService.selectOrdmadeNotfully();
 
 	    	//조회 건수 
