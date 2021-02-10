@@ -520,10 +520,12 @@ public class BoxRecomBatch  {
 	 */
     public void hdrVO(List<SearchOrdInfoVO> selectList, WifShipmentVO wifShipmentVO) {
 
-		
+		int i = 0;
     	for(SearchOrdInfoVO searchOrdInfoVO : selectList)
 		{
-    		if(searchOrdInfoVO.getShipOrderKey().equals(wifShipmentVO.getShipOrderKey())) {
+    		//한번만 처리
+    		if(searchOrdInfoVO.getShipOrderKey().equals(wifShipmentVO.getShipOrderKey())
+					&& i == 0  ) {
 
     			wifShipmentVO.setShipType(searchOrdInfoVO.getShipType());
     			wifShipmentVO.setDocStatus(searchOrdInfoVO.getDocStatus());
@@ -685,8 +687,7 @@ public class BoxRecomBatch  {
 				if( StringUtil.isEmpty(wifShipmentVO.getReusablePackageYn()) ) {
 					wifShipmentVO.setReusablePackageYn("N");
 				}
-				
-				
+				i++;
 			} else {
 				continue;
 			}
@@ -745,6 +746,7 @@ public class BoxRecomBatch  {
     			wifShipmentDtlVO.setWorkBatchNo(searchOrdInfoVO.getWorkBatchNo());
     			wifShipmentDtlVO.setQpsNum(searchOrdInfoVO.getQpsNum());
     			wifShipmentDtlVO.setWmsBatchYmd(searchOrdInfoVO.getWmsBatchYmd());
+				wifShipmentDtlVO.setDasCellGroupId(searchOrdInfoVO.getDasCellGroupId());
     			
     			if( StringUtil.isEmpty(searchOrdInfoVO.getItemStatus()) ) {
 					wifShipmentDtlVO.setItemStatus(" ");
@@ -812,6 +814,9 @@ public class BoxRecomBatch  {
 				}
 				if( StringUtil.isEmpty(searchOrdInfoVO.getWmsBatchYmd()) ) {
 					wifShipmentDtlVO.setWmsBatchYmd("");
+				}
+				if( StringUtil.isEmpty(searchOrdInfoVO.getDasCellGroupId()) ) {
+					wifShipmentDtlVO.setDasCellGroupId("");
 				}
     			
 			} else {

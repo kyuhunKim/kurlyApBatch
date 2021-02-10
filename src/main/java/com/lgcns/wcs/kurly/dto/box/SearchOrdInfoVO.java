@@ -295,4 +295,6 @@ public class SearchOrdInfoVO {
 	/*재활용 포장재 사용 여부(Y/N)
 	 * */
 	private String reusablePackageYn ;
+	
+	private String dasCellGroupId ;
 }
