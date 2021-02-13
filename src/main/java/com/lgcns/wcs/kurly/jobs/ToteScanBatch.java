@@ -260,6 +260,10 @@ public class ToteScanBatch  {
 	    	
 	    	logApiStatus.setToteId(toteScanData.getToteId());  //토트ID번호
 //	    	logApiStatus.setApiInfo(toteScanData.toString());
+
+	    	//##2021.02.13 pickingType 
+	    	logApiStatus.setWcsStatus(toteScanData.getPickingType());  //WCS 작업상태
+	    	
 	    	//##20210106  json 타입으로 저장 
 			try {
 				ObjectMapper mapper = new ObjectMapper();
@@ -275,6 +279,7 @@ public class ToteScanBatch  {
 	    	logApiStatus.setToteId("");  //토트ID번호
 	    	logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
 	    	logApiStatus.setApiInfo("");
+	    	logApiStatus.setWcsStatus("");  //WCS 작업상태
 		}
 
 		String l_apiRunTime = updateMap.get("apiRunTime").toString();
