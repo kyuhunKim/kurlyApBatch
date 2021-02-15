@@ -16,12 +16,10 @@ public class HttpUtil {
 	private HttpUtil() {
 		
 	}
-	public static String getUrlToJson(String inputUrl, String jsonValue, String method) {
+	public static String getUrlToJson(String inputUrl, String jsonValue, String method) throws Exception {
 		
 		String inputLine = "";
 		StringBuffer outResult = new StringBuffer();
-		
-//		log.info("=inputUrl="+inputUrl);
 		
 		try
 		{
@@ -55,8 +53,10 @@ public class HttpUtil {
 			
 			
 		} catch(Exception e) {
-			log.info(e.getMessage());
-			e.printStackTrace();
+//			log.info(e.getMessage());
+//			e.printStackTrace();
+			//##2021.02.14 오류가 발생했을시 오류룰 throw 함
+			throw new Exception(e);
 		}
 		return outResult.toString();
 	}

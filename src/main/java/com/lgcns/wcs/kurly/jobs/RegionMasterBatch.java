@@ -69,12 +69,10 @@ public class RegionMasterBatch  {
     		
     		RegionMasterHeaderData reqData = regionMasterService.insertRegionMaster();
     					
-    		if(reqData.getError_code() == 0 ) {
+    		//##2021.02.14  reqData.getData() null 이면 오류 처리
+    		if(reqData.getError_code() == 0 && reqData.getData() != null) {
 
     	    	for(RegionMasterDetailData master : reqData.getData() ) {
-    	    		
-//    	    		if(vvv > 1) break;  //테스트용
-//    	    		log.info("master='{}'", master.toString());
     	    		
     	    		//##2021.01.18 센터코드 상관없이 cc_code : CC02 인 값만 처리 
     	    		if(KurlyConstants.DEFAULT_REGION_CCCODE.equals(master.getCc_code()) ) {
@@ -134,11 +132,15 @@ public class RegionMasterBatch  {
 		    		}
     	    	} catch (Exception e1) {
             		result = "error";
-        			log.error( " === RegionMaster insert  error e1" +e1 );
+//        			log.error( " === RegionMaster insert  error e1" +e1 );
         			resultMessage = e1.toString();
         			r_ifYn = KurlyConstants.STATUS_N;
             	}
         		
+    		} else {
+        		result = "error";
+        		resultMessage = reqData.getError_message();
+    			r_ifYn = KurlyConstants.STATUS_N;
     		}
 
     	} catch (Exception e) {

@@ -19,15 +19,13 @@
 		OH.ORDMADE_SPLIT_YN     AS ordmadeSplitYn,
 		OH.PACK_BOX_SPLIT_YN    AS packBoxSplitYn,
 		OH.PACK_BOX_TYPE_RECOM  AS packBoxTypeRecom,
-		(CASE WHEN OH.ALLOC_TYPE = 'M'  THEN 
-			O_WCS.FC_GET_SHIP_ORDER_LASTYN(OH.WAREHOUSE_KEY
+		O_WCS.FC_GET_SHIP_ORDER_LASTYN(OH.WAREHOUSE_KEY
 			  , OH.SHIP_ORDER_KEY
 			  , OH.SHIP_UID_KEY
 			  , OH.ALLOC_TYPE
 			  , 'PACK'
 			  , ''
-			  , '') 
-			ELSE  NVL(QH.SHIP_ORDER_LAST_YN , 'N')  END)  AS shipOrderLastYn,
+			  , '')  AS shipOrderLastYn,
 		TO_CHAR(SYSDATE, 'YYYYMMDD') AS insertedDate,
 		TO_CHAR(SYSDATE, 'HH24MISS') AS insertedTime,
 		OH.MODIFIED_USER AS insertedUser

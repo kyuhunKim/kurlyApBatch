@@ -39,18 +39,34 @@ public class RegionMasterServiceImpl implements RegionMasterService {
 	public RegionMasterHeaderData insertRegionMaster() {
 
 		String result = "";
-		String inputUrl = REGION_MASTER_URL; 
+		String inputUrl = REGION_MASTER_URL;
+		String errorMessage = "";
+		String errorYn = "N";
 		RegionMasterHeaderData reqData = new RegionMasterHeaderData();
 		try
 		{
 			String method = "GET";
 			result = HttpUtil.getUrlToJson(inputUrl, "", method);
 			
-			ObjectMapper mapper = new ObjectMapper();
-			reqData = mapper.readValue(result, RegionMasterHeaderData.class);
+			//##2021.02.14  결과값이 없을 경우 처리하지 않고 에러 메세지에 값을 넣어줌
+			if(!"".equals(result)) {
+				ObjectMapper mapper = new ObjectMapper();
+				reqData = mapper.readValue(result, RegionMasterHeaderData.class);
+			} else {
+				reqData.setError_message("Result No Data ");
+			}
 			
 		} catch(Exception e) {
+			//##2021.02.14 HttpUtil.getUrlToJson throw 된 오류를 처리하기 위해 설정
+			errorMessage = e.toString();
+			errorYn = "Y";
 			e.printStackTrace();
+		} finally {
+			//##2021.02.14  에러이면 오류 코드와 오류 메세지를 넣어줌
+			if("Y".equals(errorYn)) {
+				reqData.setError_code(500);
+				reqData.setError_message(errorMessage);
+			}
 		}
 		
 		return reqData;
