@@ -142,7 +142,7 @@ public class BoxRecomServiceImpl implements BoxRecomService {
 			if(ordLines != null) {
 				for(OrdLineVO itOrdLine : ordLines)
 				{
-		    		log.info("ddd " + itOrdLine.getSkuCode());
+//		    		log.info("ddd " + itOrdLine.getSkuCode());
 					ordVO.addOrdLine(itOrdLine);
 //					ordVO.addOrdLine(itOrdLine.getSkuCode(), itOrdLine.getOrdQty());
 				}
@@ -266,7 +266,7 @@ public class BoxRecomServiceImpl implements BoxRecomService {
 
 			dParam.put("owner", ""+itOrdLine.getOwnerKey());
 			
-			log.info( "----------dParam " + dParam + "------------------------ " );
+//			log.info( "----------dParam " + dParam + "------------------------ " );
 			boxRecomRepository.insertOrdShipmentDtl(dParam);
 			
 			f_shipUidItemSeq++;

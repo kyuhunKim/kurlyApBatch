@@ -75,7 +75,7 @@ public class ToteScanBatch  {
     		//토트 자동화 설비 투입 정보 조죄
     		List<ToteScanData> listToteScan = toteScanService.selectToteScan();
 	    	
-        	log.info("toteScan size ==> "+ listToteScan.size());
+//        	log.info("toteScan size ==> "+ listToteScan.size());
 
 	    	
         	// 전송할 데이타를 Kafka로 전송 및 전송결과 List에 저장
@@ -188,8 +188,6 @@ public class ToteScanBatch  {
 
     		apiRunTimeEnd = System.currentTimeMillis();
 			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
-
-        	log.info("======= apiRunTime(ms) : "+ apiRunTime);
 
 	    	//배치 로그 정보 insert
         	LogBatchExec logBatchExec = new LogBatchExec();

@@ -53,7 +53,6 @@ public class QpsNumUseCellBatch  {
 
     public void QpsNumUseCellTask()  {
     	log.info("=======QpsNumUseCellBatch start=======");
-    	log.info("The current date  : " + LocalDateTime.now());
     	long apiRunTimeStart = 0;
 		long apiRunTimeEnd   = 0;
 		String apiRunTime    = "";
@@ -69,8 +68,7 @@ public class QpsNumUseCellBatch  {
 
 	    	//조회 건수 
 //	    	executeCount = qpsNumUseCellList.size();
-	    	
-        	log.info("qpsNumUseCellList size ==> "+ qpsNumUseCellList.size());
+//        	log.info("qpsNumUseCellList size ==> "+ qpsNumUseCellList.size());
         	
         	for(QpsNumUseCellData qpsNumUseCellData : qpsNumUseCellList ) {
         		//건당 시간 체크용
@@ -181,8 +179,6 @@ public class QpsNumUseCellBatch  {
 
     		apiRunTimeEnd = System.currentTimeMillis();
 			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
-
-			log.info("======= apiRunTime(ms) : "+ apiRunTime);
 
 	    	//배치 로그 정보 insert
         	LogBatchExec logBatchExec = new LogBatchExec();

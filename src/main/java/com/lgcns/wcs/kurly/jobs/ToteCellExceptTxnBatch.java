@@ -59,7 +59,6 @@ public class ToteCellExceptTxnBatch {
     public void ToteCellExceptTxnTask()  {
     	
     	log.info("=======ToteCellExceptTxnBatch start=======");
-    	log.info("The current date  : " + LocalDateTime.now());
     	
 		String result = "sucess";
 		String resultMessage = "";
@@ -78,7 +77,7 @@ public class ToteCellExceptTxnBatch {
 	    	
 	    	//조회 건수 
 //	    	executeCount = listToteCellExceptTxnSelect.size();
-	    	log.info("toteCellExceptTxn size ==> "+ listToteCellExceptTxnSelect.size());
+//	    	log.info("toteCellExceptTxn size ==> "+ listToteCellExceptTxnSelect.size());
 
 	    	List<Map<String, Object>> updateMapList = new ArrayList<Map<String, Object>>();
 	    	List<LogApiStatus> logApiStatusList = new ArrayList<LogApiStatus>();
@@ -95,7 +94,7 @@ public class ToteCellExceptTxnBatch {
     			String retMessage = "";
 	    		try {
 	    			
-	    			log.info("==toteId=="+toteCellExceptTxnSelectData.getToteId());
+//	    			log.info("==toteId=="+toteCellExceptTxnSelectData.getToteId());
 	    			ToteCellExceptTxnData toteCellExceptTxnData = new ToteCellExceptTxnData();
 	    			
 	    			toteCellExceptTxnData.setToteId(toteCellExceptTxnSelectData.getToteId());            
@@ -205,8 +204,6 @@ public class ToteCellExceptTxnBatch {
 		    		if( (i>2 && i%50 == 0 ) 
 		    				|| ( i == updateMapList.size()-1 ) ) {
 
-						log.info(">>>InvoicePrintCompletBatch i : ["+i+"]"  );
-						
 						Map<String, Object> upListMap = new HashMap<String, Object>();
 						upListMap.put("updateList",u_updateMapList);
 				    	
@@ -236,9 +233,6 @@ public class ToteCellExceptTxnBatch {
 			apiRunTimeEnd = System.currentTimeMillis();
 			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
 	    	
-        	log.info("======= apiRunTime(ms) : "+ apiRunTime);
-        	
-
 	    	//배치 로그 정보 insert
         	LogBatchExec logBatchExec = new LogBatchExec();
 	    	

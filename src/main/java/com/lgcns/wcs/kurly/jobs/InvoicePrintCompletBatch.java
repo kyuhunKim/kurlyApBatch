@@ -57,7 +57,6 @@ public class InvoicePrintCompletBatch  {
 
     public void InvoicePrintCompletTask() {
     	log.info("=======InvoicePrintCompletBatch start=======");
-    	log.info("The current date  : " + LocalDateTime.now());
 
 		long apiRunTimeStart = 0;
 		long apiRunTimeEnd   = 0;
@@ -76,7 +75,7 @@ public class InvoicePrintCompletBatch  {
 	    	
 	    	//조회 건수 
 //	    	executeCount = listInvoicePrintComplet.size();
-	    	log.info("invoicePrintComplet size ==> "+ listInvoicePrintComplet.size());
+//	    	log.info("invoicePrintComplet size ==> "+ listInvoicePrintComplet.size());
 	    	
 	    	List<Map<String, Object>> updateMapList = new ArrayList<Map<String, Object>>();
 	    	List<LogApiStatus> logApiStatusList = new ArrayList<LogApiStatus>();
@@ -168,8 +167,6 @@ public class InvoicePrintCompletBatch  {
 		    		if( (i>2 && i%50 == 0 ) 
 		    				|| ( i == updateMapList.size()-1 ) ) {
 
-						log.info(">>>InvoicePrintCompletBatch i : ["+i+"]"  );
-						
 						Map<String, Object> upListMap = new HashMap<String, Object>();
 						upListMap.put("updateList",u_updateMapList);
 				    	
@@ -198,8 +195,6 @@ public class InvoicePrintCompletBatch  {
 
 			apiRunTimeEnd = System.currentTimeMillis();
 			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
-
-        	log.info("======= apiRunTime(ms) : "+ apiRunTime);
 
 	    	//배치 로그 정보 insert
         	LogBatchExec logBatchExec = new LogBatchExec();

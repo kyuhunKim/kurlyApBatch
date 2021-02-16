@@ -55,7 +55,6 @@ public class DasNumUseCellBatch  {
 
     public void DasNumUseCellTask()  {
     	log.info("=======DasNumUseCellBatch start=======");
-    	log.info("The current date  : " + LocalDateTime.now());
     	long apiRunTimeStart = 0;
 		long apiRunTimeEnd   = 0;
 		String apiRunTime    = "";
@@ -73,7 +72,7 @@ public class DasNumUseCellBatch  {
     	try {
     		List<DasNumUseCellData> dasNumUseCellList = dasNumUseCellService.selectDasNumUseCellList();
 	    	
-        	log.info("dasNumUseCellList size ==> "+ dasNumUseCellList.size());
+//        	log.info("dasNumUseCellList size ==> "+ dasNumUseCellList.size());
         	
         	for(DasNumUseCellData dasNumUseCellData : dasNumUseCellList ) {
         		//건당 시간 체크용
@@ -205,7 +204,7 @@ public class DasNumUseCellBatch  {
     		apiRunTimeEnd = System.currentTimeMillis();
 			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
 
-			log.info("======= apiRunTime(ms) : "+ apiRunTime);
+//			log.info("======= apiRunTime(ms) : "+ apiRunTime);
 
 	    	//배치 로그 정보 insert
         	LogBatchExec logBatchExec = new LogBatchExec();

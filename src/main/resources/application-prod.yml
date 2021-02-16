@@ -4,10 +4,6 @@ server:
 spring:
   kafka:
     brokers:
-#      producer: b-1.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-2.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-3.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-4.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092
-#      consumer: b-1.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-2.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-3.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-4.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092
-#      producer: logistics-2cc.kafka.stage.kurly.services:9092
-#      consumer: logistics-2cc.kafka.stage.kurly.services:9092
       producer: b-1.prod-msk-wms-01.o1u6vb.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-2.prod-msk-wms-01.o1u6vb.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-3.prod-msk-wms-01.o1u6vb.c2.kafka.ap-northeast-2.amazonaws.com:9092
       consumer: b-1.prod-msk-wms-01.o1u6vb.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-2.prod-msk-wms-01.o1u6vb.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-3.prod-msk-wms-01.o1u6vb.c2.kafka.ap-northeast-2.amazonaws.com:9092
     topics:
@@ -26,12 +22,10 @@ spring:
           dasNumUseCell:  PROD-MSG-OUTBOUND-WMS-WCS_AP_DAS_CELL_AVAILABLE
   
   datasource:
-#    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-#    url: jdbc:log4jdbc:oracle:thin:@10.12.43.111:1521:wcsprod
     driver-class-name: oracle.jdbc.driver.OracleDriver
     url: jdbc:oracle:thin:@10.12.43.111:1521:wcsprod
     username : s_wcs
-    password : s_wcs
+    password : 1!smartAPP
     
     hikari:
       minimum-idle: 15
@@ -62,10 +56,6 @@ spring:
         
 spring.main.allow-bean-definition-overriding: true
 
-#wms.regionMasterUrl: https://tms.api.dev.kurly.com/tms/v1/common/wms/region/items
-#dev : 
-#wms.regionMasterUrl: http://tms.api.dev.kurly.com/tms/v1/common/wms/region/zipmasters
-#2cc: 
 #wms.regionMasterUrl: http://tms-api.2cc.kurly.services/tms/v1/common/wms/region/zipmasters
 #real: tms.api.kurly.com
 wms.regionMasterUrl: https://tms.api.kurly.services/tms/v1/common/wms/region/zipmasters

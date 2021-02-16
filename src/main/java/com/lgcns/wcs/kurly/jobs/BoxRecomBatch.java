@@ -63,7 +63,6 @@ public class BoxRecomBatch  {
     
     public void BoxRecomBatchTask() {
     	log.info("=======BoxRecomBatch start=======");
-    	log.info("The current date  : " + LocalDateTime.now());
     	long apiRunTimeStart = 0;
 		long apiRunTimeEnd   = 0;
 		String apiRunTime    = "";
@@ -107,7 +106,7 @@ public class BoxRecomBatch  {
 			svo = new SearchVO();
     	
 			List<SearchOrdInfoVO> selectList = boxRecomService.selectOrdLineListAll(svo);
-    		log.info(">>>selectList : " + selectList.size());
+//    		log.info(">>>selectList : " + selectList.size());
     		if( selectList.size() > 0 ) {
 
         		List<BoxTypeVO> boxTypeList = new ArrayList<BoxTypeVO>();
@@ -120,16 +119,16 @@ public class BoxRecomBatch  {
     			//박스정보 조회 
         		boxTypeList = boxRecomService.selectBoxTypeList();
         		int boxCnt = boxMaster.getInitBoxMaster(boxTypeList);
-        		log.info("Box Type Cnt : " + boxCnt);
+//        		log.info("Box Type Cnt : " + boxCnt);
         		
         		// 온도대별 max box 조회
         		boxTypeMaxList = boxRecomService.selectBoxTypeMaxList();
-        		log.info(" Max Box Type: " + boxTypeMaxList.size());
+//        		log.info(" Max Box Type: " + boxTypeMaxList.size());
         		
         		//cell type 조회
         		cellTypeList = boxRecomService.selectCellTypeList();
         		int cellCnt = cellList.getInitCellType(cellTypeList);
-        		log.info("Cell Type Cnt: " + cellCnt);
+//        		log.info("Cell Type Cnt: " + cellCnt);
         		
     		
 	    		//order 정보 조회
@@ -178,7 +177,7 @@ public class BoxRecomBatch  {
 	
 //	        	log.info("========order select======= apiRunTime1(ms) : "+ apiRunTime1);
 	
-	    		log.info(">>>ordList : " + ordList.getList().size());
+//	    		log.info(">>>ordList : " + ordList.getList().size());
 	    		
 	    		runTimeStart1 = System.currentTimeMillis();
 	    		
@@ -450,7 +449,7 @@ public class BoxRecomBatch  {
 	    		runTimeEnd1 = System.currentTimeMillis();
 	    		apiRunTime1 = StringUtil.formatInterval(runTimeStart1, runTimeEnd1) ;
 	
-	        	log.info("========order=all======== apiRunTime1(ms) : "+ apiRunTime1);
+//	        	log.info("========order=all======== apiRunTime1(ms) : "+ apiRunTime1);
 
     		}
     	
@@ -464,7 +463,7 @@ public class BoxRecomBatch  {
     		apiRunTimeEnd = System.currentTimeMillis();
 			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
 
-        	log.info("======= apiRunTime(ms) : "+ apiRunTime);
+//        	log.info("======= apiRunTime(ms) : "+ apiRunTime);
 
 	    	//배치 로그 정보 insert
         	LogBatchExec logBatchExec = new LogBatchExec();

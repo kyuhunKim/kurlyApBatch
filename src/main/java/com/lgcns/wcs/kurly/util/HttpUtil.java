@@ -35,8 +35,8 @@ public class HttpUtil {
 			conn.setRequestMethod(method);
 			conn.setRequestProperty("Content-Type","application/json");
 			conn.setRequestProperty("Accept-Charset","UTF-8");
-			conn.setConnectTimeout(10000);
-			conn.setReadTimeout(10000);
+			conn.setConnectTimeout(20000);
+			conn.setReadTimeout(20000);
 			
 			if(!"".equals(jsonValue)) {
 				OutputStream os = conn.getOutputStream();

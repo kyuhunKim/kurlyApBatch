@@ -120,15 +120,15 @@ public class KurlyWcsToWmsProducer {
 	 */
     public DeferredResult<ResponseEntity<?>> sendToteReleaseObject(ToteReleaseSendData toteReleaseSendData){
     	log.info("=======sendToteReleaseObject start=======");
-    	log.info("======="+toteReleaseSendData.toString());
+//    	log.info("======="+toteReleaseSendData.toString());
     		
 		DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
 
         try {
 
         	SendResult<String, ToteReleaseSendData> result =  toteReleaseKafkaTemplate.send(WMS_TOTE_RELEASE,  toteReleaseSendData).get();
-        	log.info("=======Producer send result [key = {}, value = {}]", result.getProducerRecord().key(),
-                    result.getProducerRecord().value());
+//        	log.info("=======Producer send result [key = {}, value = {}]", result.getProducerRecord().key(),
+//                    result.getProducerRecord().value());
 
 	    	ResponseMesssage resMessage = new ResponseMesssage();
 	    	resMessage.setStatus("SUCCESS");
@@ -166,8 +166,8 @@ public class KurlyWcsToWmsProducer {
 
         try {
         	SendResult<String, ToteScanData> result =  toteScanKafkaTemplate.send(WMS_TOTE_SCAN,  toteScanData).get();
-        	log.info("=======Producer send result [key = {}, value = {}]", result.getProducerRecord().key(),
-                    result.getProducerRecord().value());
+//        	log.info("=======Producer send result [key = {}, value = {}]", result.getProducerRecord().key(),
+//                    result.getProducerRecord().value());
 
 	    	ResponseMesssage resMessage = new ResponseMesssage();
 	    	resMessage.setStatus("SUCCESS");
@@ -199,15 +199,15 @@ public class KurlyWcsToWmsProducer {
 	 */
     public DeferredResult<ResponseEntity<?>> sendToteCellExceptTxnObject(ToteCellExceptTxnData toteCellExceptTxnData){
     	log.info("=======sendToteCellExceptTxnObject start=======");
-    	log.info("======="+toteCellExceptTxnData.toString());
+//    	log.info("======="+toteCellExceptTxnData.toString());
     		
 		DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
 
         try {
 
         	SendResult<String, ToteCellExceptTxnData> result =  toteCellExceptTxnKafkaTemplate.send(WMS_TOTE_CELLEXCEPTTXN,  toteCellExceptTxnData).get();
-        	log.info("=======Producer send result [key = {}, value = {}]", result.getProducerRecord().key(),
-                    result.getProducerRecord().value());
+//        	log.info("=======Producer send result [key = {}, value = {}]", result.getProducerRecord().key(),
+//                    result.getProducerRecord().value());
 
 	    	ResponseMesssage resMessage = new ResponseMesssage();
 	    	resMessage.setStatus("SUCCESS");
@@ -241,15 +241,15 @@ public class KurlyWcsToWmsProducer {
      */
     public DeferredResult<ResponseEntity<?>> sendOrdmadeNotfullyReplayObject(OrdmadeNotfullyReplaySendData ordmadeNotfullyReplaySendData){
     	log.info("=======sendOrdmadeNotfullyReplayObject start=======");
-    	log.info("======="+ordmadeNotfullyReplaySendData.toString());
+//    	log.info("======="+ordmadeNotfullyReplaySendData.toString());
     		
 		DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
 
         try {
 
         	SendResult<String, OrdmadeNotfullyReplaySendData> result =  ordmadeNotfullyReplayKafkaTemplate.send(WMS_ORDMADE_NOTFULLYREPLAY,  ordmadeNotfullyReplaySendData).get();
-        	log.info("=======Producer send result [key = {}, value = {}]", result.getProducerRecord().key(),
-                    result.getProducerRecord().value());
+//        	log.info("=======Producer send result [key = {}, value = {}]", result.getProducerRecord().key(),
+//                    result.getProducerRecord().value());
 
 	    	ResponseMesssage resMessage = new ResponseMesssage();
 	    	resMessage.setStatus("SUCCESS");
@@ -282,15 +282,15 @@ public class KurlyWcsToWmsProducer {
      */
     public DeferredResult<ResponseEntity<?>> sendOrdmadeNotfullyObject(OrdmadeNotfullySendData ordmadeNotfullySendData){
     	log.info("=======sendOrdmadeNotfullyObject start=======");
-    	log.info("======="+ordmadeNotfullySendData.toString());
+//    	log.info("======="+ordmadeNotfullySendData.toString());
     		
 		DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
 
         try {
 
         	SendResult<String, OrdmadeNotfullySendData> result =  ordmadeNotfullyKafkaTemplate.send(WMS_ORDMADE_NOTFULLY,  ordmadeNotfullySendData).get();
-        	log.info("=======Producer send result [key = {}, value = {}]", result.getProducerRecord().key(),
-                    result.getProducerRecord().value());
+//        	log.info("=======Producer send result [key = {}, value = {}]", result.getProducerRecord().key(),
+//                    result.getProducerRecord().value());
 
 	    	ResponseMesssage resMessage = new ResponseMesssage();
 	    	resMessage.setStatus("SUCCESS");
@@ -322,15 +322,15 @@ public class KurlyWcsToWmsProducer {
      */
     public DeferredResult<ResponseEntity<?>> sendPackQpsCompletObject(PackQpsCompletSendData packQpsCompletSendData){
     	log.info("=======sendPackQpsCompletObject start=======");
-    	log.info("======="+packQpsCompletSendData.toString());
+//    	log.info("======="+packQpsCompletSendData.toString());
     		
 		DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
 
         try {
 
         	SendResult<String, PackQpsCompletSendData> result =  packQpsCompletKafkaTemplate.send(WMS_PACK_QPSCOMPLET,  packQpsCompletSendData).get();
-        	log.info("=======Producer send result [key = {}, value = {}]", result.getProducerRecord().key(),
-                    result.getProducerRecord().value());
+//        	log.info("=======Producer send result [key = {}, value = {}]", result.getProducerRecord().key(),
+//                    result.getProducerRecord().value());
 
 	    	ResponseMesssage resMessage = new ResponseMesssage();
 	    	resMessage.setStatus("SUCCESS");
@@ -363,15 +363,15 @@ public class KurlyWcsToWmsProducer {
      */
     public DeferredResult<ResponseEntity<?>> sendPickQpsCompletObject(PickQpsCompletSendData pickQpsCompletSendData){
     	log.info("=======sendPickQpsCompletObject start=======");
-    	log.info("======="+pickQpsCompletSendData.toString());
+//    	log.info("======="+pickQpsCompletSendData.toString());
     		
 		DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
 
         try {
 
         	SendResult<String, PickQpsCompletSendData> result =  pickQpsCompletKafkaTemplate.send(WMS_PICK_QPSCOMPLET,  pickQpsCompletSendData).get();
-        	log.info("=======Producer send result [key = {}, value = {}]", result.getProducerRecord().key(),
-                    result.getProducerRecord().value());
+//        	log.info("=======Producer send result [key = {}, value = {}]", result.getProducerRecord().key(),
+//                    result.getProducerRecord().value());
 
 	    	ResponseMesssage resMessage = new ResponseMesssage();
 	    	resMessage.setStatus("SUCCESS");
@@ -403,15 +403,15 @@ public class KurlyWcsToWmsProducer {
      */
     public DeferredResult<ResponseEntity<?>> sendInvoicePrintCompletObject(InvoicePrintCompletData invoicePrintCompletData){
     	log.info("=======sendInvoicePrintCompletObject start=======");
-    	log.info("======="+invoicePrintCompletData.toString());
+//    	log.info("======="+invoicePrintCompletData.toString());
     		
 		DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
 
         try {
 
         	SendResult<String, InvoicePrintCompletData> result =  invoicePrintCompletKafkaTemplate.send(WMS_INVOICE_PRINTCOMPLET,  invoicePrintCompletData).get();
-        	log.info("=======Producer send result [key = {}, value = {}]", result.getProducerRecord().key(),
-                    result.getProducerRecord().value());
+//        	log.info("=======Producer send result [key = {}, value = {}]", result.getProducerRecord().key(),
+//                    result.getProducerRecord().value());
 
 	    	ResponseMesssage resMessage = new ResponseMesssage();
 	    	resMessage.setStatus("SUCCESS");
@@ -444,15 +444,15 @@ public class KurlyWcsToWmsProducer {
      */
     public DeferredResult<ResponseEntity<?>> sendInvoiceSortCompletObject(InvoiceSortCompletData invoiceSortCompletData){
     	log.info("=======sendInvoiceSortCompletObject start=======");
-    	log.info("======="+invoiceSortCompletData.toString());
+//    	log.info("======="+invoiceSortCompletData.toString());
     		
 		DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
 
         try {
 
         	SendResult<String, InvoiceSortCompletData> result =  invoiceSortCompletKafkaTemplate.send(WMS_INVOICE_SORTCOMPLET,  invoiceSortCompletData).get();
-        	log.info("=======Producer send result [key = {}, value = {}]", result.getProducerRecord().key(),
-                    result.getProducerRecord().value());
+//        	log.info("=======Producer send result [key = {}, value = {}]", result.getProducerRecord().key(),
+//                    result.getProducerRecord().value());
 
 	    	ResponseMesssage resMessage = new ResponseMesssage();
 	    	resMessage.setStatus("SUCCESS");
@@ -485,15 +485,15 @@ public class KurlyWcsToWmsProducer {
      */
     public DeferredResult<ResponseEntity<?>> sendQpsNumUseCellObject(QpsNumUseCellData qpsNumUseCellData){
     	log.info("=======sendQpsNumUseCellObject start=======");
-    	log.info("======="+qpsNumUseCellData.toString());
+//    	log.info("======="+qpsNumUseCellData.toString());
     		
 		DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
 
         try {
 
         	SendResult<String, QpsNumUseCellData> result =  qpsNumUseCellKafkaTemplate.send(WMS_QPSNUMUSECELL,  qpsNumUseCellData).get();
-        	log.info("=======Producer send result [key = {}, value = {}]", result.getProducerRecord().key(),
-                    result.getProducerRecord().value());
+//        	log.info("=======Producer send result [key = {}, value = {}]", result.getProducerRecord().key(),
+//                    result.getProducerRecord().value());
 
 	    	ResponseMesssage resMessage = new ResponseMesssage();
 	    	resMessage.setStatus("SUCCESS");
@@ -527,15 +527,15 @@ public class KurlyWcsToWmsProducer {
      */
     public DeferredResult<ResponseEntity<?>> sendDasNumUseCellObject(DasNumUseCellData dasNumUseCellData){
     	log.info("=======sendDasNumUseCellObject start=======");
-    	log.info("======="+dasNumUseCellData.toString());
+//    	log.info("======="+dasNumUseCellData.toString());
     		
 		DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
 
         try {
 
         	SendResult<String, DasNumUseCellData> result =  dasNumUseCellKafkaTemplate.send(WMS_DASNUMUSECELL,  dasNumUseCellData).get();
-        	log.info("=======Producer send result [key = {}, value = {}]", result.getProducerRecord().key(),
-                    result.getProducerRecord().value());
+//        	log.info("=======Producer send result [key = {}, value = {}]", result.getProducerRecord().key(),
+//                    result.getProducerRecord().value());
 
 	    	ResponseMesssage resMessage = new ResponseMesssage();
 	    	resMessage.setStatus("SUCCESS");

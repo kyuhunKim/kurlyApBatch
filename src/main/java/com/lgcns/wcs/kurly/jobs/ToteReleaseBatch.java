@@ -60,7 +60,6 @@ public class ToteReleaseBatch  {
     public void ToteReleaseTask()  {
     	
     	log.info("=======ToteReleaseBatch start=======");
-    	log.info("The current date  : " + LocalDateTime.now());
     	
 		String result = "sucess";
 		String resultMessage = "";
@@ -78,7 +77,7 @@ public class ToteReleaseBatch  {
 	    	List<ToteReleaseParamData> listToteRelease = toteReleaseService.selectToteRelease();
 
 	    	//조회 건수 
-	    	log.info("toteRelease size ==> "+ listToteRelease.size());
+//	    	log.info("toteRelease size ==> "+ listToteRelease.size());
 
 	    		List<Map<String, Object>> updateMapList = new ArrayList<Map<String, Object>>();
 	    	List<LogApiStatus> logApiStatusList = new ArrayList<LogApiStatus>();
@@ -179,8 +178,6 @@ public class ToteReleaseBatch  {
 		    		if( (i>2 && i%50 == 0 ) 
 		    				|| ( i == updateMapList.size()-1 ) ) {
 
-						log.info(">>>ToteReleaseBatch i : ["+i+"]"  );
-						
 						Map<String, Object> upListMap = new HashMap<String, Object>();
 						upListMap.put("updateList",u_updateMapList);
 				    	
@@ -210,8 +207,6 @@ public class ToteReleaseBatch  {
 			apiRunTimeEnd = System.currentTimeMillis();
 			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
 			
-        	log.info("======= apiRunTime(ms) : "+ apiRunTime);
-
 	    	//배치 로그 정보 insert
         	LogBatchExec logBatchExec = new LogBatchExec();
 	    	

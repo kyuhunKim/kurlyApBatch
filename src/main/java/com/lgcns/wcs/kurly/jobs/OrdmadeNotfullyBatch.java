@@ -57,7 +57,6 @@ public class OrdmadeNotfullyBatch  {
 
     public void OrdmadeNotfullyTask() {
     	log.info("=======OrdmadeNotfullyBatch start=======");
-    	log.info("The current date  : " + LocalDateTime.now());
     	long apiRunTimeStart = 0;
 		long apiRunTimeEnd   = 0;
 		String apiRunTime    = "";
@@ -76,7 +75,7 @@ public class OrdmadeNotfullyBatch  {
 
 	    	//조회 건수 
 //	    	executeCount = listOrdmadeNotfully.size();
-	    	log.info("listOrdmadeNotfully size ==> "+ listOrdmadeNotfully.size());
+//	    	log.info("listOrdmadeNotfully size ==> "+ listOrdmadeNotfully.size());
 	    	
 	    	List<Map<String, Object>> updateMapList = new ArrayList<Map<String, Object>>();
 	    	List<LogApiStatus> logApiStatusList = new ArrayList<LogApiStatus>();
@@ -186,8 +185,6 @@ public class OrdmadeNotfullyBatch  {
 		    		if( (i>2 && i%50 == 0 ) 
 		    				|| ( i == updateMapList.size()-1 ) ) {
 
-						log.info(">>>OrdmadeNotfullyBatch i : ["+i+"]"  );
-						
 						Map<String, Object> upListMap = new HashMap<String, Object>();
 						upListMap.put("updateList",u_updateMapList);
 				    	
@@ -216,8 +213,6 @@ public class OrdmadeNotfullyBatch  {
 			apiRunTimeEnd = System.currentTimeMillis();
 			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
 
-        	log.info("======= apiRunTime(ms) : "+ apiRunTime);
-        	
 	    	//배치 로그 정보 insert
         	LogBatchExec logBatchExec = new LogBatchExec();
 	    	

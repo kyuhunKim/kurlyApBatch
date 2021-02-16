@@ -60,7 +60,6 @@ public class PickQpsCompletBatch  {
 
     public void PickQpsCompletTask()  {
     	log.info("=======PickQpsCompletBatch start=======");
-    	log.info("The current date  : " + LocalDateTime.now());
     	long apiRunTimeStart = 0;
 		long apiRunTimeEnd   = 0;
 		String apiRunTime    = "";
@@ -78,7 +77,7 @@ public class PickQpsCompletBatch  {
     		
 	    	//조회 건수 
 //	    	executeCount = listPickQpsComplet.size();
-	    	log.info("listPickQpsComplet size ==> "+ listPickQpsComplet.size());
+//	    	log.info("listPickQpsComplet size ==> "+ listPickQpsComplet.size());
 
 	    	List<Map<String, Object>> updateMapList = new ArrayList<Map<String, Object>>();
 	    	List<LogApiStatus> logApiStatusList = new ArrayList<LogApiStatus>();
@@ -200,8 +199,6 @@ public class PickQpsCompletBatch  {
 		    		if( (i>2 && i%50 == 0 ) 
 		    				|| ( i == updateMapList.size()-1 ) ) {
 
-						log.info(">>>PickQpsCompletBatch i : ["+i+"]"  );
-						
 						Map<String, Object> upListMap = new HashMap<String, Object>();
 						upListMap.put("updateList",u_updateMapList);
 				    	
@@ -230,8 +227,6 @@ public class PickQpsCompletBatch  {
     		apiRunTimeEnd = System.currentTimeMillis();
 			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
 
-        	log.info("======= apiRunTime(ms) : "+ apiRunTime);
-        	
 	    	//배치 로그 정보 insert
         	LogBatchExec logBatchExec = new LogBatchExec();
 	    	
