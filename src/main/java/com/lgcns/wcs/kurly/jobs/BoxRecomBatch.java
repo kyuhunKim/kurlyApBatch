@@ -99,8 +99,9 @@ public class BoxRecomBatch  {
     	     *  오더분할된 카운트를 TB_ORD_SHIPMENT_HDR 테이블의 ORDER_NO_INVOICE_CNT 필드에 셋팅
     	     * ##2021.01.28
     	     *  실행할 데이타가 없을 경우 box, cell master 정보를 조회 하지 않게 처릭
+    	     * ##2021.02.21 
+    	     *  매뉴얼출고처리여부 Y일 경우 allocType : V 값으로 설정
     	     * */
-        	long runTimeStart1 = System.currentTimeMillis();
         	
     		SearchVO svo = new SearchVO();
 			svo = new SearchVO();
@@ -172,14 +173,7 @@ public class BoxRecomBatch  {
 	    			
 	    		}
 	    		
-	    		long runTimeEnd1 = System.currentTimeMillis();
-	    		String apiRunTime1 = StringUtil.formatInterval(runTimeStart1, runTimeEnd1) ;
-	
-//	        	log.info("========order select======= apiRunTime1(ms) : "+ apiRunTime1);
-	
 //	    		log.info(">>>ordList : " + ordList.getList().size());
-	    		
-	    		runTimeStart1 = System.currentTimeMillis();
 	    		
 	    		String r_ifYn = KurlyConstants.STATUS_Y;
 	    		
@@ -189,7 +183,6 @@ public class BoxRecomBatch  {
 	        	OrdSplitApp app;
 	    		for(OrdInfoVO itOrd : ordList.getList())
 	    		{
-	//	    		log.info(">>>itOrd.getShipOrderKey() : ["+executeCount+"]" + itOrd.getShipOrderKey() );
 	    			int rSplit = 0;
 	    			
 	    			//오더박스분할여부확인(Y:오더분할가능, N:오더분할불가능)
@@ -211,10 +204,6 @@ public class BoxRecomBatch  {
 	    				//box 추천 실행
 	    				new BoxRecommendApp(tempOrd, boxMaster);
 	
-	//    				log.info( "------------------------------------------" );
-	//    				log.info( "S boxType : " + tempOrd.getBoxType()  );
-	//    				log.info( "------------------------------------------" );
-	    				
 	    				String t_packBoxTypeRecom = tempOrd.getBoxType();
 	    				String t_packBoxSplitYn = KurlyConstants.STATUS_N;
 	    				
@@ -261,7 +250,6 @@ public class BoxRecomBatch  {
 		    				wifShipmentDtlVOList.add(wifShipmentDtlVO);
 	    				}
 	    	    		
-	//    	    		log.info(">>>itOrd.getShipOrderKey() : [S"+j+"]" + itOrd.getShipOrderKey() );
 	    	    		j++;
 	    			} else {
 	    				//order split
@@ -270,7 +258,6 @@ public class BoxRecomBatch  {
 	        			
 	        			//분할이 되질 않을 경우 TB_ORD_SHIPMENT_HDR, TB_ORD_SHIPMENT_DTL 에 분할되지 않은 상태로 생성함
 	        			if(rSplit == -1) {
-	//        				log.info( " runOrdSplit fail ["+itOrd.getShipOrderKey()+"]" );
 	        				
 		    				String t_packBoxTypeRecom = "";
 		    				String t_packBoxSplitYn = KurlyConstants.STATUS_N;
@@ -314,109 +301,105 @@ public class BoxRecomBatch  {
 			    				wifShipmentDtlVOList.add(wifShipmentDtlVO);
 		    				}
 	
-	//	    	    		log.info(">>>itOrd.getShipOrderKey() : [N]" + itOrd.getShipOrderKey() );
 	//        				continue;
 	        			}
-	        			
-	        			int splitSeqNum = itOrd.getSplitNum(); 
-		    			for(int i=0;i<splitSeqNum;i++)
-		    			{
-		    				
-		    				//데이터 정리(OrderInfoVo 1개는 1split 오더
-		    				OrdInfoVO tempOrd = new OrdInfoVO();
-		    				for(OrdLineVO itOrderLine : itOrd.getOrdList() )
-		    				{
-		    					
-		    					if(i + 1 == itOrderLine.getSplitSeq())
-		    					{
-		    						String itemSeq = StringUtil.lpad((i+1)+"", 4, "0");
-		    						tempOrd.addOrdLine(itOrderLine);
-		    						tempOrd.setOrderNo(itOrd.getOrderNo() + "_" + i);
-		    						tempOrd.setShipOrderKey(itOrd.getShipOrderKey());
-			    					tempOrd.setWarehouseKey(itOrd.getWarehouseKey());
-	
-			    					tempOrd.setInvoiceNo(itOrd.getInvoiceNo() + "-" + itemSeq);
-		    					}
-						
-		    				}
-		    				
-		    				if(tempOrd != null) {
-		        			
-	    	    				//box 추천 실행
-	    	    				new BoxRecommendApp(tempOrd, boxMaster);
-	
-	//    	    				log.info( "------------------------------------------" );
-	//    	    				log.info( "boxType : " + tempOrd.getBoxType()  );
-	//    	    				log.info( "------------------------------------------" );
-	
-	    	    				String t_packBoxTypeRecom = tempOrd.getBoxType();
-	    	    				String t_packBoxSplitYn = KurlyConstants.STATUS_Y;
-			    				//2020.11.19 invoiceNo 뒤에 4자리 순번 추가
-			    				String t_invoiceNo = tempOrd.getInvoiceNo();
-	    	    				
-	    	    				if("NoBox".equals(t_packBoxTypeRecom)) {
-	    	    					t_packBoxTypeRecom = boxMaster.getMaxBox(boxTypeMaxList, itOrd.getWarehouseKey());
-	    	    				} 
-	    	    				//오더분할 된경우만 'Y'
-	    	    				if(splitSeqNum>1) {
-	    	    					t_packBoxSplitYn = KurlyConstants.STATUS_Y;
-	    	    				} else {
-	    	    					t_packBoxSplitYn = KurlyConstants.STATUS_N;
-	    	    				}
-	
+	        			else {
+	        				int splitSeqNum = itOrd.getSplitNum(); 
+			    			for(int i=0;i<splitSeqNum;i++)
+			    			{
 			    				
-				    			WifShipmentVO wifShipmentVO = new WifShipmentVO();
-				    			
-			    				wifShipmentVO.setShipOrderKey(itOrd.getShipOrderKey());
-			    				wifShipmentVO.setOrderNo(itOrd.getOrderNo());
-			    				wifShipmentVO.setWarehouseKey(itOrd.getWarehouseKey());
-			    				wifShipmentVO.setOwnerKey(itOrd.getOwnerKey());
-			    				wifShipmentVO.setInvoiceNo(t_invoiceNo);
-	
-			    				wifShipmentVO.setPackBoxTypeRecom(t_packBoxTypeRecom);
-			    				wifShipmentVO.setPackBoxSplitYn(t_packBoxSplitYn);
-			    				wifShipmentVO.setShipmentCnclYn("N");
-			    				wifShipmentVO.setOrderNoInvoiceCnt(splitSeqNum);
-	
-			    				this.hdrVO(selectList,  wifShipmentVO) ;
-			    				
-			    				wifShipmentVOList.add(wifShipmentVO);
-			    				
-			    				int kk =0;
-			    				int f_shipUidItemSeq = 1;
-			    				String v_shipUidItemSeq = "";
-			    				
-			    				for(OrdLineVO itOrderLine : tempOrd.getOrdList() )
+			    				//데이터 정리(OrderInfoVo 1개는 1split 오더
+			    				OrdInfoVO tempOrd = new OrdInfoVO();
+			    				for(OrdLineVO itOrderLine : itOrd.getOrdList() )
 			    				{
-					    			WifShipmentDtlVO wifShipmentDtlVO = new WifShipmentDtlVO();
-					    			
-			    					if(splitSeqNum == 1) {
-			    						v_shipUidItemSeq = itOrderLine.getShipOrderItemSeq();
-			    					} else {
-			    						v_shipUidItemSeq = StringUtil.lpad(f_shipUidItemSeq+"", 6, "0");
+			    					
+			    					if(i + 1 == itOrderLine.getSplitSeq())
+			    					{
+			    						String itemSeq = StringUtil.lpad((i+1)+"", 4, "0");
+			    						tempOrd.addOrdLine(itOrderLine);
+			    						tempOrd.setOrderNo(itOrd.getOrderNo() + "_" + i);
+			    						tempOrd.setShipOrderKey(itOrd.getShipOrderKey());
+				    					tempOrd.setWarehouseKey(itOrd.getWarehouseKey());
+		
+				    					tempOrd.setInvoiceNo(itOrd.getInvoiceNo() + "-" + itemSeq);
 			    					}
-			    					
-			    					wifShipmentDtlVO.setShipOrderKey(itOrderLine.getShipOrderKey());
-			    					wifShipmentDtlVO.setShipOrderItemSeq(itOrderLine.getShipOrderItemSeq());
-			    					wifShipmentDtlVO.setSkuCode(itOrderLine.getSkuCode());
-			    					wifShipmentDtlVO.setQtyQpsOrder(""+itOrderLine.getOrdQty());
-			    					wifShipmentDtlVO.setOwner(itOrd.getOwnerKey());
-			    					wifShipmentDtlVO.setShipUidItemSeq(v_shipUidItemSeq);
-			    					wifShipmentDtlVO.setInvoiceNo(t_invoiceNo);
-			    					
-	//		    					log.info(">>>itOrd.getSkuCode() : [M"+kk+"]" + itOrderLine.getSkuCode() );
-			    					kk++;
-	
-			    					this.dtlVO(selectList, wifShipmentDtlVO);
-	
-				    				wifShipmentDtlVOList.add(wifShipmentDtlVO);
-				    				f_shipUidItemSeq++;
+							
 			    				}
-	
-		    				} //if(tmpOrd) end
-		    				
-		    	    		j++;
-		    			} //for end
+			    				
+			    				if(tempOrd != null) {
+			        			
+		    	    				//box 추천 실행
+		    	    				new BoxRecommendApp(tempOrd, boxMaster);
+		
+		    	    				String t_packBoxTypeRecom = tempOrd.getBoxType();
+		    	    				String t_packBoxSplitYn = KurlyConstants.STATUS_Y;
+				    				//2020.11.19 invoiceNo 뒤에 4자리 순번 추가
+				    				String t_invoiceNo = tempOrd.getInvoiceNo();
+		    	    				
+		    	    				if("NoBox".equals(t_packBoxTypeRecom)) {
+		    	    					t_packBoxTypeRecom = boxMaster.getMaxBox(boxTypeMaxList, itOrd.getWarehouseKey());
+		    	    				} 
+		    	    				//오더분할 된경우만 'Y'
+		    	    				if(splitSeqNum>1) {
+		    	    					t_packBoxSplitYn = KurlyConstants.STATUS_Y;
+		    	    				} else {
+		    	    					t_packBoxSplitYn = KurlyConstants.STATUS_N;
+		    	    				}
+		
+				    				
+					    			WifShipmentVO wifShipmentVO = new WifShipmentVO();
+					    			
+				    				wifShipmentVO.setShipOrderKey(itOrd.getShipOrderKey());
+				    				wifShipmentVO.setOrderNo(itOrd.getOrderNo());
+				    				wifShipmentVO.setWarehouseKey(itOrd.getWarehouseKey());
+				    				wifShipmentVO.setOwnerKey(itOrd.getOwnerKey());
+				    				wifShipmentVO.setInvoiceNo(t_invoiceNo);
+		
+				    				wifShipmentVO.setPackBoxTypeRecom(t_packBoxTypeRecom);
+				    				wifShipmentVO.setPackBoxSplitYn(t_packBoxSplitYn);
+				    				wifShipmentVO.setShipmentCnclYn("N");
+				    				wifShipmentVO.setOrderNoInvoiceCnt(splitSeqNum);
+		
+				    				this.hdrVO(selectList,  wifShipmentVO) ;
+				    				
+				    				wifShipmentVOList.add(wifShipmentVO);
+				    				
+				    				int kk =0;
+				    				int f_shipUidItemSeq = 1;
+				    				String v_shipUidItemSeq = "";
+				    				
+				    				for(OrdLineVO itOrderLine : tempOrd.getOrdList() )
+				    				{
+						    			WifShipmentDtlVO wifShipmentDtlVO = new WifShipmentDtlVO();
+						    			
+				    					if(splitSeqNum == 1) {
+				    						v_shipUidItemSeq = itOrderLine.getShipOrderItemSeq();
+				    					} else {
+				    						v_shipUidItemSeq = StringUtil.lpad(f_shipUidItemSeq+"", 6, "0");
+				    					}
+				    					
+				    					wifShipmentDtlVO.setShipOrderKey(itOrderLine.getShipOrderKey());
+				    					wifShipmentDtlVO.setShipOrderItemSeq(itOrderLine.getShipOrderItemSeq());
+				    					wifShipmentDtlVO.setSkuCode(itOrderLine.getSkuCode());
+				    					wifShipmentDtlVO.setQtyQpsOrder(""+itOrderLine.getOrdQty());
+				    					wifShipmentDtlVO.setOwner(itOrd.getOwnerKey());
+				    					wifShipmentDtlVO.setShipUidItemSeq(v_shipUidItemSeq);
+				    					wifShipmentDtlVO.setInvoiceNo(t_invoiceNo);
+				    					
+		//		    					log.info(">>>itOrd.getSkuCode() : [M"+kk+"]" + itOrderLine.getSkuCode() );
+				    					kk++;
+		
+				    					this.dtlVO(selectList, wifShipmentDtlVO);
+		
+					    				wifShipmentDtlVOList.add(wifShipmentDtlVO);
+					    				f_shipUidItemSeq++;
+				    				}
+		
+			    				} //if(tmpOrd) end
+			    				
+			    	    		j++;
+			    			} //for end
+	        			}
 			        	
 	    			} //else end
 	    			executeCount++;
@@ -445,12 +428,7 @@ public class BoxRecomBatch  {
 	    		if(skuMastList.size() > 0 ) {
 	    			skuMasterService.insertSkuMasterList(skuMastList);
 	    		}
-	    		
-	    		runTimeEnd1 = System.currentTimeMillis();
-	    		apiRunTime1 = StringUtil.formatInterval(runTimeStart1, runTimeEnd1) ;
 	
-//	        	log.info("========order=all======== apiRunTime1(ms) : "+ apiRunTime1);
-
     		}
     	
     	} catch (Exception e) {
@@ -685,6 +663,10 @@ public class BoxRecomBatch  {
 				}
 				if( StringUtil.isEmpty(wifShipmentVO.getReusablePackageYn()) ) {
 					wifShipmentVO.setReusablePackageYn("N");
+				}
+				//##2021.02.21 매뉴얼출고처리여부 Y일 경우 allocType : V 값으로 설정
+				if( wifShipmentVO.getManualProcYn().equals(KurlyConstants.STATUS_Y) ) {
+    				wifShipmentVO.setAllocType("V");
 				}
 				i++;
 			} else {
