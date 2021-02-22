@@ -101,6 +101,8 @@ public class BoxRecomBatch  {
     	     *  실행할 데이타가 없을 경우 box, cell master 정보를 조회 하지 않게 처릭
     	     * ##2021.02.21 
     	     *  매뉴얼출고처리여부 Y일 경우 allocType : V 값으로 설정
+    	     * ##2021.02.22 
+    	     *  allocTyper 값  V -> N 값으로 변경 컬리요청
     	     * */
         	
     		SearchVO svo = new SearchVO();
@@ -665,8 +667,9 @@ public class BoxRecomBatch  {
 					wifShipmentVO.setReusablePackageYn("N");
 				}
 				//##2021.02.21 매뉴얼출고처리여부 Y일 경우 allocType : V 값으로 설정
+				//##2021.02.22 allocTyper 값  V -> N 값으로 변경 컬리요청
 				if( wifShipmentVO.getManualProcYn().equals(KurlyConstants.STATUS_Y) ) {
-    				wifShipmentVO.setAllocType("V");
+    				wifShipmentVO.setAllocType("N");
 				}
 				i++;
 			} else {
