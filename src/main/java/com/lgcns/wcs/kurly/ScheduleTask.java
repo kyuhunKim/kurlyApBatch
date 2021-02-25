@@ -1,7 +1,5 @@
 package com.lgcns.wcs.kurly;
 
-import java.time.LocalDateTime;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -16,6 +14,7 @@ import com.lgcns.wcs.kurly.jobs.PackQpsCompletBatch;
 import com.lgcns.wcs.kurly.jobs.PickQpsCompletBatch;
 import com.lgcns.wcs.kurly.jobs.QpsNumUseCellBatch;
 import com.lgcns.wcs.kurly.jobs.RegionMasterBatch;
+import com.lgcns.wcs.kurly.jobs.ReplayOptimizBatch;
 import com.lgcns.wcs.kurly.jobs.ToteCellExceptTxnBatch;
 import com.lgcns.wcs.kurly.jobs.ToteReleaseBatch;
 import com.lgcns.wcs.kurly.jobs.ToteScanBatch;
@@ -64,6 +63,9 @@ public class ScheduleTask {
 	
 	@Autowired
 	DasNumUseCellBatch dasNumUseCell;
+	
+	@Autowired
+	ReplayOptimizBatch replayOptimizBatch;
 	
 //	//TEST
 	@Scheduled(fixedDelay = 600000)
@@ -154,5 +156,12 @@ public class ScheduleTask {
 	public void DasNumUseCell() {
 //		System.out.println("The current date (14) DasNumUseCell : " + LocalDateTime.now());
 		dasNumUseCell.DasNumUseCellTask();
+	}
+
+	//최적화 배치 미처리분 재작업 - 3분
+	@Scheduled(fixedDelay = 180000) 
+	public void ReplayOptimizBatch() {
+//		System.out.println("The current date (15) InvoiceSortComplet : " + LocalDateTime.now());
+		replayOptimizBatch.ReplayOptimizBatchTask();
 	}
 }

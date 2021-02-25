@@ -85,4 +85,10 @@ public final class KurlyConstants {
      * DAS 셀그룹번호(DAS출고시 활용)별 가용셀 정보
      * */
     public static final String METHOD_DASNUMUSECELL = "DasNumUseCell";
+    
+
+	/**
+     * 최적화 작업배치정보 연계 - 재작업 처리
+     */
+	public static final String METHOD_REPLAY_OPTIMIZBATCH = "replayOptimizBatch";
 }
