@@ -56,9 +56,9 @@ spring:
         
 spring.main.allow-bean-definition-overriding: true
 
-#wms.regionMasterUrl: http://tms-api.2cc.kurly.services/tms/v1/common/wms/region/zipmasters
-#real: tms.api.kurly.com
-wms.regionMasterUrl: https://tms.api.kurly.services/tms/v1/common/wms/region/zipmasters
+#2021.03.02 url 변경 - 컬리
+#wms.regionMasterUrl: https://tms.api.kurly.services/tms/v1/common/wms/region/zipmasters
+wms.regionMasterUrl: https://tam.api.kurly.services/region/zipmasters
 
 
 # mybatis 설정.
