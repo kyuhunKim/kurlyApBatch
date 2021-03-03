@@ -219,6 +219,7 @@
 	    HD.INVOICE_NO             AS invoiceNo ,
 	    HD.SPECIAL_MGNT_CUST_YN    AS specialMgntCustYn,
 	    HD.REUSABLE_PACKAGE_YN     AS reusablePackageYn,
+	    HD.ORDER_TYPE_ALL         AS orderTypeAll,
 	    DT.SHIP_ORDER_ITEM_SEQ    AS shipOrderItemSeq,
 	    DT.ITEM_STATUS            AS itemStatus,
 	    DT.QTY_ORIGIN_ORDER       AS qtyOriginOrder,
@@ -319,6 +320,7 @@
 	    HD.INVOICE_NO          ,
 	    HD.SPECIAL_MGNT_CUST_YN  ,
 	    HD.REUSABLE_PACKAGE_YN   ,
+	    HD.ORDER_TYPE_ALL      ,
 	    DT.SHIP_ORDER_ITEM_SEQ ,
 	    DT.ITEM_STATUS         ,
 	    DT.QTY_ORIGIN_ORDER    ,
@@ -856,7 +858,8 @@
 		  ORDER_NO_INVOICE_CNT  ,
 		  WMS_BATCH_YMD         ,
 		  DELIVERY_TYPE         ,
-		  REUSABLE_PACKAGE_YN   
+		  REUSABLE_PACKAGE_YN   ,
+		  ORDER_TYPE_ALL
 		)
 		SELECT o_wcs.SEQ_ORD_SHIPMENT_HDR.NEXTVAL, A.* 
            from (
@@ -899,7 +902,7 @@
 		      #{item.regionGroupCode, jdbcType=VARCHAR}  AS REGION_GROUP_CODE  ,
 		      #{item.regionCode, jdbcType=VARCHAR}       AS REGION_CODE        ,
 		      #{item.deliveryRound, jdbcType=VARCHAR}    AS DELIVERY_ROUND     ,
-		      #{item.allocSeq}         AS ALLOC_SEQ          ,
+		      #{item.allocSeq}          AS ALLOC_SEQ          ,
 		      #{item.originInvoiceNo}   AS ORIGIN_INVOICE_NO,
 		      TO_CHAR(SYSDATE, 'YYYYMMDD')   AS CREATED_DATE ,
 		      TO_CHAR(SYSDATE, 'HH24MISS')   AS CREATED_TIME ,
@@ -921,7 +924,8 @@
 		      #{item.orderNoInvoiceCnt}     AS ORDER_NO_INVOICE_CNT    ,
 			  #{item.wmsBatchYmd, jdbcType=VARCHAR}       AS  WMS_BATCH_YMD  ,
 		      'S'     AS DELIVERY_TYPE ,
-			  #{item.reusablePackageYn, jdbcType=VARCHAR}       AS  REUSABLE_PACKAGE_YN  
+			  #{item.reusablePackageYn, jdbcType=VARCHAR}       AS  REUSABLE_PACKAGE_YN   ,
+			  #{item.orderTypeAll, jdbcType=VARCHAR}       AS  ORDER_TYPE_ALL  
 		  FROM DUAL
 		  </foreach> ) A
   </insert>

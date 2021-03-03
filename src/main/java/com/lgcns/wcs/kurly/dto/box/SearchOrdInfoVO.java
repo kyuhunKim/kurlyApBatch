@@ -297,4 +297,8 @@ public class SearchOrdInfoVO {
 	private String reusablePackageYn ;
 	
 	private String dasCellGroupId ;
+
+	/*출하종합유형(라벨출력용)
+	 * */
+	private String orderTypeAll ;
 }

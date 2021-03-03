@@ -170,4 +170,8 @@ public class WifShipmentVO {
 	 * */
 	private String reusablePackageYn ;
 
+	/*출하종합유형(라벨출력용)
+	 * */
+	private String orderTypeAll ;
+
 }

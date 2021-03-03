@@ -545,6 +545,7 @@ public class BoxRecomBatch  {
 				wifShipmentVO.setManualProcYn(searchOrdInfoVO.getManualProcYn());
 				wifShipmentVO.setWmsBatchYmd(searchOrdInfoVO.getHdWmsBatchYmd());
 				wifShipmentVO.setReusablePackageYn(searchOrdInfoVO.getReusablePackageYn());
+				wifShipmentVO.setOrderTypeAll(searchOrdInfoVO.getOrderTypeAll());
 				
     			if( StringUtil.isEmpty(wifShipmentVO.getShipType()) ) {
     				wifShipmentVO.setShipType(" ");
@@ -670,6 +671,11 @@ public class BoxRecomBatch  {
 				//##2021.02.22 allocTyper 값  V -> N 값으로 변경 컬리요청
 				if( wifShipmentVO.getManualProcYn().equals(KurlyConstants.STATUS_Y) ) {
     				wifShipmentVO.setAllocType("N");
+				}
+
+				//##2021.03.03  출하종합유형(라벨출력용)
+				if( StringUtil.isEmpty(wifShipmentVO.getOrderTypeAll()) ) {
+					wifShipmentVO.setOrderTypeAll(" ");
 				}
 				i++;
 			} else {
