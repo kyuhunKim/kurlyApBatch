@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.lgcns.wcs.kurly.dto.LogApiStatus;
 import com.lgcns.wcs.kurly.dto.ToteReleaseParamData;
 
 /**
@@ -20,5 +21,7 @@ public interface ToteReleaseService {
 	public List<ToteReleaseParamData> selectToteRelease() ;
 	
 	public void updateToteRelease(Map<String, String> data) ;
+	
+	public void updateToteReleaseList(Map<String, Object> data, List<LogApiStatus> logApiStatusList)  ;
 
 }

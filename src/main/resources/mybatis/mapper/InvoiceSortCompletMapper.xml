@@ -11,8 +11,9 @@
 		INVOICE_NO               AS invoiceNo,
 		SHIP_ORDER_KEY       AS shipOrderKey,
 		WAREHOUSE_KEY            AS warehouseKey,
-		ORIGIN_INVOICE_NO        AS originInvoiceNo,
-		SHIP_UID_KEY         AS shipUidWcs,
+		CASE WHEN LENGTH(ORIGIN_INVOICE_NO) > 21 THEN SUBSTR(ORIGIN_INVOICE_NO,0,20) 
+			ELSE ORIGIN_INVOICE_NO END       AS originInvoiceNo,
+		SHIP_UID_KEY         AS shipUidKey,
 		PACK_BOX_SPLIT_YN        AS packBoxSplitYn,
 		PACK_BOX_TYPE_RECOM      AS packBoxTypeRecom,
 		INVOICE_STATUS           AS invoiceStatus,
@@ -22,9 +23,12 @@
 		SUBSTR(INVOICE_SORT_CMPT_YMD,9,6) AS sorterSortTime,
 		TO_CHAR(SYSDATE, 'YYYYMMDD') AS insertedDate,
 		TO_CHAR(SYSDATE, 'HH24MISS') AS insertedTime,
-		MODIFIED_USER            AS insertedUser
+		( CASE  WHEN WAREHOUSE_KEY = 'GGH1' THEN 'GG_SORT_H1' 
+				WHEN WAREHOUSE_KEY = 'GGM1' THEN 'GG_SORT_M1' 
+				WHEN WAREHOUSE_KEY = 'GGL1' THEN 'GG_SORT_L1' 
+			ELSE MODIFIED_USER END ) AS insertedUser
 	FROM o_wcs.TB_DOC_INVOICE_HDR
-	WHERE INVOICE_STATUS = '90'
+	WHERE INVOICE_STATUS = '50'
 	  AND INVOICE_SORT_INTF_YN = 'N'
 	ORDER BY INVOICE_NO ASC , SHIP_ORDER_KEY ASC 
   </select>
@@ -45,4 +49,40 @@
 	  AND SHIP_ORDER_KEY = #{shipOrderKey}
 
   </update>
+  
+  <update id="updateInvoiceSortCompletList" parameterType="map">
+  /* [InvoiceSortCompletMapper.xml] updateInvoiceSortCompletList */
+    MERGE INTO o_wcs.TB_DOC_INVOICE_HDR  HDR
+    	USING (
+    		<foreach collection="updateList" item="item" index="index" separator="UNION ALL">
+    		SELECT
+				#{item.invoiceNo}  AS INVOICE_NO,
+				#{item.warehouseKey}  AS WAREHOUSE_KEY,
+				#{item.shipOrderKey}  AS SHIP_ORDER_KEY ,  
+				#{item.invoiceSortIntfYn}  AS INVOICE_SORT_INTF_YN ,  
+				#{item.invoiceSortIntfCode}  AS INVOICE_SORT_INTF_CODE ,
+				#{item.invoiceSortIntfMemo}  AS INVOICE_SORT_INTF_MEMO ,
+				#{item.modifiedUser}  AS MODIFIED_USER
+    		FROM DUAL
+   		   </foreach>
+	) TB
+	ON 
+	(
+			HDR.INVOICE_NO = TB.INVOICE_NO
+		AND HDR.WAREHOUSE_KEY = TB.WAREHOUSE_KEY
+		AND HDR.SHIP_ORDER_KEY = TB.SHIP_ORDER_KEY
+	)
+	WHEN MATCHED THEN
+		UPDATE
+		<set>
+			HDR.INVOICE_SORT_INTF_YN  = TB.INVOICE_SORT_INTF_YN ,
+			HDR.INVOICE_SORT_INTF_DT = SYSDATE ,
+			HDR.INVOICE_SORT_INTF_CODE = TB.INVOICE_SORT_INTF_CODE ,
+			HDR.INVOICE_SORT_INTF_MEMO = TB.INVOICE_SORT_INTF_MEMO ,
+			HDR.MODIFIED_DATE = TO_CHAR(SYSDATE, 'YYYYMMDD') ,
+			HDR.MODIFIED_TIME = TO_CHAR(SYSDATE, 'HH24MISS') ,
+			HDR.MODIFIED_USER = TB.MODIFIED_USER
+		</set>
+  </update>
+  
 </mapper>

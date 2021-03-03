@@ -18,6 +18,7 @@ import com.lgcns.wcs.kurly.dto.LogBatchExec;
 import com.lgcns.wcs.kurly.repository.LogBatchExecRepository;
 import com.lgcns.wcs.kurly.service.LogBatchExecService;
 import com.lgcns.wcs.kurly.util.HttpUtil;
+import com.lgcns.wcs.kurly.util.StringUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,9 +46,6 @@ public class LogBatchExecServiceImpl implements LogBatchExecService {
 	 */
 	@Transactional(propagation=Propagation.REQUIRES_NEW, rollbackFor=SQLException.class)
 	public int createLogBatchExec(LogBatchExec logBatchExec) {
-
-    	log.info("=================createLogBatchExec start===============");
-		Date endDate = Calendar.getInstance().getTime();
 		
 		if(logBatchExec.getWarehouseKey() ==null ||
 				"".equals(logBatchExec.getWarehouseKey())) {
@@ -61,11 +59,16 @@ public class LogBatchExecServiceImpl implements LogBatchExecService {
 		
 		logBatchExec.setServerIp(serverIp);
 		logBatchExec.setServerHost(serverHostName);
-		logBatchExec.setEndDate(endDate);
 		
+		Date endDate = Calendar.getInstance().getTime();
+		logBatchExec.setEndDate(endDate);
+
+		String v_messageLog = logBatchExec.getMessageLog();
+		String c_messageLog = StringUtil.cutString(v_messageLog, 3500, "");
+		logBatchExec.setMessageLog(c_messageLog);
+    	
 		int seqId = logBatchExecRepository.createLogBatchExec(logBatchExec);
 
-    	log.info("=================createLogBatchExec end========"+ "["+seqId+"]");
     	
 		return seqId;
 	}
@@ -83,7 +86,6 @@ public class LogBatchExecServiceImpl implements LogBatchExecService {
 		
 		int seqId = 0; 
 
-    	log.info("=================createLogBatchExec start===============");
 		if(param != null) {
 			String serverHostName = "";
 			String serverIp = "";
@@ -111,7 +113,10 @@ public class LogBatchExecServiceImpl implements LogBatchExecService {
 			logBatchExec.setServerHost(serverHostName);
 			logBatchExec.setWarehouseKey(p_warehouseKey);
 			logBatchExec.setExecMethod(p_execMethod);
-			logBatchExec.setMessageLog(p_messageLog);
+
+			String c_messageLog = StringUtil.cutString(p_messageLog, 3500, "");
+			logBatchExec.setMessageLog(c_messageLog);
+			
 			logBatchExec.setSuccessYn(p_successYn);
 			logBatchExec.setExecuteDirectYn(KurlyConstants.STATUS_N);
 			logBatchExec.setExecuteCount(executeCount);
@@ -121,7 +126,6 @@ public class LogBatchExecServiceImpl implements LogBatchExecService {
 			seqId = logBatchExecRepository.createLogBatchExec(logBatchExec);
 		}
 
-    	log.info("=================createLogBatchExec end===============");
 		
     	return seqId;
 	}	

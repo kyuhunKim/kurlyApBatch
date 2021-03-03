@@ -1,12 +1,16 @@
 package com.lgcns.wcs.kurly.service.impl;
 
+import java.sql.SQLException;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lgcns.wcs.kurly.dto.KurlyConstants;
 import com.lgcns.wcs.kurly.dto.RegionMasterData;
-import com.lgcns.wcs.kurly.dto.RegionMasterDetailData;
 import com.lgcns.wcs.kurly.dto.RegionMasterHeaderData;
 import com.lgcns.wcs.kurly.repository.RegionMasterRepository;
 import com.lgcns.wcs.kurly.service.RegionMasterService;
@@ -28,55 +32,72 @@ public class RegionMasterServiceImpl implements RegionMasterService {
 
 	@Autowired
 	RegionMasterRepository regionMasterRepository;
+
+	@Value("${wms.regionMasterUrl}")
+	private String REGION_MASTER_URL;
 	
-	public String insertRegionMaster() {
+	public RegionMasterHeaderData insertRegionMaster() {
 
 		String result = "";
-		String inputUrl = "https://tms.api.dev.kurly.com/tms/v1/common/wms/region/items"; 
-		StringBuffer insertData = new StringBuffer();
+		String inputUrl = REGION_MASTER_URL;
+		String errorMessage = "";
+		String errorYn = "N";
+		RegionMasterHeaderData reqData = new RegionMasterHeaderData();
 		try
 		{
 			String method = "GET";
 			result = HttpUtil.getUrlToJson(inputUrl, "", method);
-
-			RegionMasterHeaderData reqData = new RegionMasterHeaderData();
 			
-			ObjectMapper mapper = new ObjectMapper();
-			reqData = mapper.readValue(result, RegionMasterHeaderData.class);
-			if(reqData.getError_code() == 0 ) {
-				int vvv =0 ;
-		    	for(RegionMasterDetailData master : reqData.getData() ) {
-		    		
-//		    		if(vvv > 1) break;  //테스트용
-		    		log.info("dddd='{}'", master.toString());
-		    		
-		    		if(KurlyConstants.DEFAULT_CENTERCODE.equals(master.getCenter_code())) {
-		    			
-		    			RegionMasterData rMaster = new RegionMasterData();
-		    			rMaster.setCoCd("MK");
-		    			rMaster.setRgnCd(master.getRegncd());
-		    			rMaster.setRgnNm(master.getRegnnm());
-		    			rMaster.setRegionGroupCode(master.getRegnky_group_code());
-		    			rMaster.setDeliveryRound(master.getDelivery_round());
-		    			rMaster.setRgnKy(master.getRegnky());
-		    			rMaster.setUseYn(KurlyConstants.STATUS_Y);
-		    			rMaster.setRegId(KurlyConstants.DEFAULT_USERID);
-		    			rMaster.setUpdId(KurlyConstants.DEFAULT_USERID);
-		    			
-		    			regionMasterRepository.insertRegionMaster(rMaster);
-		    			
-		    			insertData.append(rMaster);
-		    			vvv++;	
-		    		}
-		    	}
+			//##2021.02.14  결과값이 없을 경우 처리하지 않고 에러 메세지에 값을 넣어줌
+			if(!"".equals(result)) {
+				ObjectMapper mapper = new ObjectMapper();
+				reqData = mapper.readValue(result, RegionMasterHeaderData.class);
+			} else {
+				reqData.setError_message("Result No Data ");
 			}
 			
 		} catch(Exception e) {
+			//##2021.02.14 HttpUtil.getUrlToJson throw 된 오류를 처리하기 위해 설정
+			errorMessage = e.toString();
+			errorYn = "Y";
 			e.printStackTrace();
+		} finally {
+			//##2021.02.14  에러이면 오류 코드와 오류 메세지를 넣어줌
+			if("Y".equals(errorYn)) {
+				reqData.setError_code(500);
+				reqData.setError_message(errorMessage);
+			}
 		}
 		
-		return insertData.toString();
+		return reqData;
 		
 	}
-
+	/**
+	 * 
+	 * @Method Name : insertRegionMasterList
+	 * @작성일 : 2021. 01. 18.
+	 * @작성자 : jooni
+	 * @변경이력 : 2021. 01. 18. 최초작성
+	 * @Method 설명 : 토트 문제 처리용 피킹정보 연계  처리  update
+	 */
+	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=SQLException.class)
+	public void insertRegionMasterList(Map<String, Object> upListMap)   {
+						
+    	//RegionMaster insert
+		regionMasterRepository.insertRegionMasterList(upListMap);
+	}
+	/**
+	 * 
+	 * @Method Name : insertRegionMaster
+	 * @작성일 : 2021. 01. 18.
+	 * @작성자 : jooni
+	 * @변경이력 : 2021. 01. 18. 최초작성
+	 * @Method 설명 : 토트 문제 처리용 피킹정보 연계  처리   update
+	 */
+	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=SQLException.class)
+	public void insertRegionMaster(RegionMasterData data)   {
+						
+    	//RegionMaster insert
+		regionMasterRepository.insertRegionMaster(data);
+	}
 }

@@ -9,7 +9,7 @@ import lombok.Data;
  * */
 @Data
 public class RegionMasterDetailData {
-	
+	/*
 	private String regnky ;
 	private String regncd ;
 	private String regnnm ;
@@ -27,4 +27,20 @@ public class RegionMasterDetailData {
 	private String regnky_group_code ;
 	private String delivery_round ;
 	private String center_code ;
+	 */
+	private String regzky ;
+	private String regzcd ;
+	private String regznm ;
+	private String credat ;
+	private String cretim ;
+	private String creusr ;
+	private String lmodat ;
+	private String lmotim ;
+	private String lmousr ;
+	private String daytype ;
+	private String regzky_group_code ;
+	private String delivery_round ;
+	private String center_code ;
+	private String cc_code ;
+	
 }

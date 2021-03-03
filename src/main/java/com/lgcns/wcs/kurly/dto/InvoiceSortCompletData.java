@@ -26,7 +26,7 @@ public class InvoiceSortCompletData {
 	private String originInvoiceNo ;
 	/*출고오더UID(WCS)
 	 * */
-	private String shipUidWcs ;
+	private String shipUidKey ;
 	/*패킹박스분할여부
 	 * N': 패킹박스분할하지않음, 'Y':패킹박스분할
 	 * */

@@ -21,4 +21,6 @@ public interface InvoiceSortCompletRepository  {
 	List<InvoiceSortCompletData> selectInvoiceSortComplet();
 	
 	void updateInvoiceSortComplet(Map<String, String> data);
+	
+	void updateInvoiceSortCompletList(Map<String, Object> data);
 }

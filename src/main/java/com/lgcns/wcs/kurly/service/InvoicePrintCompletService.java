@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 import com.lgcns.wcs.kurly.dto.InvoicePrintCompletData;
+import com.lgcns.wcs.kurly.dto.LogApiStatus;
 
 /**
  * 
@@ -19,4 +20,6 @@ public interface InvoicePrintCompletService {
 
 	public List<InvoicePrintCompletData> selectInvoicePrintComplet() ;
 	public void updateInvoicePrintComplet(Map<String, String> data) ;
+	
+	public void updateInvoicePrintCompletList(Map<String, Object> data, List<LogApiStatus> logApiStatusList)  ;
 }

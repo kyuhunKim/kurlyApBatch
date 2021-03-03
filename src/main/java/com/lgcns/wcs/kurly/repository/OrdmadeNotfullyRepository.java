@@ -21,4 +21,6 @@ public interface OrdmadeNotfullyRepository  {
 	List<OrdmadeNotfullyData> selectOrdmadeNotfully();
 	
 	void updateOrdmadeNotfully(Map<String, String> data);
+	
+	void updateOrdmadeNotfullyList(Map<String, Object> data);
 }

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.lgcns.wcs.kurly.dto.LogApiStatus;
 import com.lgcns.wcs.kurly.dto.OrdmadeNotfullyReplayData;
 
 /**
@@ -19,4 +20,6 @@ public interface OrdmadeNotfullyReplayService {
 
 	public List<OrdmadeNotfullyReplayData> selectOrdmadeNotfullyReplay() ;
 	public void updateOrdmadeNotfullyReplay(Map<String, String> data) ;
+	
+	public void updateOrdmadeNotfullyReplayList(Map<String, Object> data, List<LogApiStatus> logApiStatusList)  ;
 }

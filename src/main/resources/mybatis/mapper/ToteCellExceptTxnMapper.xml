@@ -5,36 +5,43 @@
 
 <mapper namespace="com.lgcns.wcs.kurly.repository.ToteCellExceptTxnRepository">
    
-  <select id="selectToteCellExceptTxn" resultType="com.lgcns.wcs.kurly.dto.ToteCellExceptTxnData">
+  <select id="selectToteCellExceptTxn" resultType="com.lgcns.wcs.kurly.dto.ToteCellExceptTxnSelectData">
   	/* [ToteCellExceptTxnMapper.xml] selectToteCellExceptTxn */
     SELECT 
-		CELL_EXCEPT_SEQ  AS cellExceptSeq,
-		TOTE_ID        AS toteId,
-		TOTE_ID_SEQ    AS toteIdSeq,
-		WAREHOUSE_KEY  AS warehouseKey,
-		WMS_PICKING_DATE   AS wmsPickingDate,
-		'FIX'          AS pickingType,
-		ALLOC_TYPE   AS allocType,
-		EXCEPT_TXN_TYPE AS exceptTxnType,
-		GROUP_NO AS groupNo,
-		WORK_BATCH_NO  AS workBatchNo,
-		SKU_CODE       AS skuCode,
-		SKU_NAME       AS skuName,
-		SKU_SUB_NAME   AS skuSubName,
-		QTY_QPS_EXCEPT AS qtyQpsExcept,
-		TO_SKU_CODE    AS toSkuCode,
-		TO_SKU_NAME    AS toSkuName,
-		TO_SKU_SUB_NAME AS toSkuSubName,
-		FROM_SKU_CODE   AS fromSkuCode,
-		FROM_SKU_NAME   AS fromSkuName,
-		FROM_SKU_SUB_NAME AS fromSkuSubName,
-		PICK_BATCH_JOB AS pickBatchGroup,
+		ET.CELL_EXCEPT_SEQ  AS cellExceptSeq,
+		ET.TOTE_ID          AS toteId,
+		ET.TOTE_ID_SEQ      AS toteIdSeq,
+		ET.WAREHOUSE_KEY    AS warehouseKey,
+		ET.WMS_PICKING_DATE AS wmsPickingDate,
+		'FIX'               AS pickingType,
+		ET.ALLOC_TYPE       AS allocType,
+		ET.EXCEPT_TXN_TYPE  AS exceptTxnType,
+		ET.GROUP_NO         AS groupNo,
+		ET.WORK_BATCH_NO    AS workBatchNo,
+		ET.SHIP_ORDER_KEY   AS shipOrderKey,
+		ET.SHIP_ORDER_ITEM_SEQ   AS shipOrderItemSeq,
+		CT.EQP_ID           AS qpsNum,
+		NVL(ET.SHIP_UID_KEY,'')     AS shipUidKey,
+		NVL(ET.SHIP_UID_ITEM_SEQ,'')   AS shipUidItemSeq,
+		ET.SKU_CODE         AS skuCode,
+		ET.SKU_NAME         AS skuName,
+		ET.SKU_SUB_NAME     AS skuSubName,
+		ET.QTY_QPS_EXCEPT   AS qtyQpsExcept,
+		ET.TO_SKU_CODE      AS toSkuCode,
+		ET.TO_SKU_NAME      AS toSkuName,
+		ET.TO_SKU_SUB_NAME  AS toSkuSubName,
+		ET.FROM_SKU_CODE    AS fromSkuCode,
+		ET.FROM_SKU_NAME    AS fromSkuName,
+		ET.FROM_SKU_SUB_NAME AS fromSkuSubName,
+		ET.PICKING_BATCH_NO  AS pickingBatchNo,
 		TO_CHAR(SYSDATE, 'YYYYMMDD') AS insertedDate,
 		TO_CHAR(SYSDATE, 'HH24MISS') AS insertedTime,
-		MODIFIED_USER AS insertedUser
-	FROM o_wcs.TB_QPS_CELL_EXCEPT_TXN
-	WHERE EXCEPT_IF_YN = 'N'
-	ORDER BY CELL_EXCEPT_SEQ ASC
+		ET.MODIFIED_USER   AS insertedUser
+	FROM o_wcs.TB_QPS_CELL_EXCEPT_TXN ET
+		LEFT OUTER JOIN o_wcs.TB_COM_CELL_MST CT
+			ON CT.CELL_ID = ET.CELL_ID 
+	WHERE ET.EXCEPT_IF_YN = 'N'
+	ORDER BY ET.CELL_EXCEPT_SEQ ASC
   </select>
   
   <update id="updateToteCellExceptTxn" parameterType="Map">
@@ -51,6 +58,41 @@
 	WHERE TOTE_ID = #{toteId}
 	  AND TOTE_ID_SEQ = #{toteIdSeq}
 	  AND CELL_EXCEPT_SEQ = #{cellExceptSeq}
+  </update>
+  
+  <update id="updateToteCellExceptTxnList" parameterType="map">
+  /* [ToteCellExceptTxnMapper.xml] updateToteCellExceptTxnList */
+    MERGE INTO o_wcs.TB_QPS_CELL_EXCEPT_TXN  HDR
+    	USING (
+    		<foreach collection="updateList" item="item" index="index" separator="UNION ALL">
+    		SELECT
+				#{item.toteId}  AS TOTE_ID,
+				#{item.toteIdSeq}  AS TOTE_ID_SEQ,
+				#{item.cellExceptSeq}  AS CELL_EXCEPT_SEQ,
+				#{item.exceptIfYn}  AS EXCEPT_IF_YN ,  
+				#{item.exceptIfRetCode}  AS EXCEPT_IF_RET_CODE ,
+				#{item.exceptIfRetMessage}  AS EXCEPT_IF_RET_MESSAGE ,
+				#{item.modifiedUser}  AS MODIFIED_USER
+    		FROM DUAL
+   		   </foreach>
+	) TB
+	ON 
+	(
+			HDR.TOTE_ID = TB.TOTE_ID
+		AND HDR.TOTE_ID_SEQ = TB.TOTE_ID_SEQ
+		AND HDR.CELL_EXCEPT_SEQ = TB.CELL_EXCEPT_SEQ
+	)
+	WHEN MATCHED THEN
+		UPDATE
+		<set>
+			HDR.EXCEPT_IF_YN =  TB.EXCEPT_IF_YN,
+			HDR.EXCEPT_IF_DT =  SYSDATE,
+			HDR.EXCEPT_IF_RET_CODE =  TB.EXCEPT_IF_RET_CODE,
+			HDR.EXCEPT_IF_RET_MESSAGE =  TB.EXCEPT_IF_RET_MESSAGE,
+			HDR.MODIFIED_DATE = TO_CHAR(SYSDATE, 'YYYYMMDD') ,
+			HDR.MODIFIED_TIME = TO_CHAR(SYSDATE, 'HH24MISS') ,
+			HDR.MODIFIED_USER =  TB.MODIFIED_USER
+		</set>
   </update>
 
 </mapper>

@@ -63,4 +63,62 @@
     ) 
   </insert>
   
+  <insert id="createLogApiStatusList" parameterType="map">
+	  /* [LogApiStatusMapper.xml] createLogApiStatus */
+	  	INSERT INTO o_wcs.TB_LOG_API_STATUS (
+	  		API_STATUS_SEQ ,
+			WAREHOUSE_KEY ,
+			API_YYYYMMDD ,
+			EXEC_METHOD ,
+			WORK_BATCH_NO ,
+			GROUP_NO ,
+			SHIP_UID_KEY ,
+			SHIP_UID_ITEM_SEQ ,
+			SHIP_ORDER_KEY ,
+			SHIP_ORDER_ITEM_SEQ ,
+			TOTE_ID ,
+			INVOICE_NO ,
+			STATUS ,
+			QTY_ORDER ,
+			QTY_COMPLETE ,
+			SKU_CODE ,
+			WCS_STATUS ,
+			API_URL ,
+			API_INFO ,
+			API_RUNTIME ,
+			INTF_YN ,
+			INTF_MEMO ,
+			INSERTED_DATE ,
+			INSERTED_TIME
+	  	)
+	  	SELECT o_wcs.SEQ_LOG_API_STATUS.NEXTVAL, A.* 
+           from (
+         <foreach collection="logApiStatusList" item="item" index="index" separator="union all">
+         SELECT 
+		    #{item.warehouseKey, jdbcType=VARCHAR}  AS WAREHOUSE_KEY,
+		    NVL(#{item.apiYyyymmdd, jdbcType=VARCHAR}, TO_CHAR(SYSDATE, 'YYYYMMDD')) AS  API_YYYYMMDD,
+		    #{item.execMethod, jdbcType=VARCHAR}  AS EXEC_METHOD,
+		    #{item.workBatchNo, jdbcType=VARCHAR}  AS WORK_BATCH_NO,
+		    #{item.groupNo, jdbcType=VARCHAR}  AS GROUP_NO,
+		    #{item.shipUidWcs, jdbcType=VARCHAR}  AS SHIP_UID_KEY,
+		    #{item.shipUidSeq, jdbcType=VARCHAR}  AS SHIP_UID_ITEM_SEQ,
+		    #{item.shipOrderKey, jdbcType=VARCHAR}  AS SHIP_ORDER_KEY,
+		    #{item.shipOrderItemSeq, jdbcType=VARCHAR}  AS SHIP_ORDER_ITEM_SEQ,
+		    #{item.toteId, jdbcType=VARCHAR}  AS TOTE_ID,
+		    #{item.invoiceNo, jdbcType=VARCHAR}  AS INVOICE_NO,
+		    #{item.status, jdbcType=VARCHAR}  AS STATUS,
+		    #{item.qtyOrder}  AS QTY_ORDER,
+		    #{item.qtyComplete}  AS QTY_COMPLETE,
+		    #{item.skuCode, jdbcType=VARCHAR}  AS SKU_CODE,
+		    #{item.wcsStatus, jdbcType=VARCHAR}  AS WCS_STATUS,
+		    #{item.apiUrl, jdbcType=VARCHAR}  AS API_URL,
+		    #{item.apiInfo}  AS API_INFO,
+		    #{item.apiRuntime, jdbcType=VARCHAR}  AS API_RUNTIME,
+		    #{item.intfYn, jdbcType=VARCHAR}  AS INTF_YN,
+		    #{item.intfMemo, jdbcType=VARCHAR}  AS INTF_MEMO,
+		    TO_CHAR(SYSDATE, 'YYYYMMDD')  AS  INSERTED_DATE,
+		    TO_CHAR(SYSDATE, 'HH24MISS')  AS INSERTED_TIME
+         FROM DUAL
+		  </foreach> ) A
+  </insert>
 </mapper>

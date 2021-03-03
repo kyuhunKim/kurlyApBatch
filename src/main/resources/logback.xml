@@ -1,51 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
- [Layout]
- %m : 로그내용이 출력
- %p : trace > debug > info > warn > error 등의 priority 출력
- %r : 어플리케이션이 시작되어 로깅이벤트가 발생하는 시점까지의 경과시간을 밀리세컨드로 출력
- %c : 예) 카테고리가 a.b.c 처럼 되어있다면 %c{2}는 b.c가 출력됩니다.
- %n :  플랫폼 종속적인 개행문자가 출력된다. \r\n 또는 \n 일것이다
- %d : 로깅이벤트가 일어나 날짜 출력 ( 프로그램의 실행속도를 느리게 한다.)
-     예) %d{HH:mm:ss} 또는 %d{dd MMMM yyyy HH:mm:ss}
- %C : 호출자의 클래스명 출력
-    예) 클래스구조가 org.apache.xyz.SomeClass 처럼 되어있다면 %C{2}는 xyz.SomeClass 가 출력됩니다
- %M : 로깅이 발생한 method 이름을 나타냅니다.
- %F : 로깅이 발생한 프로그램 파일명을 나타냅니다.
- %l : 로깅이 발생한 caller의 정보를 나타냅니다 
- %L : 로깅이 발생한 caller의 라인수를 나타냅니다 
- %x : 로깅이 발생한 thread와 관련된 NDC(nested diagnostic context)를 출력합니다. 
- %X : 로깅이 발생한 thread와 관련된 MDC(mapped diagnostic context)를 출력합니다. 
- %% : % 표시를 출력하기 위해 사용한다.  
- %t : 로그이벤트가 발생된 쓰레드의 이름을 출력합니다
--->
+
 
 <configuration debug="true" scan="true">
     <include resource="org/springframework/boot/logging/logback/defaults.xml" />
     <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
     
-    <property name="LOG_DIR" value="D://logs/spring-boot-log/kruly_gradle" />
-    <property name="FILE_NAME" value="kruly_batch" /> 
+    <!-- <property name="LOG_DIR" value="D://logs/spring-boot-log/kruly_gradle_test" />
+    <property name="FILE_NAME" value="gimpoWcsApBatch" /> -->
+    <property name="LOG_DIR" value="/logs/wcs/gimpoWcsApBatch" />
+    <property name="FILE_NAME" value="gimpoWcsApBatch" />
  
     <!--파일에 로그를 남깁니다.-->
     <appender name="File" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_DIR}/${FILE_NAME}.log</file>
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <Pattern>
-                %d{yyyy-MM-dd HH:mm:ss} [%-3level] %logger{36} - %msg%n
-            </Pattern>
-            <charset>UTF-8</charset>
-        </encoder>
-
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_DIR}/${FILE_NAME}.%d{yyyy-MM-dd}.log</fileNamePattern>
-            <maxHistory>30</maxHistory>
-        </rollingPolicy>
-    </appender>
-   
-<!--파일에 로그를 남깁니다. (Roling)-->
-    <appender name="RollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_DIR}/archived/${FILE_NAME}_roling.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <Pattern>%d{yyyy-MM-dd HH:mm:ss} [%-3level] %logger{36} - %msg%n</Pattern>
             <charset>UTF-8</charset>
@@ -57,15 +24,19 @@
             <MaxFileSize>10MB</MaxFileSize>
         </triggeringPolicy>
 
-        <!-- 파일을 덮어쓰는 정책 -->
+         <!-- 파일을 덮어쓰는 정책 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-            <FileNamePattern>${LOG_DIR}/archived/${FILE_NAME}_roling.%i.log.zip</FileNamePattern>
+            <FileNamePattern>${LOG_DIR}/${FILE_NAME}.%i.log.zip</FileNamePattern>
             <!--
                 10MB단위로 로그 압축 파일이 생성된다. (1 ~ 10)
                 10개가 넘어가면 오래된순으로 덮어쓰기 됩니다.
             -->
             <MinIndex>1</MinIndex>
-            <MaxIndex>10</MaxIndex>
+            <MaxIndex>5</MaxIndex>
+        </rollingPolicy>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/${FILE_NAME}.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>5</maxHistory>
         </rollingPolicy>
     </appender>   
    
@@ -115,7 +86,7 @@
     
     <logger name="org.mybatis" level="DEBUG" additivity="false">
         <appender-ref ref="Console"/>
-        <appender-ref ref="RollingFile"/>
+        <appender-ref ref="File"/>
         <appender-ref ref="Error"/>
     </logger>
 	<root level="INFO">
