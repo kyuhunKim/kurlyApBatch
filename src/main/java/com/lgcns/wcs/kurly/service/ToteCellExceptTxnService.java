@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.lgcns.wcs.kurly.dto.LogApiStatus;
 import com.lgcns.wcs.kurly.dto.ToteCellExceptTxnSelectData;
 
 /**
@@ -20,5 +21,7 @@ public interface ToteCellExceptTxnService {
 	public List<ToteCellExceptTxnSelectData> selectToteCellExceptTxn() ;
 	
 	public void updateToteCellExceptTxn(Map<String, String> data) ;
+	
+	public void updateToteCellExceptTxnList(Map<String, Object> data, List<LogApiStatus> logApiStatusList)  ;
 
 }

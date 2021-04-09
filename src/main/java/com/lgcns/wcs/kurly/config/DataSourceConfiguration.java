@@ -19,20 +19,35 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class DataSourceConfiguration  {
  
     @Value("${mybatis.mapper-locations}")
-    private String mapperLocation;
+    private String mapperLocations;
+    @Value("${mybatis.config-location}")
+	private String configLocation;
 
-    @Bean
-    public SqlSessionFactory sqlSessionFactory(DataSource dataSource)throws Exception{
-            SqlSessionFactoryBean sqlSessionFactoryBean  = new SqlSessionFactoryBean();
-            sqlSessionFactoryBean .setDataSource(dataSource);
-            
-            Resource[] arrResource = new PathMatchingResourcePatternResolver().getResources(mapperLocation);
-            
-            sqlSessionFactoryBean.setMapperLocations(arrResource);
-            sqlSessionFactoryBean.getObject().getConfiguration().setMapUnderscoreToCamelCase(true);
-            return sqlSessionFactoryBean.getObject();
+//    @Bean
+//    public SqlSessionFactory sqlSessionFactory(DataSource dataSource)throws Exception{
+//            SqlSessionFactoryBean sqlSessionFactoryBean  = new SqlSessionFactoryBean();
+//            sqlSessionFactoryBean .setDataSource(dataSource);
+//            
+//            Resource[] arrResource = new PathMatchingResourcePatternResolver().getResources(mapperLocation);
+//            
+//            sqlSessionFactoryBean.setMapperLocations(arrResource);
+//            sqlSessionFactoryBean.getObject().getConfiguration().setMapUnderscoreToCamelCase(true);
+//            return sqlSessionFactoryBean.getObject();
+//    }
+
+    @Bean(name="sqlSessionFactory")
+    public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception {
+    	final SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
+        sessionFactory.setDataSource(dataSource);
+
+        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+        sessionFactory.setMapperLocations(resolver.getResources(mapperLocations));
+        sessionFactory.setConfigLocation(resolver.getResource(configLocation));
+        SqlSessionFactory sessionFactoryBean = sessionFactory.getObject();
+        sessionFactoryBean.openSession(false);
+        
+        return sessionFactoryBean;
     }
- 
     @Bean
     public SqlSessionTemplate sqlSessionTemplate(SqlSessionFactory sqlSessionFactory) throws Exception {
         return new SqlSessionTemplate(sqlSessionFactory);

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.lgcns.wcs.kurly.dto.LogApiStatus;
 import com.lgcns.wcs.kurly.dto.ToteScanData;
 
 /**
@@ -19,4 +20,6 @@ public interface ToteScanService {
 
 	public List<ToteScanData> selectToteScan() ;
 	public void updateToteScan(Map<String, String> data) ;
+	
+	public void updateToteScanList(Map<String, Object> upListMap, List<LogApiStatus> logApiStatusList) ;
 }

@@ -2,55 +2,76 @@ package com.lgcns.wcs.kurly.dto.box;
 
 public class BoxTypeVO {
 
-	private String BoxTypeCD;
-	private String BoxTypeName;
-	private String BoxShape;
 	private String warehouseKey;
-	private double BoxDepth;
-	private double BoxWidth;
-	private double BoxHeight;
-	
+	private String logicCd; // 예제 : 1번 또는 2번
+	private double boxMinCBM;
+	private double boxMaxCBM;
 	public String getWarehouseKey() {
 		return warehouseKey;
 	}
 	public void setWarehouseKey(String warehouseKey) {
 		this.warehouseKey = warehouseKey;
 	}
+	public String getLogicCd() {
+		return logicCd;
+	}
+	public void setLogicCd(String logicCd) {
+		this.logicCd = logicCd;
+	}
+	public double getBoxMinCBM() {
+		return boxMinCBM;
+	}
+	public void setBoxMinCBM(double boxMinCBM) {
+		this.boxMinCBM = boxMinCBM;
+	}
+	public double getBoxMaxCBM() {
+		return boxMaxCBM;
+	}
+	public void setBoxMaxCBM(double boxMaxCBM) {
+		this.boxMaxCBM = boxMaxCBM;
+	}
+
+	private double boxWidth;
+	private double boxHeight;
+	private double boxDepth;
+	private String boxTypeCD;
+	private String boxTypeName;
+	private String boxShape;
 	public double getBoxWidth() {
-		return BoxWidth;
+		return boxWidth;
 	}
 	public void setBoxWidth(double boxWidth) {
-		BoxWidth = boxWidth;
+		this.boxWidth = boxWidth;
 	}
 	public double getBoxHeight() {
-		return BoxHeight;
+		return boxHeight;
 	}
 	public void setBoxHeight(double boxHeight) {
-		BoxHeight = boxHeight;
+		this.boxHeight = boxHeight;
 	}
 	public double getBoxDepth() {
-		return BoxDepth;
+		return boxDepth;
 	}
 	public void setBoxDepth(double boxDepth) {
-		BoxDepth = boxDepth;
+		this.boxDepth = boxDepth;
 	}
 	public String getBoxTypeCD() {
-		return BoxTypeCD;
+		return boxTypeCD;
 	}
 	public void setBoxTypeCD(String boxTypeCD) {
-		BoxTypeCD = boxTypeCD;
+		this.boxTypeCD = boxTypeCD;
 	}
 	public String getBoxTypeName() {
-		return BoxTypeName;
+		return boxTypeName;
 	}
 	public void setBoxTypeName(String boxTypeName) {
-		BoxTypeName = boxTypeName;
+		this.boxTypeName = boxTypeName;
 	}
 	public String getBoxShape() {
-		return BoxShape;
+		return boxShape;
 	}
 	public void setBoxShape(String boxShape) {
-		BoxShape = boxShape;
+		this.boxShape = boxShape;
 	}
 	
 	double max(double a, double b)
@@ -68,9 +89,9 @@ public class BoxTypeVO {
 	
 	public boolean checkBox(double first, double second, double third)
 	{
-		double boxFirst = max(this.BoxWidth, max(this.BoxHeight, this.BoxDepth));
-		double boxThird = min(this.BoxWidth, min(this.BoxHeight, this.BoxDepth));
-		double boxSecond = BoxWidth + BoxHeight + BoxDepth;
+		double boxFirst = max(this.boxWidth, max(this.boxHeight, this.boxDepth));
+		double boxThird = min(this.boxWidth, min(this.boxHeight, this.boxDepth));
+		double boxSecond = this.boxWidth + this.boxHeight + this.boxDepth;
 		boxSecond -= boxFirst;
 		boxSecond -= boxThird;
 		
@@ -83,7 +104,6 @@ public class BoxTypeVO {
 	
 	public double getBoxCBM()
 	{
-		return this.BoxWidth * this.BoxHeight * this.BoxDepth;
+		return this.boxWidth * this.boxHeight * this.boxDepth;
 	}
-	
 }

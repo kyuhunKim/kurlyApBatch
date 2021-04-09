@@ -23,16 +23,16 @@ public class ToteScanData {
 	private String pickingType ;
 	/*프로세스유형(SINGLE/MULTI)
 	 * */
-	private String processType ;
+	private String allocType ;
 	/*QPS 호기번호
 	 * */
-	private String qpsUnitNo ;
+	private String qpsNum ;
 	/*설비번호(FACTOVA)
 	 * */
 	private String facEqpId ;
 	/*설비명(FACTOVA)
 	 * */
-	private String facEqpName ;
+	private String facEqpNm ;
 	/*토트스캔일자
 	 * */
 	private String toteScanDate ;

@@ -21,4 +21,6 @@ public interface InvoicePrintCompletRepository  {
 	List<InvoicePrintCompletData> selectInvoicePrintComplet();
 	
 	void updateInvoicePrintComplet(Map<String, String> data);
+	
+	void updateInvoicePrintCompletList(Map<String, Object> data);
 }

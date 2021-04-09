@@ -1,6 +1,11 @@
 package com.lgcns.wcs.kurly.service;
 
+import java.util.Map;
+
 import org.springframework.stereotype.Service;
+
+import com.lgcns.wcs.kurly.dto.RegionMasterData;
+import com.lgcns.wcs.kurly.dto.RegionMasterHeaderData;
 
 /**
  * 
@@ -12,6 +17,8 @@ import org.springframework.stereotype.Service;
 @Service
 public interface RegionMasterService {
 
-	public String insertRegionMaster() ;
-
+	public RegionMasterHeaderData insertRegionMaster() ;
+	
+	public void insertRegionMaster(RegionMasterData data) ;
+	public void insertRegionMasterList(Map<String, Object> upListMap) ;
 }

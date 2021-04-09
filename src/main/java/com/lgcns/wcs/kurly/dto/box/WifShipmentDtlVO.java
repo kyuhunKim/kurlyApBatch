@@ -5,6 +5,10 @@ import lombok.Data;
 @Data
 public class WifShipmentDtlVO {
 
+private String shipUidKey ;
+	
+	private String shipUidItemSeq ;
+
 	/*출하문서번호(WMS)
 	 * */
 	private String shipOrderKey	;
@@ -13,10 +17,11 @@ public class WifShipmentDtlVO {
 	private String shipOrderItemSeq ;
 	/*개별문서상태
 	 * */
-	private String itemStat ;
+	private String itemStatus ;
 	/*상품코드
 	 * */
 	private String skuCode ;
+	
 	/*Original Order quantity(원주문수량)	
 	 * */
 	private double qtyOriginOrder ;
@@ -26,6 +31,10 @@ public class WifShipmentDtlVO {
 	/*Appointed quantity(피킹수량)	
 	 * */
 	private double qtyPicking ;
+	/*QPS주문처리수량
+	 * */
+	private String qtyQpsOrder ;
+
 	/*Allocated quantity(할당수량)	
 	 * */
 	private double qtyAllocated ;
@@ -78,18 +87,18 @@ public class WifShipmentDtlVO {
 	/*SKU Group 04	
 	 * */
 	private String skuGroup04 ;
-	/*SKU Group 03(선입선출구분)
+	/*sellingType
 	 * */
-	private double sellingType ;
+	private String sellingType ;
 	/*Gross weight	
 	 * */
 	private double grossWeight ;
 	/*Net weight	
 	 * */
-	private String netWeight ;
+	private double netWeight ;
 	/*Weight unit	
 	 * */
-	private double weightUnit ;
+	private String weightUnit ;
 	/*Length	
 	 * */
 	private double length ;
@@ -121,5 +130,17 @@ public class WifShipmentDtlVO {
 	/*수정자
 	 * */
 	private String modifiedUser	;
+	/*화주
+	 * */
+	private String owner ;
+
+	/*Ship order number from external system(송장번호)
+	 * */
+	private String invoiceNo ;
+	private String groupNo ;
+	private String workBatchNo ;
+	private String qpsNum ;
+	private String wmsBatchYmd ;
+	private String dasCellGroupId ;
 
 }

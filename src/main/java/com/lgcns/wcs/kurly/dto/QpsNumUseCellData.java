@@ -1,7 +1,5 @@
 package com.lgcns.wcs.kurly.dto;
 
-import java.util.Date;
-
 import org.apache.ibatis.type.Alias;
 
 import lombok.Data;
@@ -12,22 +10,19 @@ import lombok.Data;
 @Data
 @Alias("QpsNumUseCell")
 public class QpsNumUseCellData {
-	/*회사 코드
+	/*센터
 	 * */
 	private String warehouseKey ;
-	/*회사 코드
+	/*QPS 1호기 가용셀수
 	 * */
 	private int qpsNumUseCell01 ;
-	/*회사 코드
+	/*QPS 2호기 가용셀수
 	 * */
 	private int qpsNumUseCell02 ;
-	/*회사 코드
-	 * */
-	private int dasNumUseCell ;
-	/*회사 코드
+	/*가용셀수배치수행일자
 	 * */
 	private String batchRunDate ;
-	/*회사 코드
+	/*가용셀수배치수행시간
 	 * */
 	private String batchRunTime ;
 

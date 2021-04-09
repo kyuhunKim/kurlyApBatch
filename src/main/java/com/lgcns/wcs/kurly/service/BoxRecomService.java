@@ -10,8 +10,12 @@ import com.lgcns.wcs.kurly.dto.box.CellTypeVO;
 import com.lgcns.wcs.kurly.dto.box.OrdInfoList;
 import com.lgcns.wcs.kurly.dto.box.OrdInfoVO;
 import com.lgcns.wcs.kurly.dto.box.OrdLineVO;
+import com.lgcns.wcs.kurly.dto.box.SearchOrdInfoVO;
+import com.lgcns.wcs.kurly.dto.box.SearchVO;
 import com.lgcns.wcs.kurly.dto.box.SkuTypeMap;
 import com.lgcns.wcs.kurly.dto.box.SkuTypeVO;
+import com.lgcns.wcs.kurly.dto.box.WifShipmentDtlVO;
+import com.lgcns.wcs.kurly.dto.box.WifShipmentVO;
 
 
 /**
@@ -33,21 +37,32 @@ public interface BoxRecomService {
 	
 	public List<OrdInfoVO> selectOrdInfoList();
 	
-	public int insertOrdShipmentHdr(Map<String, String> data)  throws Exception;
+	public String insertOrdShipmentHdr(Map<String, String> data)  throws Exception;
 
 	public void insertOrdShipmentDtl(Map<String, String> data)  throws Exception;
 	
 	public OrdInfoList selectOrdList(SkuTypeMap skuMaster) ;
 	
-	public int getShipUidKey();
+	public String getShipUidKey();
 	
 	public void updateWifShipmentHdr(Map<String, String> data) ;
 	
 	public void insertOrdShipmentDtlAll(Map<String, String> data) throws Exception ;
 	
-	public void insertOrdShipmentDtl(OrdInfoVO tempOrd, int shipUidKey, int splitSeqNum) throws Exception ;
-	
-	public int selectOrdShipmentCount(Map<String, String> data);
+	public void insertOrdShipmentDtl(OrdInfoVO tempOrd, String shipUidKey, int splitSeqNum) throws Exception ;
 	
 	public String selectDate() ;
+	
+	public List<BoxTypeVO> selectBoxTypeMaxList() ;
+	
+	public int selectOrdInfoSearchCount() ;
+	
+	public List<OrdInfoVO> selectOrdInfoSearchList(SearchVO svo) ;
+
+	public List<SearchOrdInfoVO> selectOrdLineListAll(SearchVO svo) ;
+
+	public void insertOrdShipmentListType(List<WifShipmentVO> data, List<WifShipmentDtlVO> data2);
+
+	public void updateWifShipmentHdrList(Map<String, Object> data) ;
+	
 }

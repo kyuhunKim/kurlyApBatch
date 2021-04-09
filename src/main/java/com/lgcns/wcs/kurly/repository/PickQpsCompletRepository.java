@@ -24,4 +24,6 @@ public interface PickQpsCompletRepository  {
 	List<PickQpsCompletDetailData> selectPickQpsCompletDetail(PickQpsCompletData data) ;
 	
 	void updatePickQpsComplet(Map<String, String> data);
+	
+	void updatePickQpsCompletList(Map<String, Object> data);
 }

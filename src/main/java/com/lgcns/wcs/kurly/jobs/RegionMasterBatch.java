@@ -1,18 +1,28 @@
 package com.lgcns.wcs.kurly.jobs;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lgcns.wcs.kurly.dto.KurlyConstants;
 import com.lgcns.wcs.kurly.dto.LogApiStatus;
 import com.lgcns.wcs.kurly.dto.LogBatchExec;
+import com.lgcns.wcs.kurly.dto.RegionMasterData;
+import com.lgcns.wcs.kurly.dto.RegionMasterDetailData;
+import com.lgcns.wcs.kurly.dto.RegionMasterHeaderData;
 import com.lgcns.wcs.kurly.service.LogApiStatusService;
 import com.lgcns.wcs.kurly.service.LogBatchExecService;
 import com.lgcns.wcs.kurly.service.RegionMasterService;
+import com.lgcns.wcs.kurly.util.DateUtil;
 import com.lgcns.wcs.kurly.util.StringUtil;
 
 import lombok.extern.slf4j.Slf4j;
@@ -39,29 +49,113 @@ public class RegionMasterBatch  {
     LogApiStatusService logApiStatusService;
 
     public void RegionMasterTask()  {
-    	log.info("=================RegionMasterBatch start===============");
-    	log.info("The current date  : " + LocalDateTime.now());
-    	long start = System.currentTimeMillis();
+    	log.info("=======RegionMasterBatch start=======");
+    	long apiRunTimeStart = 0;
+		long apiRunTimeEnd   = 0;
+		String apiRunTime    = "";
+		
+		apiRunTimeStart = System.currentTimeMillis();
     	
 		String result = "sucess";
 		String resultMessage = "";
 		int executeCount = 0;
     	Date startDate = Calendar.getInstance().getTime();
+		List<RegionMasterData> updateMapList = new ArrayList<RegionMasterData>();
+
+		String r_ifYn = KurlyConstants.STATUS_Y;
+		
     	try {
     		
-    		String retData = regionMasterService.insertRegionMaster();
+    		RegionMasterHeaderData reqData = regionMasterService.insertRegionMaster();
+    					
+    		//##2021.02.14  reqData.getData() null 이면 오류 처리
+    		if(reqData.getError_code() == 0 && reqData.getData() != null) {
 
-    		log.info("====finally createLogApiStatus===============1");
+    	    	for(RegionMasterDetailData master : reqData.getData() ) {
+    	    		
+    	    		//##2021.01.18 센터코드 상관없이 cc_code : CC02 인 값만 처리 
+    	    		if(KurlyConstants.DEFAULT_REGION_CCCODE.equals(master.getCc_code()) ) {
+//    	    				&& "1".equals(master.getDelivery_round())) {
+//    	    		if(KurlyConstants.DEFAULT_REGION_CENTERCODE.equals(master.getCenter_code())) {
+    	    			
+    	    			RegionMasterData rMaster = new RegionMasterData();
+    	    			rMaster.setCoCd("MK");
+    	    			rMaster.setRgnCd(master.getRegzcd());
+    	    			rMaster.setRgnNm(master.getRegznm());
+    	    			rMaster.setRegionGroupCode(master.getRegzky());
+    	    			rMaster.setDeliveryRound(master.getDelivery_round());
+    	    			rMaster.setRgnKy(master.getRegzky());
+    	    			rMaster.setUseYn(KurlyConstants.STATUS_Y);
+    	    			rMaster.setRegId(KurlyConstants.DEFAULT_USERID);
+    	    			rMaster.setUpdId(KurlyConstants.DEFAULT_USERID);
+    	    			rMaster.setRgnKyGroupCode(master.getRegzky_group_code());
+    	    			rMaster.setCcCode(master.getCc_code());
+    	    			
+//    	    			regionMasterService.insertRegionMaster(rMaster);
 
-			long endFor = System.currentTimeMillis(); 
-			long diffTimeFor = ( endFor - start ); //ms
+    	    			//중복체크
+    	    			if(!checkRgnCd( updateMapList,  master.getRegzcd())) {
 
-			//로그 정보 insert
+        	    			updateMapList.add(rMaster);
+        		    		executeCount++;    	    				
+    	    			}
+	
+    	    		}
+    	    	}
+
+//    	    	log.info("=======updateMapList size======="+updateMapList.size());
+//    			log.error( " === executeCount===" + executeCount );
+    	    	try
+    	    	{
+		    		List<RegionMasterData> u_updateMapList = new ArrayList<RegionMasterData>();
+		
+		    		for(int i=0; i <updateMapList.size(); i++) {
+		
+		    			u_updateMapList.add(updateMapList.get(i));
+		    			
+		    			//100 건 씩 처리
+			    		if( (i>2 && i%100 == 0 ) 
+			    				|| ( i == updateMapList.size()-1 ) ) {
+		
+//							log.info(">>>RegionMaster i : ["+i+"]"  );
+		
+							Map<String, Object> uList = new HashMap<String, Object>();
+							uList.put("regionMasterList",u_updateMapList);
+							
+							//toteRelease update
+							regionMasterService.insertRegionMasterList(uList);
+							
+							//초기화
+							u_updateMapList = new ArrayList<RegionMasterData>();
+			    		}
+		    		}
+    	    	} catch (Exception e1) {
+            		result = "error";
+//        			log.error( " === RegionMaster insert  error e1" +e1 );
+        			resultMessage = e1.toString();
+        			r_ifYn = KurlyConstants.STATUS_N;
+            	}
+        		
+    		} else {
+        		result = "error";
+        		resultMessage = reqData.getError_message();
+    			r_ifYn = KurlyConstants.STATUS_N;
+    		}
+
+    	} catch (Exception e) {
+    		result = "error";
+			log.error( " === RegionMasterBatch  error" +e );
+			resultMessage = e.toString();
+			r_ifYn = KurlyConstants.STATUS_N;
+    	} finally {
+    		
+    		//로그 정보 insert
 			LogApiStatus logApiStatus = new LogApiStatus();
 
-			logApiStatus.setWarehouseKey(" ");
-			
-			logApiStatus.setApiYyyymmdd(""); 
+	    	logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
+
+	    	String sYyyymmdd = DateUtil.getToday("yyyyMMdd");
+		    logApiStatus.setApiYyyymmdd(sYyyymmdd);
 			logApiStatus.setExecMethod(KurlyConstants.METHOD_REGIONMASTER);
 			    	
 			logApiStatus.setGroupNo("");  //그룹배치번호
@@ -84,28 +178,35 @@ public class RegionMasterBatch  {
 	    	logApiStatus.setWcsStatus("");  //WCS 작업상태
 	    	
 	    	logApiStatus.setApiUrl(KurlyConstants.METHOD_REGIONMASTER);
-	    	
-	    	logApiStatus.setApiInfo(retData);
-	    	logApiStatus.setApiRuntime(diffTimeFor+"");
-	    	
-	    	logApiStatus.setIntfYn("Y") ; //'Y': 전송완료, 'N': 미전송
-	    	
-	    	logApiStatus.setIntfMemo("");
+	    	if(updateMapList.size() > 0) {
+		    	try {
+					ObjectMapper mapper = new ObjectMapper();
+					String jsonStr = mapper.writeValueAsString(updateMapList);
+
+					logApiStatus.setApiInfo(jsonStr);
+				} catch (IOException e) {
+//		            e.printStackTrace();
+					logApiStatus.setApiInfo(updateMapList.toString());
+		        }
+	    	}
+
+	    	logApiStatus.setIntfYn(r_ifYn) ; //'Y': 전송완료, 'N': 미전송
+	    	if(KurlyConstants.STATUS_N.equals(r_ifYn)) {
+	    		String c_intfMemo = StringUtil.cutString(resultMessage, 3500, "");
+				logApiStatus.setIntfMemo(c_intfMemo);
+	    	} else {
+		    	logApiStatus.setIntfMemo(KurlyConstants.STATUS_OK);
+	    	}
+
+    		apiRunTimeEnd = System.currentTimeMillis();
+			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
+			
+			logApiStatus.setApiRuntime(apiRunTime);
 	    	
 	    	logApiStatusService.createLogApiStatus(logApiStatus);
-			log.info("====finally createLogApiStatus===============2");
-			    	
-    	} catch (Exception e) {
-    		result = "error";
-			log.error( " === ToteScanBatch  error" +e );
-			resultMessage = e.toString();
-//			throw new Exception(e);
-    	} finally {
-
-        	long end = System.currentTimeMillis();
-        	long diffTime = ( end - start );  //m
-
-        	log.info("================= diffTime(ms) : "+ diffTime);
+	    	
+    		apiRunTimeEnd = System.currentTimeMillis();
+			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
 
 	    	//배치 로그 정보 insert
         	LogBatchExec logBatchExec = new LogBatchExec();
@@ -113,7 +214,7 @@ public class RegionMasterBatch  {
         	logBatchExec.setExecMethod(KurlyConstants.METHOD_REGIONMASTER);
         	if("sucess".equals(result)) {
             	logBatchExec.setSuccessYn(KurlyConstants.STATUS_Y);
-            	logBatchExec.setMessageLog("");	
+            	logBatchExec.setMessageLog(KurlyConstants.METHOD_REGIONMASTER +" Sucess("+apiRunTime+"ms)");
         	} else {
             	logBatchExec.setSuccessYn(KurlyConstants.STATUS_N);
             	logBatchExec.setMessageLog(resultMessage);
@@ -123,12 +224,30 @@ public class RegionMasterBatch  {
         	logBatchExec.setStartDate(startDate);
         	
         	logBatchExecService.createLogBatchExec(logBatchExec);
-        	log.info("=================createLogBatchExec end=============== ");    		
     	}
     	
-    	log.info("=================RegionMasterBatch end===============");
+    	log.info("=======RegionMasterBatch end=======");
     	
     }
 
+	/**
+	 * 
+	 * @Method Name : checkRgnCd
+	 * @작성일 : 2021. 01. 19.
+	 * @작성자 : jooni
+	 * @변경이력 : 2021. 01. 19. 최초작성
+	 * @Method 설명 : 중복값 체크
+	 */
+    public boolean checkRgnCd(List<RegionMasterData> updateMapList, String regzcd) {
+	    boolean reVal = false;
+    	for(int k=0; k <updateMapList.size(); k++) {
+			if(updateMapList.get(k).getRgnCd().equals(regzcd))
+			{
+				reVal = true;
+				break;
+			}
+		}
+    	return reVal;
+    }
 }
 

@@ -16,9 +16,11 @@
     WHEN MATCHED THEN 
     UPDATE SET
      		RGN_NM   =  #{rgnNm} ,
-			REGION_GROUP_CODE =  #{regionGroupCode} ,
+			REGION_GROUP_CODE =  #{rgnKy} ,
 			DELIVERY_ROUND    =  #{deliveryRound} ,
 			RGN_KY   =  #{rgnKy} ,
+			RGN_KY_GROUP_CODE   =  #{rgnKyGroupCode} ,
+			CC_CODE    =  #{ccCode} ,
 			USE_YN   =  #{useYn} ,
 			UPD_DT   =  SYSDATE ,
 			UPD_ID   = #{updId}
@@ -29,27 +31,98 @@
 			CO_CD             ,
 		  	RGN_CD            ,
 			RGN_NM            ,
-			REGION_GROUP_CODE ,
-			DELIVERY_ROUND    ,
-			RGN_KY            ,
 			USE_YN            ,
 			REG_ID            ,
 			REG_DT            ,
 			UPD_ID            ,
-			UPD_DT
+			UPD_DT            ,
+			REGION_GROUP_CODE ,
+			DELIVERY_ROUND    ,
+			RGN_KY            ,
+			RGN_KY_GROUP_CODE ,
+			CC_CODE 
 	     ) VALUES (
 			#{coCd},
 			#{rgnCd},
 			#{rgnNm},
-			#{regionGroupCode},
-			#{deliveryRound},
-			#{rgnKy},
 			#{useYn},
 			#{regId},
 			SYSDATE,
 			#{updId},
-			SYSDATE
+			SYSDATE ,
+			#{rgnKy},
+			#{deliveryRound},
+			#{rgnKy},
+			#{rgnKyGroupCode},
+			#{ccCode}
 	    ) 
   </update>
-  
+  <update id="insertRegionMasterList"  parameterType="map">
+	/* [RegionMasterMapper.xml] insertRegionMasterList */
+	MERGE INTO o_wcs.TB_COM_RGN_MST RM
+    USING  
+    (
+    <foreach collection="regionMasterList" item="item" index="index" separator="union all">
+         SELECT 
+		    #{item.coCd, jdbcType=VARCHAR}  AS CO_CD,
+			#{item.rgnCd, jdbcType=VARCHAR}  AS RGN_CD,
+			#{item.rgnNm, jdbcType=VARCHAR}  AS RGN_NM,
+			#{item.useYn, jdbcType=VARCHAR}  AS USE_YN,
+			#{item.regId, jdbcType=VARCHAR}  AS REG_ID,
+			#{item.updId, jdbcType=VARCHAR}  AS UPD_ID,
+			#{item.rgnKy, jdbcType=VARCHAR}  AS RGN_KY,
+			#{item.deliveryRound, jdbcType=VARCHAR}  AS DELIVERY_ROUND,
+			#{item.regionGroupCode, jdbcType=VARCHAR}  AS REGION_GROUP_CODE,
+			#{item.rgnKyGroupCode, jdbcType=VARCHAR}  AS RGN_KY_GROUP_CODE,
+			#{item.ccCode, jdbcType=VARCHAR}   AS CC_CODE
+         FROM DUAL
+		  </foreach>
+    ) TB
+    ON  ( 
+    		RM.CO_CD  = TB.CO_CD 
+		AND RM.RGN_CD = TB.RGN_CD
+		)
+    WHEN MATCHED THEN 
+    UPDATE SET
+     		RM.RGN_NM   =  TB.RGN_NM ,
+			RM.REGION_GROUP_CODE =  TB.RGN_KY ,
+			RM.DELIVERY_ROUND    =  TB.DELIVERY_ROUND ,
+			RM.RGN_KY   =  TB.RGN_KY ,
+			RM.RGN_KY_GROUP_CODE   =  TB.RGN_KY_GROUP_CODE ,
+			RM.CC_CODE    =  TB.CC_CODE ,
+			RM.USE_YN   =  TB.USE_YN ,
+			RM.UPD_DT   =  SYSDATE ,
+			RM.UPD_ID   = TB.UPD_ID
+    WHEN NOT MATCHED THEN
+	    INSERT
+	    ( 
+			CO_CD             ,
+		  	RGN_CD            ,
+			RGN_NM            ,
+			USE_YN            ,
+			REG_ID            ,
+			REG_DT            ,
+			UPD_ID            ,
+			UPD_DT            ,
+			REGION_GROUP_CODE ,
+			DELIVERY_ROUND    ,
+			RGN_KY            ,
+			RGN_KY_GROUP_CODE ,
+			CC_CODE 
+	     ) VALUES (
+			TB.CO_CD             ,
+		  	TB.RGN_CD            ,
+			TB.RGN_NM            ,
+			TB.USE_YN            ,
+			TB.REG_ID            ,
+			SYSDATE              ,
+			TB.UPD_ID            ,
+			SYSDATE              ,
+			TB.RGN_KY            ,
+			TB.DELIVERY_ROUND    ,
+			TB.RGN_KY            ,
+			TB.RGN_KY_GROUP_CODE ,
+			TB.CC_CODE
+	    ) 
+  </update>
 </mapper>

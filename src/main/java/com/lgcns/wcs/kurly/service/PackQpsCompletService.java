@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.lgcns.wcs.kurly.dto.LogApiStatus;
 import com.lgcns.wcs.kurly.dto.PackQpsCompletData;
 import com.lgcns.wcs.kurly.dto.PackQpsCompletDetailData;
 
@@ -21,4 +22,6 @@ public interface PackQpsCompletService {
 	public List<PackQpsCompletData> selectPackQpsComplet() ;
 	public List<PackQpsCompletDetailData> selectPackQpsCompletDetail(PackQpsCompletData data) ;
 	public void updatePackQpsComplet(Map<String, String> data) ;
+	
+	public void updatePackQpsCompletList(Map<String, Object> data, List<LogApiStatus> logApiStatusList)  ;
 }

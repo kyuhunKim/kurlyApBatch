@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 public class WifShipmentVO {
 
+	private String shipUidKey ;
 	/*출하문서번호(WMS)
 	 * */
 	private String shipOrderKey	;
@@ -28,7 +29,6 @@ public class WifShipmentVO {
 	/*화주
 	 * */
 	private String ownerKey ;
-	
 	/*Requested ship date(배송요청일)
 	 * */
 	private String reqShipDate ;
@@ -151,5 +151,27 @@ public class WifShipmentVO {
 	/*수정자
 	 * */
 	private String modifiedUser	;
+
+	//패킹박스분할여부
+	private String packBoxSplitYn ;
+
+	//추천패킹박스타입
+	private String packBoxTypeRecom ;
+	//특별관리고객용W/S여부
+	private String specialMgntCustYn ;
+	//매뉴얼출고처리여부(Y:WMS출고처리,N:WCS설비출고처리)
+	private String manualProcYn ;
+	//출고오더취소여부
+	private String shipmentCnclYn ;
+	//주문번호별운송장총갯수
+	private int orderNoInvoiceCnt = 0;
+	private String wmsBatchYmd ;
+	/*재활용 포장재 사용 여부(Y/N)
+	 * */
+	private String reusablePackageYn ;
+
+	/*출하종합유형(라벨출력용)
+	 * */
+	private String orderTypeAll ;
 
 }
