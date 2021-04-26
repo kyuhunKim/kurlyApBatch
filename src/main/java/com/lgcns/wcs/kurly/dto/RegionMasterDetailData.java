@@ -42,5 +42,5 @@ public class RegionMasterDetailData {
 	private String delivery_round ;
 	private String center_code ;
 	private String cc_code ;
-	
+	private String operation_time;
 }
