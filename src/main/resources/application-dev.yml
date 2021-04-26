@@ -62,7 +62,7 @@ spring.main.allow-bean-definition-overriding: true
 #dev : 
 #wms.regionMasterUrl: http://tms.api.dev.kurly.com/tms/v1/common/wms/region/zipmasters
 #2cc: 
-wms.regionMasterUrl: http://tms-api.2cc.kurly.services/tms/v1/common/wms/region/zipmasters
+wms.regionMasterUrl: http://tam-api.2cc.kurly.services/region/zipmasters
 #real: 
 #wms.regionMasterUrl: https://tms.api.kurly.services/tms/v1/common/wms/region/zipmasters
 
