@@ -453,7 +453,7 @@ public class BoxRecomBatch  {
             	logBatchExec.setSuccessYn(KurlyConstants.STATUS_Y);
             	logBatchExec.setMessageLog(KurlyConstants.METHOD_BOXRECOM +" Sucess("+apiRunTime+"ms)");
         	} else {
-            	logBatchExec.setSuccessYn(KurlyConstants.STATUS_N);
+            	logBatchExec.setSuccessYn(KurlyConstants.STATUS_E);
             	logBatchExec.setMessageLog(resultMessage);
         	}
         	logBatchExec.setExecuteDirectYn(KurlyConstants.STATUS_N);
