@@ -372,7 +372,7 @@ public class BoxRecomServiceImpl implements BoxRecomService {
 			boxRecomRepository.insertOrdShipmentDtlListType(dtMap);
 		
     	} catch (Exception e) {
-    		
+
 			log.info( " === insertOrdShipmentListType  error >> " +e );
 			inft_yn = KurlyConstants.STATUS_E;
 			e.printStackTrace();
@@ -387,7 +387,7 @@ public class BoxRecomServiceImpl implements BoxRecomService {
 				uParam.put("receiveIntfCode", "");
 			}else if(KurlyConstants.STATUS_E.equals(inft_yn)){
 				uParam.put("receiveIntfCode", KurlyConstants.STATUS_NG);
-			}else {
+			}else{
 	    		uParam.put("receiveIntfCode", KurlyConstants.STATUS_OK);
 	    	}
 			uParam.put("receiveIntfMemo", "");
