@@ -17,8 +17,6 @@ import com.lgcns.wcs.kurly.dto.RegionMasterHeaderData;
 @Service
 public interface RegionMasterService {
 
-	public RegionMasterHeaderData insertRegionMaster() ;
-	
-	public void insertRegionMaster(RegionMasterData data) ;
+	public RegionMasterHeaderData getRegionMaster() ;
 	public void insertRegionMasterList(Map<String, Object> upListMap) ;
 }

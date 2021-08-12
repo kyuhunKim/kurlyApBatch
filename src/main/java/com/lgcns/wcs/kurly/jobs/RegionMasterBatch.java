@@ -9,16 +9,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.lgcns.wcs.kurly.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lgcns.wcs.kurly.dto.KurlyConstants;
-import com.lgcns.wcs.kurly.dto.LogApiStatus;
-import com.lgcns.wcs.kurly.dto.LogBatchExec;
-import com.lgcns.wcs.kurly.dto.RegionMasterData;
-import com.lgcns.wcs.kurly.dto.RegionMasterDetailData;
-import com.lgcns.wcs.kurly.dto.RegionMasterHeaderData;
 import com.lgcns.wcs.kurly.service.LogApiStatusService;
 import com.lgcns.wcs.kurly.service.LogBatchExecService;
 import com.lgcns.wcs.kurly.service.RegionMasterService;
@@ -56,7 +51,7 @@ public class RegionMasterBatch  {
 		
 		apiRunTimeStart = System.currentTimeMillis();
     	
-		String result = "sucess";
+		String result = "success";
 		String resultMessage = "";
 		int executeCount = 0;
     	Date startDate = Calendar.getInstance().getTime();
@@ -65,48 +60,30 @@ public class RegionMasterBatch  {
 		String r_ifYn = KurlyConstants.STATUS_Y;
 		
     	try {
-    		
-    		RegionMasterHeaderData reqData = regionMasterService.insertRegionMaster();
+    		// 권역정보 URL 호출
+    		RegionMasterHeaderData reqData = regionMasterService.getRegionMaster();
     					
     		//##2021.02.14  reqData.getData() null 이면 오류 처리
     		if(reqData.getError_code() == 0 && reqData.getData() != null) {
-
     	    	for(RegionMasterDetailData master : reqData.getData() ) {
-    	    		
-    	    		//##2021.01.18 센터코드 상관없이 cc_code : CC02 인 값만 처리 
-    	    		if(KurlyConstants.DEFAULT_REGION_CCCODE.equals(master.getCc_code()) ) {
-//    	    				&& "1".equals(master.getDelivery_round())) {
-//    	    		if(KurlyConstants.DEFAULT_REGION_CENTERCODE.equals(master.getCenter_code())) {
-    	    			
-    	    			RegionMasterData rMaster = new RegionMasterData();
-    	    			rMaster.setCoCd("MK");
-    	    			rMaster.setRgnCd(master.getRegzcd());
-    	    			rMaster.setRgnNm(master.getRegznm());
-    	    			rMaster.setRegionGroupCode(master.getRegzky());
-    	    			rMaster.setDeliveryRound(master.getDelivery_round());
-    	    			rMaster.setRgnKy(master.getRegzky());
-    	    			rMaster.setUseYn(KurlyConstants.STATUS_Y);
-    	    			rMaster.setRegId(KurlyConstants.DEFAULT_USERID);
-    	    			rMaster.setUpdId(KurlyConstants.DEFAULT_USERID);
-    	    			rMaster.setRgnKyGroupCode(master.getRegzky_group_code());
-    	    			rMaster.setCcCode(master.getCc_code());
-    	    			
-//    	    			regionMasterService.insertRegionMaster(rMaster);
+    	    		for(RegionMasterCodeData regions : master.getRegions()) {
 
-    	    			//중복체크
-    	    			if(!checkRgnCd( updateMapList,  master.getRegzcd())) {
+						RegionMasterData rMaster = new RegionMasterData();
+						rMaster.setCoCd("MK");
+						rMaster.setRegionGroupCode(regions.getCode());
+						rMaster.setRgnKy(regions.getCode());
+						rMaster.setRgnKyGroupCode(master.getCode());
+						rMaster.setCcCode(KurlyConstants.DEFAULT_REGION_CCCODE);
+						rMaster.setUseYn(KurlyConstants.STATUS_Y);
+						rMaster.setRegId(KurlyConstants.DEFAULT_USERID);
+						rMaster.setUpdId(KurlyConstants.DEFAULT_USERID);
 
-        	    			updateMapList.add(rMaster);
-        		    		executeCount++;    	    				
-    	    			}
-	
+						updateMapList.add(rMaster);
+						executeCount++;
     	    		}
     	    	}
 
-//    	    	log.info("=======updateMapList size======="+updateMapList.size());
-//    			log.error( " === executeCount===" + executeCount );
-    	    	try
-    	    	{
+    	    	try {
 		    		List<RegionMasterData> u_updateMapList = new ArrayList<RegionMasterData>();
 		
 		    		for(int i=0; i <updateMapList.size(); i++) {
@@ -114,15 +91,12 @@ public class RegionMasterBatch  {
 		    			u_updateMapList.add(updateMapList.get(i));
 		    			
 		    			//100 건 씩 처리
-			    		if( (i>2 && i%100 == 0 ) 
-			    				|| ( i == updateMapList.size()-1 ) ) {
-		
-//							log.info(">>>RegionMaster i : ["+i+"]"  );
-		
+			    		if( (i>2 && i%100 == 0 ) || ( i == updateMapList.size()-1 ) ) {
+
 							Map<String, Object> uList = new HashMap<String, Object>();
 							uList.put("regionMasterList",u_updateMapList);
 							
-							//toteRelease update
+							//db table merge
 							regionMasterService.insertRegionMasterList(uList);
 							
 							//초기화
@@ -212,7 +186,7 @@ public class RegionMasterBatch  {
         	LogBatchExec logBatchExec = new LogBatchExec();
 	    	
         	logBatchExec.setExecMethod(KurlyConstants.METHOD_REGIONMASTER);
-        	if("sucess".equals(result)) {
+        	if("success".equals(result)) {
             	logBatchExec.setSuccessYn(KurlyConstants.STATUS_Y);
             	logBatchExec.setMessageLog(KurlyConstants.METHOD_REGIONMASTER +" Sucess("+apiRunTime+"ms)");
         	} else {
@@ -228,26 +202,6 @@ public class RegionMasterBatch  {
     	
     	log.info("=======RegionMasterBatch end=======");
     	
-    }
-
-	/**
-	 * 
-	 * @Method Name : checkRgnCd
-	 * @작성일 : 2021. 01. 19.
-	 * @작성자 : jooni
-	 * @변경이력 : 2021. 01. 19. 최초작성
-	 * @Method 설명 : 중복값 체크
-	 */
-    public boolean checkRgnCd(List<RegionMasterData> updateMapList, String regzcd) {
-	    boolean reVal = false;
-    	for(int k=0; k <updateMapList.size(); k++) {
-			if(updateMapList.get(k).getRgnCd().equals(regzcd))
-			{
-				reVal = true;
-				break;
-			}
-		}
-    	return reVal;
     }
 }
 
