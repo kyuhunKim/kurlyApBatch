@@ -21,10 +21,10 @@ public class OrdmadeNotfullyReplayData {
 	private String warehouseKey ;
 	/*출고오더UID(WCS)
 	 * */
-	private String shipUidWcs ;
+	private String shipUidKey ;
 	/*출고오더UID순번(WCS)
 	 * */
-	private String shipUidSeq ;
+	private String shipUidItemSeq ;
 	/*피킹구분
 	 * 미출오더추가피킹:SUPPLY
 	 * */

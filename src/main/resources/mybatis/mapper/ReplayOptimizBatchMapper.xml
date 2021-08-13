@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lgcns.wcs.kurly.repository.ReplayOptimizBatchRepository">
+   
+   <select id="selectReplayOptimize" resultType="com.lgcns.wcs.kurly.dto.ReplayOptimizBatchData">
+    /* [ReplayOptimizBatchMapper.xml] selectReplayOptimize */
+    <![CDATA[ 
+	    SELECT
+		      T.DT_SHIP_ORDER_KEY      AS dtShipOrderKey,
+		      T.DT_SHIP_ORDER_ITEM_SEQ AS dtDhipOrderItemSeq,
+		      T.DT_GROUP_NO            AS dtGroupNo,
+		      T.OPTIMIZE_BATCH_SEQ     AS optimizeBatchSeq,
+		      T.SHIP_ORDER_KEY         AS shipOrderKey,
+		      T.SHIP_ORDER_ITEM_SEQ    AS shipOrderItemSeq,
+		      T.WAREHOUSE_KEY          AS warehouseKey,
+		      T.BATCH_TYPE_STATUS      AS batchTypeStatus,
+		      T.DOC_DATE               AS docDate,
+		      T.SKU_CODE               AS skuCode,
+		      T.ITEM_STATUS            AS itemStatus,
+		      T.QTY_SHIP_ORDER         AS qtyShipOrder,
+		      T.QTY_ALLOCATED          AS qtyAllocated,
+		      T.SKU_NAME               AS skuName,
+		      T.SKU_SUB_NAME           AS skuSubName,
+		      T.SKU_ALTER_CODE         AS skuAlterCode,
+		      T.ALLOC_TYPE             AS allocType,
+		      T.GROUP_NO               AS groupNo,
+		      T.WORK_BATCH_NO          AS workBatchNo,
+		      T.QPS_NUM                AS qpsNum,
+		      T.DAS_CELL_GROUP_ID      AS dasCellGroupId,
+		      T.ALLOC_SEQ              AS allocSeq,
+		      T.WAVE_BATCH_CNCL_YN     AS waveBatchCnclYn,
+		      T.WAVE_BATCH_CNCL_DATE   AS waveBatchCnclDate,
+		      T.WAVE_BATCH_CNCL_TIME   AS waveBatchCnclTime,
+		      T.WAVE_BATCH_CNCL_USER   AS waveBatchCnclUser,
+		      T.CREATED_USER           AS insertedUser
+		    FROM
+		    (
+		        SELECT
+			        DT.SHIP_ORDER_KEY          AS DT_SHIP_ORDER_KEY,
+			        DT.SHIP_ORDER_ITEM_SEQ     AS DT_SHIP_ORDER_ITEM_SEQ,
+			        NVL(DT.GROUP_NO, 'X')      AS DT_GROUP_NO,
+			        NVL(DT.WORK_BATCH_NO, 'X') AS DT_WORK_BATCH_NO,
+			        OB.OPTIMIZE_BATCH_SEQ      AS OPTIMIZE_BATCH_SEQ,
+			        OB.SHIP_ORDER_KEY          AS SHIP_ORDER_KEY,
+			        OB.SHIP_ORDER_ITEM_SEQ     AS SHIP_ORDER_ITEM_SEQ,
+			        OB.WAREHOUSE_KEY           AS WAREHOUSE_KEY,
+			        OB.BATCH_TYPE_STATUS       AS BATCH_TYPE_STATUS,
+			        OB.DOC_DATE                AS DOC_DATE,
+			        OB.SKU_CODE                AS SKU_CODE,
+			        OB.ITEM_STATUS             AS ITEM_STATUS,
+			        OB.QTY_SHIP_ORDER          AS QTY_SHIP_ORDER,
+			        OB.QTY_ALLOCATED           AS QTY_ALLOCATED,
+			        OB.SKU_NAME                AS SKU_NAME,
+			        OB.SKU_SUB_NAME            AS SKU_SUB_NAME,
+			        OB.SKU_ALTER_CODE          AS SKU_ALTER_CODE,
+			        OB.ALLOC_TYPE              AS ALLOC_TYPE,
+			        CASE WHEN BATCH_TYPE_STATUS = 'MAKE'
+			             THEN NVL(OB.GROUP_NO, 'X')
+			             ELSE 'X'
+			        END                        AS OB_GROUP_NO,
+			        CASE WHEN BATCH_TYPE_STATUS = 'MAKE'
+			             THEN NVL(OB.WORK_BATCH_NO, 'X')
+			             ELSE 'X'
+			        END                        AS OB_WORK_BATCH_NO,
+			        CASE WHEN BATCH_TYPE_STATUS = 'MAKE'
+			             THEN OB.GROUP_NO
+			             ELSE ''
+			        END                        AS GROUP_NO,
+			        CASE WHEN BATCH_TYPE_STATUS = 'MAKE'
+			             THEN OB.WORK_BATCH_NO
+			             ELSE ''
+			        END                        AS WORK_BATCH_NO,
+			        OB.QPS_NUM                 AS QPS_NUM,
+			        OB.DAS_CELL_GROUP_ID       AS DAS_CELL_GROUP_ID,
+			        OB.ALLOC_SEQ               AS ALLOC_SEQ,
+			        OB.WAVE_BATCH_CNCL_YN      AS WAVE_BATCH_CNCL_YN,
+			        OB.WAVE_BATCH_CNCL_DATE    AS WAVE_BATCH_CNCL_DATE,
+			        OB.WAVE_BATCH_CNCL_TIME    AS WAVE_BATCH_CNCL_TIME,
+			        OB.WAVE_BATCH_CNCL_USER    AS WAVE_BATCH_CNCL_USER,
+			        OB.CREATED_USER            AS CREATED_USER
+		      FROM O_WCS.TB_WIF_OPTIMIZE_BATCH          OB
+		      LEFT OUTER JOIN O_WCS.TB_ORD_SHIPMENT_DTL DT
+		                   ON ( OB.SHIP_ORDER_KEY      = DT.SHIP_ORDER_KEY
+		                   AND  OB.SHIP_ORDER_ITEM_SEQ = DT.SHIP_ORDER_ITEM_SEQ )
+		      WHERE 1=1
+		        AND OB.OPTIMIZE_BATCH_YMD >= TO_CHAR(SYSDATE-10/24/60, 'YYYYMMDDHH24MISS')
+		        AND OB.APPLY_YN     = 'Y'
+		    ) T
+		 WHERE 1=1
+		   AND T.OB_GROUP_NO      <> T.DT_GROUP_NO
+		   AND T.OB_WORK_BATCH_NO <> T.DT_WORK_BATCH_NO
+	 ]]> 
+  </select>
+  
+  <update id="updateOptimizBatchMake" parameterType="com.lgcns.wcs.kurly.dto.ReplayOptimizBatchData"> 
+  	/* [ReplayOptimizBatchMapper.xml] updateOptimizBatchMake */
+  	UPDATE o_wcs.TB_ORD_SHIPMENT_DTL SET
+		<if test="@com.lgcns.wcs.kurly.util.MybatisCheck@notEmpty(itemStatus)">ITEM_STATUS = #{itemStatus} ,</if>
+		<if test="@com.lgcns.wcs.kurly.util.MybatisCheck@notEmpty(qtyShipOrder)">QTY_SHIP_ORDER = #{qtyShipOrder} ,</if>
+		<if test="@com.lgcns.wcs.kurly.util.MybatisCheck@notEmpty(skuName)">SKU_NAME = #{skuName} ,</if>
+		<if test="@com.lgcns.wcs.kurly.util.MybatisCheck@notEmpty(skuSubName)">SKU_SUB_NAME = #{skuSubName} ,</if>
+		<if test="@com.lgcns.wcs.kurly.util.MybatisCheck@notEmpty(skuAlterCode)">SKU_ALTER_CODE = #{skuAlterCode} ,</if>
+		GROUP_NO = #{groupNo} ,
+		WORK_BATCH_NO = #{workBatchNo} ,
+		PICKING_WAVE_NO = #{workBatchNo} ,
+		QPS_NUM = #{qpsNum} ,
+		DAS_CELL_GROUP_ID = #{dasCellGroupId} ,
+		MODIFIED_DATE = TO_CHAR(SYSDATE, 'YYYYMMDD') ,
+		MODIFIED_TIME = TO_CHAR(SYSDATE, 'HH24MISS') ,
+		MODIFIED_USER = #{insertedUser}   ,
+		WMS_BATCH_YMD = TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS')
+	 WHERE SHIP_ORDER_KEY = #{shipOrderKey}
+	   AND SHIP_ORDER_ITEM_SEQ = #{shipOrderItemSeq}
+  </update>
+
+  <update id="updateOptimizBatchCancel" parameterType="com.lgcns.wcs.kurly.dto.ReplayOptimizBatchData"> 
+  	/* [ReplayOptimizBatchMapper.xml] updateOptimizBatchCancel */
+  	UPDATE o_wcs.TB_ORD_SHIPMENT_DTL SET
+		GROUP_NO = ' ' ,
+		WORK_BATCH_NO = ' ' ,
+		PICKING_WAVE_NO = ' ' ,
+		QPS_NUM = ' ' ,
+		DAS_CELL_GROUP_ID = '' ,
+		MODIFIED_DATE = TO_CHAR(SYSDATE, 'YYYYMMDD') ,
+		MODIFIED_TIME = TO_CHAR(SYSDATE, 'HH24MISS') ,
+		MODIFIED_USER = #{insertedUser}   ,
+		WMS_BATCH_YMD = TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS')
+	 WHERE SHIP_ORDER_KEY = #{shipOrderKey}
+	   AND SHIP_ORDER_ITEM_SEQ = #{shipOrderItemSeq}
+
+  </update>
+
+  <update id="updateOrdShipmentHdr" parameterType="com.lgcns.wcs.kurly.dto.ReplayOptimizBatchData"> 
+  	/* [ReplayOptimizBatchMapper.xml] updateOrdShipmentHdr */
+  	UPDATE o_wcs.TB_ORD_SHIPMENT_HDR SET
+		ALLOC_TYPE = #{allocType} ,
+		ALLOC_SEQ = #{allocSeq} ,
+		MODIFIED_DATE = TO_CHAR(SYSDATE, 'YYYYMMDD') ,
+		MODIFIED_TIME = TO_CHAR(SYSDATE, 'HH24MISS') ,
+		MODIFIED_USER = #{insertedUser}   ,
+		WMS_BATCH_YMD = (CASE WHEN WMS_BATCH_YMD IS NULL THEN 
+								TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS')
+							 ELSE WMS_BATCH_YMD END)
+	 WHERE SHIP_ORDER_KEY = #{shipOrderKey}
+  </update>
+</mapper>

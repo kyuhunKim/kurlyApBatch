@@ -12,6 +12,10 @@ import lombok.Data;
 @Data
 @Alias("PickQpsCompletData")
 public class PickQpsCompletData {
+
+	/* 송장번호UID(WCS)
+	 * */
+	private String invoiceUidKey ;
 	/*출하문서번호(WMS)
 	 * */
 	private String shipOrderKey ;
@@ -23,7 +27,7 @@ public class PickQpsCompletData {
 	private String warehouseKey ;
 	/*출고오더UID(WCS)
 	 * */
-	private String shipUidWcs ;
+	private String shipUidKey ;
 	/*셀UID번호
 	 * */
 	private String cellId ;
@@ -55,5 +59,9 @@ public class PickQpsCompletData {
 	/*detail
 	 * */
 	private List<PickQpsCompletDetailData> detail ;
+	
+	/*마지막출하문서번호여부
+	 * */
+	private String shipOrderLastYn ;
 	
 }

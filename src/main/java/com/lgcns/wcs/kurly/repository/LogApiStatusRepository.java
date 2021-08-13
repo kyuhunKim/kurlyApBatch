@@ -1,5 +1,7 @@
 package com.lgcns.wcs.kurly.repository;
 
+import java.util.Map;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
@@ -16,4 +18,6 @@ import com.lgcns.wcs.kurly.dto.LogApiStatus;
 @Repository
 public interface LogApiStatusRepository  {
 	int createLogApiStatus(LogApiStatus logApiStatus);
+
+	void createLogApiStatusList(Map<String, Object> data);
 }

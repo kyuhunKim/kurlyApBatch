@@ -20,4 +20,6 @@ import com.lgcns.wcs.kurly.dto.ToteScanData;
 public interface ToteScanRepository  {
 	List<ToteScanData> selectToteScan();
 	void updateToteScan(Map<String, String> data);
+	
+	void updateToteScanList(Map<String, Object> data);
 }

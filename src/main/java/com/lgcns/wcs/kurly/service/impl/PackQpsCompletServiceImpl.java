@@ -1,6 +1,7 @@
 package com.lgcns.wcs.kurly.service.impl;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -9,8 +10,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.lgcns.wcs.kurly.dto.LogApiStatus;
 import com.lgcns.wcs.kurly.dto.PackQpsCompletData;
 import com.lgcns.wcs.kurly.dto.PackQpsCompletDetailData;
+import com.lgcns.wcs.kurly.repository.LogApiStatusRepository;
 import com.lgcns.wcs.kurly.repository.PackQpsCompletRepository;
 import com.lgcns.wcs.kurly.service.PackQpsCompletService;
 
@@ -26,6 +29,9 @@ public class PackQpsCompletServiceImpl implements PackQpsCompletService {
 
 	@Autowired
 	PackQpsCompletRepository packQpsCompletRepository;
+
+	@Autowired
+	LogApiStatusRepository logApiStatusRepository;
 	
 	/**
 	 * 
@@ -65,5 +71,25 @@ public class PackQpsCompletServiceImpl implements PackQpsCompletService {
 	@Transactional(propagation=Propagation.REQUIRES_NEW, rollbackFor=SQLException.class)
 	public void updatePackQpsComplet(Map<String, String> data) {
 		packQpsCompletRepository.updatePackQpsComplet(data);
+	}
+
+	/**
+	 * 
+	 * @Method Name : updatePackQpsCompletList
+	 * @작성일 : 2020. 12. 22.
+	 * @작성자 : jooni
+	 * @변경이력 : 2020. 12. 22. 최초작성
+	 * @Method 설명 : WCS 오더 피킹 완료 정보  처리 와 로그  update
+	 */
+	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=SQLException.class)
+	public void updatePackQpsCompletList(Map<String, Object> upListMap, List<LogApiStatus> logApiStatusList)   {
+				
+		packQpsCompletRepository.updatePackQpsCompletList(upListMap);
+
+		Map<String, Object> logList = new HashMap<String, Object>();
+		logList.put("logApiStatusList",logApiStatusList);
+		
+    	//logApi insert
+		logApiStatusRepository.createLogApiStatusList(logList);
 	}
 }

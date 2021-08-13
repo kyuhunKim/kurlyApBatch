@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lgcns.wcs.kurly.repository.SkuMasterRepository">
+    
+  <update id="insertSkuMaster" parameterType="com.lgcns.wcs.kurly.dto.SkuMasterData">
+  	/* [SkuMasterMapper.xml] insertSkuMaster */
+    MERGE INTO o_wcs.TB_COM_SKU_MST 
+    USING  DUAL
+    ON  ( 
+    		OWNER  = #{owner} 
+		AND SKU_CODE = #{skuCode}
+		)
+    WHEN MATCHED THEN 
+    UPDATE SET
+     		SKU_NAME     =  #{skuName} ,
+			SKU_SUB_NAME =  #{skuSubName} ,
+			UOM_KEY      =  #{uomKey} ,
+			UOM_QTY      =  #{uomQty} ,
+			LENGTH   =  #{length} ,
+			WIDTH    =  #{width} ,
+			HEIGHT   =  #{height} ,
+			CBM      =  #{cbm} ,
+			GROSS_WEIGHT =  #{grossWeight} ,
+			NET_WEIGHT   =  #{netWeight} ,
+			BOX_LENGTH  =  #{boxLength} ,
+			BOX_WIDTH   =  #{boxWidth} ,
+			BOX_HEIGHT  =  #{boxHeight} ,
+			BOX_CBM     =  #{boxCbm} ,
+			BOX_GROSS_WEIGHT =  #{boxGrossWeight} ,
+			BOX_NET_WEIGHT   =  #{boxNetWeight} ,
+			UOM_LEN      =  #{uomLen} ,
+			UOM_CBM      =  #{uomCbm} ,
+			UOM_WEIGHT   =  #{uomWeight} ,
+			SKU_GROUP_01 =  #{skuGroup01} ,
+			LOT_ATTR_11  =  #{lotAttr11} ,
+			BOX_IN_QTY   =  #{boxPerQnty} ,
+			UNUSAL_SIZE  =  #{unusalSize} ,
+			USE_YN       =  #{useYn} ,
+			GOODS_IMAGE_URL =  #{goodsImageURL} ,
+			GOODS_IMAGE_THUMBNAIL_URL =  #{goodsImageThumbnailUrl} ,
+			MODIFIED_DATE = TO_CHAR(SYSDATE, 'YYYYMMDD') ,
+			MODIFIED_TIME =  TO_CHAR(SYSDATE, 'HH24MISS') ,
+			MODIFIED_USER = #{insertedUser}
+			
+    WHEN NOT MATCHED THEN
+	    INSERT
+	    ( 
+			OWNER ,
+			SKU_CODE ,
+			SKU_NAME ,
+			SKU_SUB_NAME ,
+			UOM_KEY ,
+			UOM_QTY ,
+			LENGTH ,
+			WIDTH ,
+			HEIGHT ,
+			CBM ,
+			GROSS_WEIGHT ,
+			NET_WEIGHT ,
+			BOX_LENGTH ,
+			BOX_WIDTH ,
+			BOX_HEIGHT ,
+			BOX_CBM ,
+			BOX_GROSS_WEIGHT ,
+			BOX_NET_WEIGHT ,
+			UOM_LEN ,
+			UOM_CBM ,
+			UOM_WEIGHT ,
+			SKU_GROUP_01 ,
+			LOT_ATTR_11 ,
+			BOX_IN_QTY ,
+			UNUSAL_SIZE ,
+			USE_YN ,
+			GOODS_IMAGE_URL,
+			GOODS_IMAGE_THUMBNAIL_URL ,
+			CREATED_DATE ,
+			CREATED_TIME ,
+			CREATED_USER ,
+			MODIFIED_DATE ,
+			MODIFIED_TIME ,
+			MODIFIED_USER
+	     ) VALUES (
+			#{owner} ,
+			#{skuCode} ,
+			#{skuName} ,
+			#{skuSubName} ,
+			#{uomKey} ,
+			#{uomQty} ,
+			#{length} ,
+			#{width} ,
+			#{height} ,
+			#{cbm} ,
+			#{grossWeight} ,
+			#{netWeight} ,
+			#{boxLength} ,
+			#{boxWidth} ,
+			#{boxHeight} ,
+			#{boxCbm} ,
+			#{boxGrossWeight} ,
+			#{boxNetWeight} ,
+			#{uomLen} ,
+			#{uomCbm} ,
+			#{uomWeight} ,
+			#{skuGroup01} ,
+			#{lotAttr11} ,
+			#{boxPerQnty} ,
+			#{unusalSize} ,
+			#{useYn} ,
+			#{goodsImageURL} ,
+			#{goodsImageThumbnailUrl} ,
+			TO_CHAR(SYSDATE, 'YYYYMMDD') ,
+			TO_CHAR(SYSDATE, 'HH24MISS') ,
+			#{insertedUser} ,
+			TO_CHAR(SYSDATE, 'YYYYMMDD') ,
+			TO_CHAR(SYSDATE, 'HH24MISS') ,
+			#{insertedUser}
+	    ) 
+  </update>
+  <update id="insertSkuDetail" parameterType="com.lgcns.wcs.kurly.dto.SkuDetailData"> 
+  	/* [SkuMasterMapper.xml] insertSkuDetail */
+  	MERGE INTO o_wcs.TB_COM_SKU_BCD_MST 
+    USING  DUAL
+    ON  ( 
+    		OWNER  = #{owner} 
+    	AND SKU_CODE = #{skuCode} 
+		AND SKU_ALTER_CODE = #{skuAlterCode}
+		)
+    WHEN MATCHED THEN 
+    UPDATE SET
+		BARCODE_TYPE = #{barcodeType} ,
+		USE_YN = #{useYn}  ,
+		MODIFIED_DATE = TO_CHAR(SYSDATE, 'YYYYMMDD') ,
+		MODIFIED_TIME =  TO_CHAR(SYSDATE, 'HH24MISS') ,
+		MODIFIED_USER = #{insertedUser}
+  	WHEN NOT MATCHED THEN
+	    INSERT
+	    ( 
+	  		OWNER , 
+			SKU_CODE ,
+	  		SKU_ALTER_CODE ,
+			BARCODE_TYPE ,
+			USE_YN ,
+			CREATED_DATE ,
+			CREATED_TIME ,
+			CREATED_USER ,
+			MODIFIED_DATE ,
+			MODIFIED_TIME ,
+			MODIFIED_USER
+	     ) VALUES (
+			#{owner} ,
+			#{skuCode} ,
+			#{skuAlterCode} ,
+			#{barcodeType} ,
+			#{useYn} ,
+			TO_CHAR(SYSDATE, 'YYYYMMDD') ,
+			TO_CHAR(SYSDATE, 'HH24MISS') ,
+			#{insertedUser} ,
+			TO_CHAR(SYSDATE, 'YYYYMMDD') ,
+			TO_CHAR(SYSDATE, 'HH24MISS') ,
+			#{insertedUser}
+	    ) 
+  </update>
+  
+  <update id="insertSkuDetailList" parameterType="map"> 
+  	/* [SkuMasterMapper.xml] insertSkuDetailList */
+  	MERGE INTO o_wcs.TB_COM_SKU_BCD_MST  SM
+    USING  (
+   		<foreach collection="dtList" item="item" index="index" separator="UNION ALL">
+        SELECT 
+			#{item.owner, jdbcType=VARCHAR}   AS  OWNER,
+			#{item.skuCode, jdbcType=VARCHAR}   AS  SKU_CODE,
+			#{item.skuAlterCode, jdbcType=VARCHAR}   AS  SKU_ALTER_CODE,
+			#{item.barcodeType, jdbcType=VARCHAR}   AS  BARCODE_TYPE,
+			#{item.useYn, jdbcType=VARCHAR}   AS  USE_YN,
+			#{item.insertedUser, jdbcType=VARCHAR}   AS  CREATED_USER,
+			#{item.insertedUser, jdbcType=VARCHAR}   AS  MODIFIED_USER
+        FROM DUAL
+		</foreach>
+    ) TB
+    ON  ( 
+    		SM.OWNER  =  TB.OWNER
+    	AND SM.SKU_CODE =  TB.SKU_CODE
+		AND SM.SKU_ALTER_CODE = TB.SKU_ALTER_CODE
+	)
+    WHEN MATCHED THEN 
+    UPDATE SET
+		SM.BARCODE_TYPE = TB.BARCODE_TYPE ,
+		SM.USE_YN = TB.USE_YN  ,
+		SM.MODIFIED_DATE = TO_CHAR(SYSDATE, 'YYYYMMDD') ,
+		SM.MODIFIED_TIME =  TO_CHAR(SYSDATE, 'HH24MISS') ,
+		SM.MODIFIED_USER = TB.MODIFIED_USER
+  	WHEN NOT MATCHED THEN
+	    INSERT
+	    ( 
+	  		OWNER , 
+			SKU_CODE ,
+	  		SKU_ALTER_CODE ,
+			BARCODE_TYPE ,
+			USE_YN ,
+			CREATED_DATE ,
+			CREATED_TIME ,
+			CREATED_USER ,
+			MODIFIED_DATE ,
+			MODIFIED_TIME ,
+			MODIFIED_USER
+	     ) VALUES (
+			TB.OWNER , 
+			TB.SKU_CODE ,
+	  		TB.SKU_ALTER_CODE ,
+			TB.BARCODE_TYPE ,
+			TB.USE_YN ,
+			TO_CHAR(SYSDATE, 'YYYYMMDD') ,
+			TO_CHAR(SYSDATE, 'HH24MISS') ,
+			TB.CREATED_USER ,
+			TO_CHAR(SYSDATE, 'YYYYMMDD') ,
+			TO_CHAR(SYSDATE, 'HH24MISS') ,
+			TB.MODIFIED_USER
+	    ) 
+  </update>
+</mapper>

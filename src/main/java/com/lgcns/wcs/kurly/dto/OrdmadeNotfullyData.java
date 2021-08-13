@@ -19,15 +19,16 @@ public class OrdmadeNotfullyData {
 	/*센터
 	 * */
 	private String warehouseKey ;
+	private String docDate ;
 	/*그룹배치번호
 	 * */
 	private String groupNo ;
 	/*작업배치번호
 	 * */
 	private String workBatchNo ;
-	/*피킹배치번호
+	/*WMS피킹지시그룹
 	 * */
-	private String pickingWaveNo ;
+	private String pickingBatchNo ;
 	/*상품코드
 	 * */
 	private String skuCode ;

@@ -1,7 +1,10 @@
 package com.lgcns.wcs.kurly.repository;
 
+import java.util.Map;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.lgcns.wcs.kurly.dto.RegionMasterData;
 
@@ -14,7 +17,9 @@ import com.lgcns.wcs.kurly.dto.RegionMasterData;
  */
 @Mapper
 @Repository
+@Transactional
 public interface RegionMasterRepository  {
 	
 	void insertRegionMaster(RegionMasterData data) ;
+	void insertRegionMasterList(Map<String, Object> data) ;
 }

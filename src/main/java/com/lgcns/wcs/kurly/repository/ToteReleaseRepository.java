@@ -21,4 +21,6 @@ public interface ToteReleaseRepository  {
 	List<ToteReleaseParamData> selectToteRelease();
 	
 	void updateToteRelease(Map<String, String> data);
+	
+	void updateToteReleaseList(Map<String, Object> data);
 }

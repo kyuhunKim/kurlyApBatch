@@ -16,12 +16,10 @@ public class HttpUtil {
 	private HttpUtil() {
 		
 	}
-	public static String getUrlToJson(String inputUrl, String jsonValue, String method) {
+	public static String getUrlToJson(String inputUrl, String jsonValue, String method) throws Exception {
 		
 		String inputLine = "";
 		StringBuffer outResult = new StringBuffer();
-		
-		log.info("=inputUrl="+inputUrl);
 		
 		try
 		{
@@ -37,8 +35,8 @@ public class HttpUtil {
 			conn.setRequestMethod(method);
 			conn.setRequestProperty("Content-Type","application/json");
 			conn.setRequestProperty("Accept-Charset","UTF-8");
-			conn.setConnectTimeout(10000);
-			conn.setReadTimeout(10000);
+			conn.setConnectTimeout(20000);
+			conn.setReadTimeout(20000);
 			
 			if(!"".equals(jsonValue)) {
 				OutputStream os = conn.getOutputStream();
@@ -53,13 +51,12 @@ public class HttpUtil {
 			}
 			conn.disconnect();
 			
-			log.info("================================");
-			log.info("="+outResult.toString());
-			log.info("================================");
 			
 		} catch(Exception e) {
-			log.info(e.getMessage());
-			e.printStackTrace();
+//			log.info(e.getMessage());
+//			e.printStackTrace();
+			//##2021.02.14 오류가 발생했을시 오류룰 throw 함
+			throw new Exception(e);
 		}
 		return outResult.toString();
 	}

@@ -22,7 +22,6 @@ public class CellTypeVO {
 		cellWidth = 0;
 	}
 	
-
 	public String getCellCd() {
 		return cellCd;
 	}
@@ -53,6 +52,77 @@ public class CellTypeVO {
 	}
 
 
+	public double getCellCBM() {
+		return cellCBM;
+	}
+
+	public void setCellCBM(double cellCBM) {
+		this.cellCBM = cellCBM;
+	}
+
+	public double getCellFirst() {
+		return cellFirst;
+	}
+
+	public void setCellFirst(double cellFirst) {
+		this.cellFirst = cellFirst;
+	}
+
+	public double getCellSecond() {
+		return cellSecond;
+	}
+
+	public void setCellSecond(double cellSecond) {
+		this.cellSecond = cellSecond;
+	}
+
+	public double getCellThird() {
+		return cellThird;
+	}
+
+	public void setCellThird(double cellThird) {
+		this.cellThird = cellThird;
+	}
+
+	public double getCellTotal() {
+		return cellTotal;
+	}
+
+	public void setCellTotal(double cellTotal) {
+		this.cellTotal = cellTotal;
+	}
+
+	public double getFirst()
+	{
+		return cellFirst;
+	}
+	
+	public double getSecond()
+	{
+		return cellSecond;
+	}
+	
+	public double getThird()
+	{
+		return cellThird;
+	}
+	
+
+	private double max(double a, double b)
+	{
+		if(a>b)
+			return a;
+		return b;
+	}
+	
+	private double min(double a, double b)
+	{
+		if(a<b)
+			return a;
+		return b;
+	}
+	
+
 	public double getCellDepth() {
 		return cellDepth;
 	}
@@ -75,40 +145,6 @@ public class CellTypeVO {
 
 	public void setCellWidth(double cellWidth) {
 		this.cellWidth = cellWidth;
-	}
-
-	public double getFirst()
-	{
-		return cellFirst;
-	}
-	
-	public double getSecond()
-	{
-		return cellSecond;
-	}
-	
-	public double getThird()
-	{
-		return cellThird;
-	}
-	
-	public double getCellCbm()
-	{
-		return cellCBM;
-	}
-
-	private double max(double a, double b)
-	{
-		if(a>b)
-			return a;
-		return b;
-	}
-	
-	private double min(double a, double b)
-	{
-		if(a<b)
-			return a;
-		return b;
 	}
 	
 	public void calCellInfo()

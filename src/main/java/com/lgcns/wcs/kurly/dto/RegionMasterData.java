@@ -16,18 +16,10 @@ public class RegionMasterData {
 	/*회사 코드
 	 * */
 	private String coCd ;
-	/*Region code
-	 * */
-	private String rgnCd ;
-	/*Region name
-	 * */
-	private String rgnNm ;
+
 	/*Region group code
 	 * */
 	private String regionGroupCode ;
-	/*delivery Round
-	 * */
-	private String deliveryRound ;
 	/*Region key
 	 * */
 	private String rgnKy ;
@@ -46,4 +38,10 @@ public class RegionMasterData {
 	/*수정일시
 	 * */
 	private Date updDt ;
+	/*REGN_KEY_GROUP_CODE
+	 * */
+	private String rgnKyGroupCode ;
+	/*김포FC센터구분자(CC02)
+	 * */
+	private String ccCode ;
 }

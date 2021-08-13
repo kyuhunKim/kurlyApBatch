@@ -7,40 +7,51 @@
    
   <select id="selectQpsNumUseCellList" resultType="com.lgcns.wcs.kurly.dto.QpsNumUseCellData">
   	/* [QpsNumUseCellMapper.xml] selectQpsNumUseCellList */
-	SELECT
-		  WAREHOUSE_KEY AS warehouseKey
-		, SUM(QPSNUMUSECELL01) AS qpsNumUseCell01
-		, SUM(QPSNUMUSECELL02) AS qpsNumUseCell02
-		, SUM(DASNUMUSECELL) AS dasNumUseCell
-		, TO_CHAR(SYSDATE, 'YYYYMMDD') AS batchRunDate
-		, TO_CHAR(SYSDATE, 'HH24MISS') AS batchRunTime
- 	FROM (
- 		SELECT 
- 			WS.WAREHOUSE_KEY
-			, CASE WHEN CM.LOCATION_TYPE IN ( 'QPS' ) 
-						AND CM.EQP_ID IN ( 'MQ01', 'MQ03', 'MQ05' ) 
-						AND CM.USE_YN = 'Y' 
-				THEN 1 
-				ELSE 0
-			  END  QPSNUMUSECELL01
-			, CASE WHEN CM.LOCATION_TYPE IN ( 'QPS' ) 
-						AND CM.EQP_ID IN ( 'MQ02', 'MQ04', 'MQ06' ) 
-						AND CM.USE_YN = 'Y' 
-				THEN 1 
-				ELSE 0
-			  END  QPSNUMUSECELL02   
-			, CASE WHEN CM.LOCATION_TYPE IN ( 'DAS' ) 
-						AND CM.USE_YN = 'Y' 
-				THEN 1 
-				ELSE 0
-			  END  DASNUMUSECELL           
-		FROM O_WCS.TB_COM_CELL_MST CM
-			JOIN O_WCS.TB_COM_WS_MST   WS 
-				ON ( CM.STATION_ID = WS.STATION_ID
-                      AND  CM.EQP_ID     = WS.EQP_ID   )
-	) T
-	GROUP BY WAREHOUSE_KEY 
-	ORDER BY WAREHOUSE_KEY ASC 
+	SELECT 
+ 		  Y.WAREHOUSE_KEY             AS warehouseKey
+		, SUM(Y.QPSCELLUSENUM01)      AS qpsNumUseCell01
+		, SUM(Y.QPSCELLUSENUM02)      AS qpsNumUseCell02
+		, TO_CHAR(SYSDATE,'YYYYMMDD') AS batchRunDate
+		, TO_CHAR(SYSDATE,'HH24MISS') AS batchRunTime     
+	FROM   
+	(  
+		SELECT 
+			X.CO_CD 
+			, X.CNTR_CD
+			, X.EQP_ID
+			, CASE  WHEN X.EQP_ID IN ( 'MQ01', 'MQ02') THEN 'GGM1' 
+					WHEN X.EQP_ID IN ( 'MQ03', 'MQ04') THEN 'GGL1' 
+					WHEN X.EQP_ID IN ( 'MQ05', 'MQ06') THEN 'GGH1'               
+				ELSE 'WHXX'
+			END  AS WAREHOUSE_KEY
+			, CASE WHEN X.EQP_ID IN ( 'MQ01', 'MQ03', 'MQ05' ) THEN 1 
+				ELSE 0 END AS QPSCELLUSENUM01
+			, CASE WHEN X.EQP_ID IN ( 'MQ02', 'MQ04', 'MQ06' ) THEN 1 
+				ELSE 0 END AS QPSCELLUSENUM02    
+		FROM
+		(
+			SELECT 
+				PD.CO_CD
+				, PD.CNTR_CD
+				, PD.EQP_ID
+				, PD.STATION_ID 
+			FROM O_WCS.TB_QPS_WS_PLAN_HDR PH
+				JOIN O_WCS.TB_QPS_WS_PLAN_DTL PD ON ( PH.CO_CD   = PD.CO_CD
+									AND  PH.CNTR_CD = PD.CNTR_CD
+									AND  PH.EQP_ID  = PD.EQP_ID
+									AND  PH.PLAN_CD = PD.PLAN_CD ) 
+			WHERE 1 = 1 
+				AND PH.USE_YN = 'Y'
+		) X
+		JOIN O_WCS.TB_COM_CELL_MST CM ON ( X.CO_CD      = CM.CO_CD
+									AND  X.CNTR_CD    = CM.CNTR_CD
+									AND  X.EQP_ID     = CM.EQP_ID 
+									AND  X.STATION_ID = CM.STATION_ID
+									AND  CM.LOCATION_TYPE = 'QPS'                              
+									AND  CM.USE_YN        = 'Y'  )
+	) Y
+	GROUP BY Y.WAREHOUSE_KEY
+	ORDER BY Y.WAREHOUSE_KEY
   </select>
   
 </mapper>

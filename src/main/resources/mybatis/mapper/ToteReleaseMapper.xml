@@ -36,4 +36,31 @@
 	
   </update>
   
+  <update id="updateToteReleaseList" parameterType="map">
+  /* [ToteReleaseMapper.xml] updateToteReleaseList */
+    MERGE INTO o_wcs.TB_WIF_PICK_TOTE_HDR  HDR
+    	USING (
+    		<foreach collection="updateList" item="item" index="index" separator="UNION ALL">
+    		SELECT
+				#{item.toteUniqueNo}  AS TOTE_UNIQUE_NO,
+				#{item.toteReleaseIntfYn}  AS TOTE_RELEASE_INTF_YN ,  
+				#{item.toteReleaseIntfCode}  AS TOTE_RELEASE_INTF_CODE ,
+				#{item.toteReleaseIntfMemo}  AS TOTE_RELEASE_INTF_MEMO
+    		FROM DUAL
+   		   </foreach>
+	) TB
+	ON 
+	(
+		HDR.WIF_PICK_TOTE_HDR_SEQ = TB.TOTE_UNIQUE_NO
+	)
+	WHEN MATCHED THEN
+		UPDATE
+		<set>
+			HDR.TOTE_RELEASE_INTF_YN =  TB.TOTE_RELEASE_INTF_YN,
+			HDR.TOTE_RELEASE_INTF_DT =  SYSDATE,
+			HDR.TOTE_RELEASE_INTF_CODE =  TB.TOTE_RELEASE_INTF_CODE,
+			HDR.TOTE_RELEASE_INTF_MEMO = TB.TOTE_RELEASE_INTF_MEMO 
+		</set>
+  </update>
+  
 </mapper>
