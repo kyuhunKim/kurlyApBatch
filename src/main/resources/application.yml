@@ -13,17 +13,17 @@ spring:
     topics:
       wcs-out:
         destination:
-          tote-scan:  2CC-MSG-OUTBOUND-WMS-WCS_AP_TOTE_SCAN
-          tote-release:  2CC-MSG-OUTBOUND-WMS-WCS_AP_TOTE_RELEASE
-          tote-cellExceptTxn:  2CC-MSG-OUTBOUND-WMS-WCS_AP_TOTE_CELL_EXCEPTION
-          packQpsComplet:  2CC-MSG-OUTBOUND-WMS-WCS_AP_PACKING_QPS_COMPLETE
-          pickQpsComplet:  2CC-MSG-OUTBOUND-WMS-WCS_AP_PICKING_QPS_COMPLETE
-          invoiceSortComplet:  2CC-MSG-OUTBOUND-WMS-WCS_AP_SHIP_SORT_COMPLETE
-          ordmadeNotfullyReplay:  2CC-MSG-OUTBOUND-WMS-WCS_AP_ADDITIONAL_ITEM_PICKING
-          invoicePrintComplet:  2CC-MSG-OUTBOUND-WMS-WCS_AP_INVOICE_PRINT_COMPLETE
-          ordmadeNotfully:  2CC-MSG-OUTBOUND-WMS-WCS_AP_INCOMPLETE_ORDER_PICKING_STOP
-          qpsNumUseCell:  2CC-MSG-OUTBOUND-WMS-WCS_AP_QPS_CELL_AVAILABLE
-          dasNumUseCell:  2CC-MSG-OUTBOUND-WMS-WCS_AP_DAS_CELL_AVAILABLE
+          tote-scan: 2CC-MSG-OUTBOUND-WMS-WCS_AP_TOTE_SCAN
+          tote-release: 2CC-MSG-OUTBOUND-WMS-WCS_AP_TOTE_RELEASE
+          tote-cellExceptTxn: 2CC-MSG-OUTBOUND-WMS-WCS_AP_TOTE_CELL_EXCEPTION
+          packQpsComplet: 2CC-MSG-OUTBOUND-WMS-WCS_AP_PACKING_QPS_COMPLETE
+          pickQpsComplet: 2CC-MSG-OUTBOUND-WMS-WCS_AP_PICKING_QPS_COMPLETE
+          invoiceSortComplet: 2CC-MSG-OUTBOUND-WMS-WCS_AP_SHIP_SORT_COMPLETE
+          ordmadeNotfullyReplay: 2CC-MSG-OUTBOUND-WMS-WCS_AP_ADDITIONAL_ITEM_PICKING
+          invoicePrintComplet: 2CC-MSG-OUTBOUND-WMS-WCS_AP_INVOICE_PRINT_COMPLETE
+          ordmadeNotfully: 2CC-MSG-OUTBOUND-WMS-WCS_AP_INCOMPLETE_ORDER_PICKING_STOP
+          qpsNumUseCell: 2CC-MSG-OUTBOUND-WMS-WCS_AP_QPS_CELL_AVAILABLE
+          dasNumUseCell: 2CC-MSG-OUTBOUND-WMS-WCS_AP_DAS_CELL_AVAILABLE
   
   datasource:
 #   dev
@@ -74,10 +74,12 @@ spring.main.allow-bean-definition-overriding: true
 #wms.regionMasterUrl: https://tms.api.dev.kurly.com/tms/v1/common/wms/region/items
 #dev : 
 #wms.regionMasterUrl: http://tms.api.dev.kurly.com/tms/v1/common/wms/region/zipmasters
-#2cc: 
-wms.regionMasterUrl: http://tam-api.2cc.kurly.services/region/zipmasters
+#2cc:
+#wms.regionMasterUrl: http://tam-api.2cc.kurly.services/region/zipmasters
+#2021.08.10 url 변경
+wms.regionMasterUrl: https://tam.api.dev.kurly.com/v1/fs/regions/simple?clusterCenter=CC02
 #real: 
-#wms.regionMasterUrl: https://tms.api.kurly.services/tms/v1/common/wms/region/zipmasters
+#wms.regionMasterUrl: https://tam.api.kurly.services/v1/fs/regions/simple?clusterCenter=CC02
 
 # mybatis 설정.
 mybatis:

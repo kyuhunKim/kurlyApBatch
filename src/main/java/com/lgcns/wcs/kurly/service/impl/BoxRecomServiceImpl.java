@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -355,25 +357,29 @@ public class BoxRecomServiceImpl implements BoxRecomService {
 	 */
 	@Transactional(propagation=Propagation.REQUIRED, rollbackFor= Throwable.class)
 	public void insertOrdShipmentListType(List<WifShipmentVO> hdList, List<WifShipmentDtlVO> dtList) {
-		
+
 		String inft_yn = KurlyConstants.STATUS_Y;
-		try
-    	{
+		try {
 			//OrdShipmentHdrL insert
 			HashMap<String, Object> hdMap = new HashMap<String, Object>();
-			hdMap.put("hdList",hdList);
-			
+			hdMap.put("hdList", hdList);
+
 			boxRecomRepository.insertOrdShipmentHdrListType(hdMap);
 
 			//OrdShipmentDtl insert
 			HashMap<String, Object> dtMap = new HashMap<String, Object>();
-			dtMap.put("dtList",dtList);
-			
+			dtMap.put("dtList", dtList);
+
 			boxRecomRepository.insertOrdShipmentDtlListType(dtMap);
-		
-    	} catch (Exception e) {
-    		
-			log.info( " === insertOrdShipmentListType  error >> " +e );
+		}catch(DuplicateKeyException e){
+			e.printStackTrace();
+//			log.info( " === insertOrdShipmentListType DuplicateKeyException error >> " +e );
+		}catch(DataAccessException e){
+			e.printStackTrace();
+//			log.info( " === insertOrdShipmentListType DataAccessException error >> " +e );
+		}catch (Exception e) {
+
+//			log.info( " === insertOrdShipmentListType  Exception error >> " +e );
 			inft_yn = KurlyConstants.STATUS_E;
 			e.printStackTrace();
 			
@@ -387,7 +393,7 @@ public class BoxRecomServiceImpl implements BoxRecomService {
 				uParam.put("receiveIntfCode", "");
 			}else if(KurlyConstants.STATUS_E.equals(inft_yn)){
 				uParam.put("receiveIntfCode", KurlyConstants.STATUS_NG);
-			}else {
+			}else{
 	    		uParam.put("receiveIntfCode", KurlyConstants.STATUS_OK);
 	    	}
 			uParam.put("receiveIntfMemo", "");

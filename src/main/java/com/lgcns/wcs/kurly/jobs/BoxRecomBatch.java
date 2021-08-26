@@ -1,10 +1,7 @@
 package com.lgcns.wcs.kurly.jobs;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -74,9 +71,14 @@ public class BoxRecomBatch  {
 		int executeCount = 0;
 		int executeCountAll = 0;
 		int insertMaxCount = 100;
-    	
+
+		String inft_yn = KurlyConstants.STATUS_Y;
+
 		Date startDate = Calendar.getInstance().getTime();
-    	
+
+		List<WifShipmentVO> wifShipmentVOList = null;
+		List<WifShipmentDtlVO> wifShipmentDtlVOList = null;
+
     	try
     	{
 
@@ -179,8 +181,8 @@ public class BoxRecomBatch  {
 	    		
 	    		String r_ifYn = KurlyConstants.STATUS_Y;
 	    		
-	    		List<WifShipmentVO> wifShipmentVOList = new ArrayList<WifShipmentVO>();
-	    		List<WifShipmentDtlVO> wifShipmentDtlVOList = new ArrayList<WifShipmentDtlVO>();
+	    		wifShipmentVOList = new ArrayList<WifShipmentVO>();
+	    		wifShipmentDtlVOList = new ArrayList<WifShipmentDtlVO>();
 	    		int j = 0;
 	        	OrdSplitApp app;
 	    		for(OrdInfoVO itOrd : ordList.getList())
@@ -435,6 +437,8 @@ public class BoxRecomBatch  {
     	
     	} catch (Exception e) {
     		result = "error";
+			inft_yn = KurlyConstants.STATUS_E;
+
 			log.info( " === BoxRecomBatch  error >> " +e );
 			resultMessage = e.toString();
 			e.printStackTrace();
@@ -442,6 +446,16 @@ public class BoxRecomBatch  {
 
     		apiRunTimeEnd = System.currentTimeMillis();
 			apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
+
+			if(KurlyConstants.STATUS_E.equals(inft_yn)) {
+				//상태 업데이트
+				HashMap<String, Object> uParam = new HashMap<String, Object>();
+				uParam.put("hdList", wifShipmentVOList);
+				uParam.put("receiveIntfYn", inft_yn);
+				uParam.put("receiveIntfCode", KurlyConstants.STATUS_NG);
+				uParam.put("receiveIntfMemo", "");
+				boxRecomService.updateWifShipmentHdrList(uParam);
+			}
 
 //        	log.info("======= apiRunTime(ms) : "+ apiRunTime);
 
