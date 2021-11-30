@@ -8,23 +8,23 @@ spring:
 #      consumer: localhost:9092
 #      producer: b-1.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-2.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-3.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-4.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092
 #      consumer: b-1.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-2.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-3.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-4.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092
-     producer: logistics-2cc.kafka.stage.kurly.services:9092
-     consumer: logistics-2cc.kafka.stage.kurly.services:9092
+     producer: logistics-kafka.dev.kurly.services:9092
+     consumer: logistics-kafka.dev.kurly.services:9092
     topics:
       wcs-out:
         destination:
-          tote-scan: 2CC-MSG-OUTBOUND-WMS-WCS_AP_TOTE_SCAN
-          tote-release: 2CC-MSG-OUTBOUND-WMS-WCS_AP_TOTE_RELEASE
-          tote-cellExceptTxn: 2CC-MSG-OUTBOUND-WMS-WCS_AP_TOTE_CELL_EXCEPTION
-          packQpsComplet: 2CC-MSG-OUTBOUND-WMS-WCS_AP_PACKING_QPS_COMPLETE
-          pickQpsComplet: 2CC-MSG-OUTBOUND-WMS-WCS_AP_PICKING_QPS_COMPLETE
-          invoiceSortComplet: 2CC-MSG-OUTBOUND-WMS-WCS_AP_SHIP_SORT_COMPLETE
-          ordmadeNotfullyReplay: 2CC-MSG-OUTBOUND-WMS-WCS_AP_ADDITIONAL_ITEM_PICKING
-          invoicePrintComplet: 2CC-MSG-OUTBOUND-WMS-WCS_AP_INVOICE_PRINT_COMPLETE
-          ordmadeNotfully: 2CC-MSG-OUTBOUND-WMS-WCS_AP_INCOMPLETE_ORDER_PICKING_STOP
-          qpsNumUseCell: 2CC-MSG-OUTBOUND-WMS-WCS_AP_QPS_CELL_AVAILABLE
-          dasNumUseCell: 2CC-MSG-OUTBOUND-WMS-WCS_AP_DAS_CELL_AVAILABLE
-  
+          tote-scan: DEV-MSG-OUTBOUND-WMS-WCS_AP_TOTE_SCAN
+          tote-release: DEV-MSG-OUTBOUND-WMS-WCS_AP_TOTE_RELEASE
+          tote-cellExceptTxn: DEV-MSG-OUTBOUND-WMS-WCS_AP_TOTE_CELL_EXCEPTION
+          packQpsComplet: DEV-MSG-OUTBOUND-WMS-WCS_AP_PACKING_QPS_COMPLETE
+          pickQpsComplet: DEV-MSG-OUTBOUND-WMS-WCS_AP_PICKING_QPS_COMPLETE
+          invoiceSortComplet: DEV-MSG-OUTBOUND-WMS-WCS_AP_SHIP_SORT_COMPLETE
+          ordmadeNotfullyReplay: DEV-MSG-OUTBOUND-WMS-WCS_AP_ADDITIONAL_ITEM_PICKING
+          invoicePrintComplet: DEV-MSG-OUTBOUND-WMS-WCS_AP_INVOICE_PRINT_COMPLETE
+          ordmadeNotfully: DEV-MSG-OUTBOUND-WMS-WCS_AP_INCOMPLETE_ORDER_PICKING_STOP
+          qpsNumUseCell: DEV-MSG-OUTBOUND-WMS-WCS_AP_QPS_CELL_AVAILABLE
+          dasNumUseCell: DEV-MSG-OUTBOUND-WMS-WCS_AP_DAS_CELL_AVAILABLE
+
   datasource:
 #   dev
 #    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
@@ -39,9 +39,9 @@ spring:
     driver-class-name: oracle.jdbc.driver.OracleDriver
 #    url: jdbc:oracle:thin:@10.12.43.111:1521:wcsprod
     url: jdbc:oracle:thin:@10.12.43.101:1521:wcsqa
-    username : s_wcs
-    password : s_wcs
-    
+    username: s_wcs
+    password: s_wcs
+
     hikari:
       minimum-idle: 15
       maximum-pool-size: 100
@@ -59,26 +59,26 @@ spring:
         cacheResultSetMetadata: true
         cacheServerConfiguration: true
         maintainTimeStats: false
-        
+
   batch:
-    job: 
+    job:
       enabled: false
 
   task:
     scheduling:
       pool:
         size: 13
-        
+
 spring.main.allow-bean-definition-overriding: true
 
 #wms.regionMasterUrl: https://tms.api.dev.kurly.com/tms/v1/common/wms/region/items
-#dev : 
+#dev :
 #wms.regionMasterUrl: http://tms.api.dev.kurly.com/tms/v1/common/wms/region/zipmasters
 #2cc:
 #wms.regionMasterUrl: http://tam-api.2cc.kurly.services/region/zipmasters
 #2021.08.10 url 변경
 wms.regionMasterUrl: https://tam.api.dev.kurly.com/v1/fs/regions/simple?clusterCenter=CC02
-#real: 
+#real:
 #wms.regionMasterUrl: https://tam.api.kurly.services/v1/fs/regions/simple?clusterCenter=CC02
 
 # mybatis 설정.
