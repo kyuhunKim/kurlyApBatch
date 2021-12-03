@@ -97,4 +97,13 @@ public class ReplayOptimizBatchData {
 	private String dtDhipOrderItemSeq ;
 	//order table 그룹배치번호
 	private String dtGroupNo ;
+
+	/* 배치내 오더라인 수 */
+	private int lineCnt;
+
+	/* ROC 오더라인 순서 */
+	private int rocOrdSeq;
+
+	/* ROC 상품 순서 */
+	private int rocSkuSeq;
 }
