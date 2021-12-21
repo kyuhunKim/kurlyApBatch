@@ -35,7 +35,10 @@
 		      T.WAVE_BATCH_CNCL_DATE   AS waveBatchCnclDate,
 		      T.WAVE_BATCH_CNCL_TIME   AS waveBatchCnclTime,
 		      T.WAVE_BATCH_CNCL_USER   AS waveBatchCnclUser,
-		      T.CREATED_USER           AS insertedUser
+		      T.CREATED_USER           AS insertedUser,
+			  T.LINE_CNT               AS lineCnt,
+			  T.ROC_ORD_SEQ            AS rocOrdSeq,
+			  T.ROC_SKU_SEQ            AS rocSkuSeq
 		    FROM
 		    (
 		        SELECT
@@ -80,8 +83,11 @@
 			        OB.WAVE_BATCH_CNCL_DATE    AS WAVE_BATCH_CNCL_DATE,
 			        OB.WAVE_BATCH_CNCL_TIME    AS WAVE_BATCH_CNCL_TIME,
 			        OB.WAVE_BATCH_CNCL_USER    AS WAVE_BATCH_CNCL_USER,
-			        OB.CREATED_USER            AS CREATED_USER
-		      FROM O_WCS.TB_WIF_OPTIMIZE_BATCH          OB
+			        OB.CREATED_USER            AS CREATED_USER,
+					OB.LINE_CNT                AS LINE_CNT,
+					OB.ROC_ORD_SEQ             AS ROC_ORD_SEQ,
+					OB.ROC_SKU_SEQ             AS ROC_SKU_SEQ
+		      FROM O_WCS.TB_WIF_OPTIMIZE_BATCH OB
 		      LEFT OUTER JOIN O_WCS.TB_ORD_SHIPMENT_DTL DT
 		                   ON ( OB.SHIP_ORDER_KEY      = DT.SHIP_ORDER_KEY
 		                   AND  OB.SHIP_ORDER_ITEM_SEQ = DT.SHIP_ORDER_ITEM_SEQ )
@@ -111,7 +117,10 @@
 		MODIFIED_DATE = TO_CHAR(SYSDATE, 'YYYYMMDD') ,
 		MODIFIED_TIME = TO_CHAR(SYSDATE, 'HH24MISS') ,
 		MODIFIED_USER = #{insertedUser}   ,
-		WMS_BATCH_YMD = TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS')
+		WMS_BATCH_YMD = TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS'),
+  	    LINE_CNT = #{lineCnt},
+  	    ROC_ORD_SEQ = #{rocOrdSeq},
+  	    ROC_SKU_SEQ = #{rocSkuSeq}
 	 WHERE SHIP_ORDER_KEY = #{shipOrderKey}
 	   AND SHIP_ORDER_ITEM_SEQ = #{shipOrderItemSeq}
   </update>
@@ -127,7 +136,10 @@
 		MODIFIED_DATE = TO_CHAR(SYSDATE, 'YYYYMMDD') ,
 		MODIFIED_TIME = TO_CHAR(SYSDATE, 'HH24MISS') ,
 		MODIFIED_USER = #{insertedUser}   ,
-		WMS_BATCH_YMD = TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS')
+		WMS_BATCH_YMD = TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS'),
+  	    LINE_CNT = 0,
+  	    ROC_ORD_SEQ = 0,
+  	    ROC_SKU_SEQ = 0
 	 WHERE SHIP_ORDER_KEY = #{shipOrderKey}
 	   AND SHIP_ORDER_ITEM_SEQ = #{shipOrderItemSeq}
 
