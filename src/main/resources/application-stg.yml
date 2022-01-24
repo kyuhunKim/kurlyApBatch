@@ -2,6 +2,9 @@ server:
   port: 8081
 
 spring:
+  application:
+    name: WCS-AP-BATCH
+
   kafka:
     brokers:
 #      producer: b-1.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-2.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-3.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-4.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092
