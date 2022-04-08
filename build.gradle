@@ -16,6 +16,11 @@ repositories {
 
 }
 
+ext {
+    set("logbackClassic", "1.2.9")
+    set("logstashLogbackVersion", "6.6")
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -29,7 +34,11 @@ dependencies {
 	implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16'
 	
     implementation 'com.oracle.database.jdbc:ojdbc8:19.7.0.0'
-		
+
+    // logback json encoder
+    implementation "ch.qos.logback:logback-classic:${logbackClassic}"
+    implementation "net.logstash.logback:logstash-logback-encoder:${logstashLogbackVersion}"
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'org.projectlombok:lombok'
