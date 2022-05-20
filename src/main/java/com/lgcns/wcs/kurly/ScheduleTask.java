@@ -1,23 +1,9 @@
 package com.lgcns.wcs.kurly;
 
+import com.lgcns.wcs.kurly.jobs.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import com.lgcns.wcs.kurly.jobs.BoxRecomBatch;
-import com.lgcns.wcs.kurly.jobs.DasNumUseCellBatch;
-import com.lgcns.wcs.kurly.jobs.InvoicePrintCompletBatch;
-import com.lgcns.wcs.kurly.jobs.InvoiceSortCompletBatch;
-import com.lgcns.wcs.kurly.jobs.OrdmadeNotfullyBatch;
-import com.lgcns.wcs.kurly.jobs.OrdmadeNotfullyReplayBatch;
-import com.lgcns.wcs.kurly.jobs.PackQpsCompletBatch;
-import com.lgcns.wcs.kurly.jobs.PickQpsCompletBatch;
-import com.lgcns.wcs.kurly.jobs.QpsNumUseCellBatch;
-import com.lgcns.wcs.kurly.jobs.RegionMasterBatch;
-import com.lgcns.wcs.kurly.jobs.ReplayOptimizBatch;
-import com.lgcns.wcs.kurly.jobs.ToteCellExceptTxnBatch;
-import com.lgcns.wcs.kurly.jobs.ToteReleaseBatch;
-import com.lgcns.wcs.kurly.jobs.ToteScanBatch;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -66,6 +52,9 @@ public class ScheduleTask {
 	
 	@Autowired
 	ReplayOptimizBatch replayOptimizBatch;
+
+	@Autowired
+	WcsToDasBatch wcsToDasBatch;
 	
 //	//TEST
 	@Scheduled(fixedDelay = 600000)
@@ -163,5 +152,23 @@ public class ScheduleTask {
 	public void ReplayOptimizBatch() {
 //		System.out.println("The current date (15) InvoiceSortComplet : " + LocalDateTime.now());
 		replayOptimizBatch.ReplayOptimizBatchTask();
+	}
+
+	//최적화 주문정보 WCS-DAS_API로 전송 - 30초
+	@Scheduled(fixedDelay = 30000)
+	public void workBatchOrderToDas() {
+		wcsToDasBatch.workBatchOrderInfoTask();
+	}
+
+	//피킹완료 토트정보 WCS-DAS_API로 전송 - 45초
+	@Scheduled(fixedDelay = 45000)
+	public void pickingCompleteToteToDas(){
+		wcsToDasBatch.pickingCompleteToteInfoTask();
+	}
+
+	//피킹완료후 취소 토트정보 WCS-DAS_API로 전송 - 55초
+	@Scheduled(fixedDelay = 55000)
+	public void pickingCnclToteToDas(){
+		wcsToDasBatch.pickingCnclToteInfoTask();
 	}
 }

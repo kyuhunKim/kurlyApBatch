@@ -1,5 +1,6 @@
 package com.lgcns.wcs.kurly.producer;
 
+import com.lgcns.wcs.kurly.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,18 +11,6 @@ import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.async.DeferredResult;
 
-import com.lgcns.wcs.kurly.dto.DasNumUseCellData;
-import com.lgcns.wcs.kurly.dto.InvoicePrintCompletData;
-import com.lgcns.wcs.kurly.dto.InvoiceSortCompletData;
-import com.lgcns.wcs.kurly.dto.OrdmadeNotfullyReplaySendData;
-import com.lgcns.wcs.kurly.dto.OrdmadeNotfullySendData;
-import com.lgcns.wcs.kurly.dto.PackQpsCompletSendData;
-import com.lgcns.wcs.kurly.dto.PickQpsCompletSendData;
-import com.lgcns.wcs.kurly.dto.QpsNumUseCellData;
-import com.lgcns.wcs.kurly.dto.ResponseMesssage;
-import com.lgcns.wcs.kurly.dto.ToteCellExceptTxnData;
-import com.lgcns.wcs.kurly.dto.ToteReleaseSendData;
-import com.lgcns.wcs.kurly.dto.ToteScanData;
 import com.lgcns.wcs.kurly.service.ToteReleaseService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -33,13 +22,10 @@ public class KurlyWcsToWmsProducer {
 	//토트 마스트 초기화 연계 
 	@Qualifier("toteReleaseKafkaTemplate")
     private KafkaTemplate<String, ToteReleaseSendData> toteReleaseKafkaTemplate;
-	
 	@Qualifier("toteScanKafkaTemplate")
     private KafkaTemplate<String, ToteScanData> toteScanKafkaTemplate;
-
 	@Qualifier("toteCellExceptTxnKafkaTemplate")
     private KafkaTemplate<String, ToteCellExceptTxnData> toteCellExceptTxnKafkaTemplate;
-
     @Qualifier("ordmadeNotfullyReplayKafkaTemplate")
     private KafkaTemplate<String, OrdmadeNotfullyReplaySendData> ordmadeNotfullyReplayKafkaTemplate;
     @Qualifier("ordmadeNotfullyKafkaTemplate")
@@ -56,7 +42,11 @@ public class KurlyWcsToWmsProducer {
     private KafkaTemplate<String, QpsNumUseCellData> qpsNumUseCellKafkaTemplate;
     @Qualifier("dasNumUseCellKafkaTemplate")
     private KafkaTemplate<String, DasNumUseCellData> dasNumUseCellKafkaTemplate;
-    
+	@Qualifier("workbatchOrderKafkaTemplate")
+	private KafkaTemplate<String, WorkBatchOrderSendData> workbatchOrderKafkaTemplate;
+	@Qualifier("pickingInfoKafkaTemplate")
+	private KafkaTemplate<String, PickingInfoData> pickingInfoKafkaTemplate;
+
     @Value("${spring.kafka.topics.wcs-out.destination.tote-release}")
     private String WMS_TOTE_RELEASE;
     @Value("${spring.kafka.topics.wcs-out.destination.tote-scan}")
@@ -77,10 +67,13 @@ public class KurlyWcsToWmsProducer {
     private String WMS_INVOICE_SORTCOMPLET;
     @Value("${spring.kafka.topics.wcs-out.destination.qpsNumUseCell}")
     private String WMS_QPSNUMUSECELL;
-
     @Value("${spring.kafka.topics.wcs-out.destination.dasNumUseCell}")
     private String WMS_DASNUMUSECELL;
-    
+	@Value("${spring.kafka.topics.wcs-out.destination.workBatchOrder}")
+	private String WORKBATCH_ORDER;
+	@Value("${spring.kafka.topics.wcs-out.destination.pickingInfo}")
+	private String PICKING_INFO;
+
     @Autowired
     ToteReleaseService toteReleaseService;
 
@@ -95,7 +88,9 @@ public class KurlyWcsToWmsProducer {
     	    KafkaTemplate<String, InvoicePrintCompletData> invoicePrintCompletKafkaTemplate,
     	    KafkaTemplate<String, InvoiceSortCompletData> invoiceSortCompletKafkaTemplate,
     	    KafkaTemplate<String, QpsNumUseCellData> qpsNumUseCellKafkaTemplate,
-    	    KafkaTemplate<String, DasNumUseCellData> dasNumUseCellKafkaTemplate
+    	    KafkaTemplate<String, DasNumUseCellData> dasNumUseCellKafkaTemplate,
+			KafkaTemplate<String, WorkBatchOrderSendData> workbatchOrderKafkaTemplate,
+			KafkaTemplate<String, PickingInfoData> pickingInfoKafkaTemplate
            ){
       this.toteReleaseKafkaTemplate = toteReleaseKafkaTemplate;
       this.toteScanKafkaTemplate = toteScanKafkaTemplate;
@@ -108,6 +103,8 @@ public class KurlyWcsToWmsProducer {
       this.invoiceSortCompletKafkaTemplate = invoiceSortCompletKafkaTemplate;
       this.qpsNumUseCellKafkaTemplate = qpsNumUseCellKafkaTemplate;
       this.dasNumUseCellKafkaTemplate = dasNumUseCellKafkaTemplate;
+	  this.workbatchOrderKafkaTemplate = workbatchOrderKafkaTemplate;
+	  this.pickingInfoKafkaTemplate = pickingInfoKafkaTemplate;
     }
 
     /**
@@ -557,4 +554,75 @@ public class KurlyWcsToWmsProducer {
     	log.info("=======sendQpsNumUseCellObject end=======");
     	return deferredResult;
     }
+
+	/**
+	 *
+	 * @Method Name : sendWorkBatchOrder
+	 * @작성일 : 2022. 04. 30
+	 * @작성자 : hwan.bae
+	 * @변경이력 : 2022. 04. 30. 최초작성
+	 * @Method 설명 : WCS 워크배치오더 정보  (WCS => WCS_DAS_API) 전송
+	 */
+	public DeferredResult<ResponseEntity<?>> sendWorkBatchOrder(WorkBatchOrderSendData orderSendData){
+		DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
+
+		try {
+
+			SendResult<String, WorkBatchOrderSendData> result =  workbatchOrderKafkaTemplate.send(WORKBATCH_ORDER,  orderSendData).get();
+
+			ResponseMesssage resMessage = new ResponseMesssage();
+			resMessage.setStatus("SUCCESS");
+			resMessage.setMessage("");
+			ResponseEntity<ResponseMesssage> responseEntity = new ResponseEntity<>(resMessage, HttpStatus.OK);
+			deferredResult.setResult(responseEntity);
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error("======= Kafka  [topic = {}, value = {}] Exception: {}",
+					WORKBATCH_ORDER,  orderSendData, e.getMessage());
+
+			ResponseMesssage resMessage = new ResponseMesssage();
+			resMessage.setStatus("FAILURE");
+			resMessage.setMessage(e.getMessage());
+			ResponseEntity<ResponseMesssage> responseEntity = new ResponseEntity<>(resMessage, HttpStatus.INTERNAL_SERVER_ERROR);
+			deferredResult.setResult(responseEntity);
+		}
+
+		return deferredResult;
+	}
+
+	/**
+	 *
+	 * @Method Name : sendPickingCompleteObject
+	 * @작성일 : 2022. 05. 04
+	 * @작성자 : hwan.bae
+	 * @변경이력 : 2022. 05. 04. 최초작성
+	 * @Method 설명 : WCS 피킹완료, 피킹취소 정보  (WCS => WCS_DAS_API) 전송
+	 */
+	public DeferredResult<ResponseEntity<?>> sendPickingInfoObject(PickingInfoData sendData) {
+		DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
+
+		try {
+
+			SendResult<String, PickingInfoData> result =  pickingInfoKafkaTemplate.send(PICKING_INFO,  sendData).get();
+
+			ResponseMesssage resMessage = new ResponseMesssage();
+			resMessage.setStatus("SUCCESS");
+			resMessage.setMessage("");
+			ResponseEntity<ResponseMesssage> responseEntity = new ResponseEntity<>(resMessage, HttpStatus.OK);
+			deferredResult.setResult(responseEntity);
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error("======= Kafka  [topic = {}, value = {}] Exception: {}",
+					PICKING_INFO,  sendData, e.getMessage());
+
+			ResponseMesssage resMessage = new ResponseMesssage();
+			resMessage.setStatus("FAILURE");
+			resMessage.setMessage(e.getMessage());
+			ResponseEntity<ResponseMesssage> responseEntity = new ResponseEntity<>(resMessage, HttpStatus.INTERNAL_SERVER_ERROR);
+			deferredResult.setResult(responseEntity);
+		}
+
+		return deferredResult;
+
+	}
 }

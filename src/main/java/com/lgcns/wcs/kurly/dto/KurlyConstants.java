@@ -91,4 +91,15 @@ public final class KurlyConstants {
      * 최적화 작업배치정보 연계 - 재작업 처리
      */
 	public static final String METHOD_REPLAY_OPTIMIZBATCH = "replayOptimizBatch";
+
+    /**
+     * DAS 오더 정보 -> WCS_DAS_API 전송
+     */
+    public static final String METHOD_WORKBATCHORDER = "workBatchOrderToDas";
+
+    /**
+     * 피킹완료, 취소 토트 정보 -> WCS_DAS_API 전송
+     */
+    public static final String METHOD_PICKINGINFO = "pickingInfoToDas";
+
 }
