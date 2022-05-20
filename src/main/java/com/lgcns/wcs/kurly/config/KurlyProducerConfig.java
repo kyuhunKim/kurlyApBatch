@@ -3,6 +3,7 @@ package com.lgcns.wcs.kurly.config;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.lgcns.wcs.kurly.dto.*;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,18 +12,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.serializer.JsonSerializer;
-
-import com.lgcns.wcs.kurly.dto.DasNumUseCellData;
-import com.lgcns.wcs.kurly.dto.InvoicePrintCompletData;
-import com.lgcns.wcs.kurly.dto.InvoiceSortCompletData;
-import com.lgcns.wcs.kurly.dto.OrdmadeNotfullyReplaySendData;
-import com.lgcns.wcs.kurly.dto.OrdmadeNotfullySendData;
-import com.lgcns.wcs.kurly.dto.PackQpsCompletSendData;
-import com.lgcns.wcs.kurly.dto.PickQpsCompletSendData;
-import com.lgcns.wcs.kurly.dto.QpsNumUseCellData;
-import com.lgcns.wcs.kurly.dto.ToteCellExceptTxnData;
-import com.lgcns.wcs.kurly.dto.ToteReleaseSendData;
-import com.lgcns.wcs.kurly.dto.ToteScanData;
 
 @Configuration
 public class KurlyProducerConfig {
@@ -244,5 +233,43 @@ public class KurlyProducerConfig {
         configPros.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
 
         return new KafkaTemplate<>(new DefaultKafkaProducerFactory<>(configPros));    	
+    }
+
+    /**
+     *
+     * @Method Name : workbatchOrderKafkaTemplate
+     * @작성일 : 2022. 05. 02.
+     * @작성자 : hwan.bae
+     * @변경이력 : 2022. 05. 02. 최초작성
+     * @Method 설명 : WCS DAS 최적화 주문 데이터를 WCS-DAS-API로 전송 kafkaTemplate
+     */
+    @Bean("workbatchOrderKafkaTemplate")
+    public KafkaTemplate<String, WorkBatchOrderSendData> workbatchOrderKafkaTemplate(){
+        Map<String, Object> configPros = new HashMap<>();
+
+        configPros.put(ProducerConfig.RETRIES_CONFIG, 1);
+        configPros.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVER);
+        configPros.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        configPros.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        return new KafkaTemplate<>(new DefaultKafkaProducerFactory<>(configPros));
+    }
+
+    /**
+     *
+     * @Method Name : pickingCompleteKafkaTemplate
+     * @작성일 : 2022. 05. 02.
+     * @작성자 : hwan.bae
+     * @변경이력 : 2022. 05. 02. 최초작성
+     * @Method 설명 : 피킹완료, 피킹취소 토트 데이터를 WCS-DAS-API로 전송 kafkaTemplate
+     */
+    @Bean("pickingInfoKafkaTemplate")
+    public KafkaTemplate<String, PickingInfoData> pickingInfoKafkaTemplate(){
+        Map<String, Object> configPros = new HashMap<>();
+
+        configPros.put(ProducerConfig.RETRIES_CONFIG, 1);
+        configPros.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVER);
+        configPros.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        configPros.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        return new KafkaTemplate<>(new DefaultKafkaProducerFactory<>(configPros));
     }
 }

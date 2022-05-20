@@ -105,6 +105,8 @@ public class BoxRecomBatch  {
     	     *  매뉴얼출고처리여부 Y일 경우 allocType : V 값으로 설정
     	     * ##2021.02.22 
     	     *  allocTyper 값  V -> N 값으로 변경 컬리요청
+    	     * ##2022.04.25
+    	     * allocType : DAS 인 경우 분할하지 않음
     	     * */
         	
     		SearchVO svo = new SearchVO();
@@ -189,8 +191,8 @@ public class BoxRecomBatch  {
 	    		{
 	    			int rSplit = 0;
 	    			
-	    			//오더박스분할여부확인(Y:오더분할가능, N:오더분할불가능)
-					//오더분할부가능일 경우 오더분할 없이 처리
+	    			//오더박스 분할여부확인(Y:오더분할가능, N:오더분할불가능)
+					//오더분할 불가능일 경우 오더분할 없이 처리
 		    		if(KurlyConstants.STATUS_N.equals(itOrd.getBoxSplitCheckYn()) ) {
 	
 		    			//분할하지 않음
@@ -306,8 +308,7 @@ public class BoxRecomBatch  {
 		    				}
 	
 	//        				continue;
-	        			}
-	        			else {
+	        			}else {
 	        				int splitSeqNum = itOrd.getSplitNum(); 
 			    			for(int i=0;i<splitSeqNum;i++)
 			    			{
