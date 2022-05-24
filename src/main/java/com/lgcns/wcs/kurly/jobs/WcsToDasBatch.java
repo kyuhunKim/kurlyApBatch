@@ -276,6 +276,220 @@ public class WcsToDasBatch {
         log.info("======workBatchOrderInfoTask end======");
     }
 
+    public void workBatchOrderUpdateInfoTask(){
+        log.info("======workBatchOrderUpdateInfoTask start======");
+
+        long apiRunTimeStart = 0;
+        long apiRunTimeEnd   = 0;
+        String apiRunTime    = "";
+
+        apiRunTimeStart = System.currentTimeMillis();
+        String result = KurlyConstants.STATUS_OK;
+        String resultMessage = "";
+        int executeCount = 0;
+        Date startDate = Calendar.getInstance().getTime();
+
+        try{
+            //한번에 모든 수정된 주문데이터들을 조회하고 Stream을 이용해서 전송 형태를 만듬.
+            List<WorkBatchOrderData> listWorkBatchOrder = wcsToDasService.selectWorkBatchOrderUpdate();
+
+            if(listWorkBatchOrder != null && listWorkBatchOrder.size() > 0) {
+                List<Map<String, Object>> updateMapList = new ArrayList<Map<String, Object>>();
+                List<LogApiStatus> logApiStatusList = new ArrayList<LogApiStatus>();
+
+                log.info("==========listWorkBatchOrder.size() : " + listWorkBatchOrder.size());
+
+                //workBatchNo로 그룹핑
+                List<WorkBatchOrderData> workBatchGroupList = listWorkBatchOrder.stream()
+                        .filter(distinctByKey(p -> p.getWorkBatchNo()))
+                        .collect(Collectors.toList());
+
+                log.info(">>>>>>>" + workBatchGroupList.size());
+                WorkBatchOrderSendData orderSendData = null;
+                //workBatchNo로 그룹핑된 결과로 반복
+                for(WorkBatchOrderData w : workBatchGroupList) {
+                    log.info("workBatchNo: " + w.getWorkBatchNo());
+                    //건당 시간 체크용
+                    long apiRunTimeStartFor = System.currentTimeMillis();
+
+                    //카프카 전송 데이터 준비
+                    orderSendData = new WorkBatchOrderSendData();
+                    orderSendData.setWarehouseKey(w.getWarehouseKey()); //센터코드
+                    orderSendData.setWorkBatchNo(w.getWorkBatchNo());   //워크배치 번호
+
+                    //특정 워크배치내에 속한 주문번호 리스트
+                    List<WorkBatchOrderData> orderNoList = listWorkBatchOrder.stream()
+                            .filter(o -> w.getWorkBatchNo().equals(o.getWorkBatchNo()))
+                            .collect(Collectors.toList());
+
+                    //orderNo로 그룹핑
+                    List<WorkBatchOrderData> orderNoGroupList = orderNoList.stream()
+                            .filter(distinctByKey(k -> k.getOrderNo()))
+                            .collect(Collectors.toList());
+
+                    List<OrderData> orderDataList = new ArrayList<>();
+                    OrderData od = null;
+                    for(WorkBatchOrderData g : orderNoGroupList){
+                        od = new OrderData();
+                        od.setCellNo(g.getCellNo());
+                        od.setOrderNo(g.getOrderNo());
+                        od.setOrderType(g.getOrderType());
+                        od.setOrderTypeAll(g.getOrderTypeAll());
+                        od.setInvoiceNo(g.getInvoiceNo());
+                        od.setCustomerName(g.getCustomerName());
+                        od.setRecipientName(g.getRecipientName());
+                        od.setReceiverAddress(g.getReceiverAddress());
+                        od.setReceiverRoadAddress(g.getReceiverRoadAddress());
+                        od.setRegionGroupCode(g.getRegionGroupCode());
+                        od.setRegionCode(g.getRegionCode());
+                        od.setRegionGu(g.getRegionGu());
+                        od.setRegionDong(g.getRegionDong());
+                        od.setAllcateSeq(g.getAllcateSeq());
+                        od.setDeliveryRound(g.getDeliveryRound());
+                        od.setReusablePackageYn(g.getReusablePackageYn());
+                        od.setSpecialMgntCustYn(g.getSpecialMgntCustYn());
+
+                        orderDataList.add(od);
+
+                        List<OrderItemData> orderItemDataList = new ArrayList<>();
+
+                        //orderNo로 그룹핑된 결과로 반복
+                        List<WorkBatchOrderData> orderItemList = orderNoList.stream()
+                                .filter((i -> g.getOrderNo().equals(i.getOrderNo())))
+                                .collect(Collectors.toList());
+
+                        OrderItemData oid = null;
+                        for(WorkBatchOrderData s : orderItemList){
+                            oid = new OrderItemData();
+                            oid.setSkuCode(s.getSkuCode());
+                            oid.setSkuName(s.getSkuName());
+                            oid.setSkuAlterCode(s.getSkuAlterCode());
+                            oid.setProductCode(s.getProductCode());
+                            oid.setQuantity(s.getQuantity());
+
+                            orderItemDataList.add(oid);
+                        }
+                        od.setOrderItemList(orderItemDataList);
+                    }
+                    orderSendData.setOrderList(orderDataList);
+
+                    String r_ifYn = KurlyConstants.STATUS_N;
+                    DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
+
+                    String retStatus = "";
+                    String retMessage = "";
+                    try {
+                        //kafka 전송
+                        deferredResult = wcsProducer.sendWorkBatchOrder(orderSendData);
+
+                        ResponseEntity<ResponseMesssage> res = (ResponseEntity<ResponseMesssage>) deferredResult.getResult();
+                        retStatus = (String) res.getBody().getStatus();
+                        retMessage = (String) res.getBody().getMessage();
+
+                        //log.info(" >>>>>>WcsToDasBatch retMessage=>" + retMessage);
+                        //log.info(" >>>>>>WcsToDasBatch retMessage.length=>" + retMessage.length());
+                        if ("SUCCESS".equals(retStatus)) {
+                            r_ifYn = KurlyConstants.STATUS_Y;
+                        } else {
+                            r_ifYn = KurlyConstants.STATUS_N;
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        log.error("== send error == " + orderSendData.getWorkBatchNo());
+                        result = "error";
+                        retMessage = ex.getMessage().substring(0, 90);
+                        r_ifYn = KurlyConstants.STATUS_N;
+                    } finally {
+                        log.info("retStatus==" + retStatus);
+                        //인터페이스 처리결과 셋팅
+                        Map<String, Object> updateMap = null;
+
+                        for (WorkBatchOrderData c : orderNoList) {
+                            updateMap = new HashMap<String, Object>();
+                            updateMap.put("shipUidKey", c.getShipUidKey());
+                            updateMap.put("shipUidItemSeq", c.getShipUidItemSeq());
+                            updateMap.put("dasIntfYn", r_ifYn);
+                            updateMap.put("modifiedUser", KurlyConstants.DEFAULT_USERID);
+
+                            updateMap.put("dasIntfMemo", retMessage);
+
+                            updateMapList.add(updateMap);
+                        }
+
+                        Map<String, Object> logMap = new HashMap<String, Object>();
+
+                        apiRunTimeEnd = System.currentTimeMillis();
+                        apiRunTime = StringUtil.formatInterval(apiRunTimeStartFor, apiRunTimeEnd);
+                        logMap.put("apiRunTime", apiRunTime);
+                        logMap.put("dasIntfYn", r_ifYn);
+                        logMap.put("dasIntfMemo", retMessage);
+
+                        //로그 저장  수집
+                        logApiStatusList.addAll(logApiStatus(logMap, orderNoList));
+                    }
+                    executeCount++;
+                }
+
+                try
+                {
+                    List<Map<String, Object>> u_updateMapList = new ArrayList<Map<String, Object>>();
+                    List<LogApiStatus> u_logApiStatusList = new ArrayList<LogApiStatus>();
+                    //인터페이스 처리내역 update
+                    for(int i = 0; i < updateMapList.size(); i++) {
+
+                        u_updateMapList.add(updateMapList.get(i));
+                        u_logApiStatusList.add(logApiStatusList.get(i));
+                        //50 건 씩 처리
+                        if( (i > 2 && i % 50 == 0 ) || ( i == updateMapList.size() - 1 ) ) {
+
+                            Map<String, Object> upListMap = new HashMap<String, Object>();
+                            upListMap.put("updateList",u_updateMapList);
+
+                            //update
+                            wcsToDasService.updateWorkBatchOrderList(upListMap, u_logApiStatusList);
+
+                            //초기화
+                            u_updateMapList = new ArrayList<Map<String, Object>>();
+                            u_logApiStatusList = new ArrayList<LogApiStatus>();
+                        }
+                    }
+                } catch (Exception e1) {
+                    result = "error";
+                    log.error( " === WcsToDasBatch  error e1" + e1 );
+                    resultMessage = e1.toString();
+                }
+            }
+        }catch(Exception e){
+            result = "error";
+            log.error( " === WcsToDasBatch  error" + e );
+            e.printStackTrace();
+            resultMessage = e.toString();
+        }finally {
+            apiRunTimeEnd = System.currentTimeMillis();
+            apiRunTime = StringUtil.formatInterval(apiRunTimeStart, apiRunTimeEnd) ;
+
+            //배치 로그 정보 insert
+            LogBatchExec logBatchExec = new LogBatchExec();
+
+            logBatchExec.setExecMethod(KurlyConstants.METHOD_DASORDERUPDATE);
+            if(KurlyConstants.STATUS_OK.equals(result)){
+                logBatchExec.setSuccessYn(KurlyConstants.STATUS_Y);
+                logBatchExec.setMessageLog(KurlyConstants.METHOD_DASORDERUPDATE +" Sucess("+apiRunTime+"ms)");
+            } else {
+                logBatchExec.setSuccessYn(KurlyConstants.STATUS_N);
+                logBatchExec.setMessageLog(resultMessage);
+            }
+            logBatchExec.setExecuteDirectYn(KurlyConstants.STATUS_N);
+            logBatchExec.setExecuteCount(executeCount);
+            logBatchExec.setStartDate(startDate);
+
+            //로그정보 적재
+            logBatchExecService.createLogBatchExec(logBatchExec);
+        }
+
+        log.info("======workBatchOrderUpdateInfoTask end======");
+    }
+
     /**
      *
      * @Name : logApiStatus

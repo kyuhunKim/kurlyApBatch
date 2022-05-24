@@ -110,4 +110,10 @@ public class WcsToDasServiceImpl implements WcsToDasService {
             }
         }
     }
+
+    @Override
+    @Transactional(propagation= Propagation.REQUIRES_NEW, rollbackFor= SQLException.class)
+    public List<WorkBatchOrderData> selectWorkBatchOrderUpdate() {
+        return wcsToDasRepository.selectWorkBatchOrderUpdate();
+    }
 }

@@ -35,4 +35,6 @@ public interface WcsToDasService {
     void updatePickingCnclList(Map<String, Object> upListMap, List<LogApiStatus> u_logApiStatusList);
 
     void createDocInfo(List<OrderData> docList) throws Exception;
+
+    List<WorkBatchOrderData> selectWorkBatchOrderUpdate();
 }

@@ -351,4 +351,50 @@
 			HDR.DAS_CNCL_INTF_DT =  SYSDATE
 		</set>
 	</update>
+
+	<select id="selectWorkBatchOrderUpdate" resultType="com.lgcns.wcs.kurly.dto.WorkBatchOrderData">
+		<![CDATA[
+		/* [WcsToDasMapper.xml] selectWorkBatchOrderUpdate */
+		SELECT TOSD.SHIP_UID_KEY 			AS shipUidKey
+			 , TOSD.SHIP_UID_ITEM_SEQ       AS shipUidItemSeq
+			 , TOSH.WAREHOUSE_KEY 			AS warehouseKey
+			 , TOSD.WORK_BATCH_NO 			AS workBatchNo
+			 , 0                            AS cellNo
+			 , TOSH.ORDER_NO 				AS orderNo
+			 , TOSH.SHIP_TYPE 				AS orderType
+			 , TOSH.ORDER_TYPE_ALL 			AS orderTypeAll
+			 , TOSH.INVOICE_NO 				AS invoiceNo
+			 , TOSH.CUSTOMER_NAME 			AS customerName
+			 , TOSH.RECIPIENT_NAME 			AS recipientName
+			 , TOSH.JIBUN_BASIC_ADDR || ' ' || TOSH.JIBUN_DETAIL_ADDR AS receiverAddress
+			 , TOSH.ROAD_ADDR || ' ' || TOSH.ROAD_ADDR_DETAIL   	  AS receiverRoadAddress
+			 , TOSH.REGION_GROUP_CODE 		AS regionGroupCode
+			 , TOSH.REGION_CODE 			AS regionCode
+			 , TOSH.ORDER_ADDR_GUGUN		AS regionGu
+			 , TOSH.ORDER_ADDR_DONG         AS regionDong
+			 , TOSH.ALLOC_SEQ 				AS allcateSeq
+			 , TOSH.DELIVERY_ROUND 			AS deliveryRound
+			 , TOSH.REUSABLE_PACKAGE_YN	 	AS reusablePackageYn
+			 , TOSH.SPECIAL_MGNT_CUST_YN	AS specialMgntCustYn
+			 , TOSD.SKU_CODE 				AS skuCode
+			 , TOSD.SKU_NAME 				AS skuName
+			 , (SELECT O_WCS.FC_GET_SKU_ALTER_CODE(TOSD.OWNER, TOSD.SKU_CODE, NULL, 'SKU_ALTER_CODE')
+				FROM DUAL)                AS skuAlterCode
+			 , (SELECT PRODUCT_CODE
+				FROM O_WCS.TB_COM_SKU_MST
+				WHERE OWNER = TOSD.OWNER
+				  AND SKU_CODE = TOSD.SKU_CODE) AS productCode
+			 , TOSD.QTY_SHIP_ORDER 			AS quantity
+		FROM O_WCS.TB_ORD_SHIPMENT_HDR TOSH
+		   , O_WCS.TB_ORD_SHIPMENT_DTL TOSD
+		WHERE TOSH.SHIP_UID_KEY 		= TOSD.SHIP_UID_KEY
+		  AND TOSH.DOC_DATE 			= TO_CHAR(SYSDATE-7/24, 'YYYYMMDD')
+		  AND TOSH.ALLOC_TYPE 			= 'DAS'
+		  AND TOSH.SHIPMENT_CNCL_YN	    = 'N'
+		  AND TOSD.DAS_INTF_YN 		    = 'Y'
+		  AND TOSH.SHIPMENT_CHANGE_YN   = 'Y'
+		  AND TOSD.DAS_INTF_DT          < TOSH.SHIPMENT_CHANGE_DT
+		ORDER BY TOSD.WORK_BATCH_NO, TOSD.SHIP_UID_KEY, TOSD.SHIP_UID_ITEM_SEQ
+		]]>
+	</select>
 </mapper>

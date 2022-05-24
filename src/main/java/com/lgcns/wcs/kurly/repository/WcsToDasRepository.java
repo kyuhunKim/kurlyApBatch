@@ -32,4 +32,6 @@ public interface WcsToDasRepository {
     void updatePickingCnclList(Map<String, Object> upListMap);
 
     void createDocInfo(Map<String, Object> upListMap);
+
+    List<WorkBatchOrderData> selectWorkBatchOrderUpdate();
 }
