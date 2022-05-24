@@ -102,4 +102,8 @@ public final class KurlyConstants {
      */
     public static final String METHOD_PICKINGINFO = "pickingInfoToDas";
 
+    /**
+     * DAS 오더 변경 정보 -> WCS_DAS_API 전송
+     */
+    public static final String METHOD_DASORDERUPDATE = "workBatchOrderUpdateToDas";
 }

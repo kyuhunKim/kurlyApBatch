@@ -61,7 +61,6 @@ public class ScheduleTask {
 	public void testTask() {
 //		log.info("The current date (1) testTask: " + LocalDateTime.now());
 		String resDate = boxRecom.selectDate();
-		log.info("The current date (1) resDate: " + resDate);
 
 //		log.info("Current Thread : {}", Thread.currentThread().getName());
 	}
@@ -160,7 +159,13 @@ public class ScheduleTask {
 		wcsToDasBatch.workBatchOrderInfoTask();
 	}
 
-	//피킹완료 토트정보 WCS-DAS_API로 전송 - 45초
+	//최적화 주문 수정 정보 WCS-DAS_API로 전송 - 35초
+	@Scheduled(fixedDelay = 35000)
+	public void workBatchOrderUpdateToDas() {
+		wcsToDasBatch.workBatchOrderUpdateInfoTask();
+	}
+
+	//피킹완료 토트정보 WCS-DAS_API로 전송 - 40초
 	@Scheduled(fixedDelay = 45000)
 	public void pickingCompleteToteToDas(){
 		wcsToDasBatch.pickingCompleteToteInfoTask();
