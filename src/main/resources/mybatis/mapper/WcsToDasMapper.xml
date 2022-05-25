@@ -299,6 +299,7 @@
 			  FROM O_WCS.TB_WIF_PICK_TOTE_DTL
 			 WHERE TOTE_ID 			= #{item.toteId}
                AND WORK_BATCH_NO 	= #{item.workBatchNo}
+			 GROUP BY WIF_PICK_TOTE_HDR_SEQ
 		</foreach>
 		) TB
 		ON(
