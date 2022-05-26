@@ -28,8 +28,9 @@ import java.util.stream.Collectors;
  * @변경이력 : 2022. 04. 27. 최초작성
  * @Method 설명 : WCS DAS 데이터를 WCS-DAS-API로 kafka전송
  *               1. 워크배치 오더정보
- *               2. 피킹완료 토트정보
- *               3. 피킹완료 토트취소정보
+ *               2. 오더 주소변경정보
+ *               3. 피킹완료 토트정보
+ *               4. 피킹완료 토트취소정보
  */
 
 @Slf4j
@@ -171,8 +172,6 @@ public class WcsToDasBatch {
                             retStatus = (String) res.getBody().getStatus();
                             retMessage = (String) res.getBody().getMessage();
 
-                            //log.info(" >>>>>>WcsToDasBatch retMessage=>" + retMessage);
-                            //log.info(" >>>>>>WcsToDasBatch retMessage.length=>" + retMessage.length());
                             if ("SUCCESS".equals(retStatus)) {
                                 r_ifYn = KurlyConstants.STATUS_Y;
                             } else {
@@ -386,8 +385,6 @@ public class WcsToDasBatch {
                         retStatus = (String) res.getBody().getStatus();
                         retMessage = (String) res.getBody().getMessage();
 
-                        //log.info(" >>>>>>WcsToDasBatch retMessage=>" + retMessage);
-                        //log.info(" >>>>>>WcsToDasBatch retMessage.length=>" + retMessage.length());
                         if ("SUCCESS".equals(retStatus)) {
                             r_ifYn = KurlyConstants.STATUS_Y;
                         } else {
@@ -586,9 +583,6 @@ public class WcsToDasBatch {
                     retStatus = (String)res.getBody().getStatus();
                     retMessage = (String)res.getBody().getMessage();
 
-                    //log.info(" >>>>>>sendCompleteTote retStatus=>"+retStatus);
-	    			//log.info(" >>>>>>"+retMessage);
-
                     if(retStatus.equals("SUCCESS")) {
                         r_ifYn = KurlyConstants.STATUS_Y;
                     } else {
@@ -785,9 +779,6 @@ public class WcsToDasBatch {
                     ResponseEntity<ResponseMesssage> res = (ResponseEntity<ResponseMesssage>)deferredResult.getResult();
                     retStatus = (String)res.getBody().getStatus();
                     retMessage = (String)res.getBody().getMessage();
-
-                    //log.info(" >>>>>>sendCompleteTote retStatus=>"+retStatus);
-                    //log.info(" >>>>>>"+retMessage);
 
                     if(retStatus.equals("SUCCESS")) {
                         r_ifYn = KurlyConstants.STATUS_Y;
