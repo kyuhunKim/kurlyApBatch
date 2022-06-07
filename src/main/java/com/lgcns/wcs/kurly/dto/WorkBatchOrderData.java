@@ -10,6 +10,7 @@ public class WorkBatchOrderData {
     private String shipUidItemSeq;
     private String warehouseKey;
     private String workBatchNo;
+    private String documentDate;
     private int    cellNo;
     private String orderNo;
     private String orderType;

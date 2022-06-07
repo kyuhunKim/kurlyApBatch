@@ -88,7 +88,7 @@ public class WcsToDasBatch {
                     orderSendData = new WorkBatchOrderSendData();
                     orderSendData.setWarehouseKey(w.getWarehouseKey()); //센터코드
                     orderSendData.setWorkBatchNo(w.getWorkBatchNo());   //워크배치 번호
-
+                    orderSendData.setDocumentDate(w.getDocumentDate()); //문서일자
                     //특정 워크배치내에 속한 주문번호 리스트
                     List<WorkBatchOrderData> orderNoList = listWorkBatchOrder.stream()
                             .filter(o -> w.getWorkBatchNo().equals(o.getWorkBatchNo()))
