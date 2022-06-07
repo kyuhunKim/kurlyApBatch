@@ -11,6 +11,7 @@
 			 , TOSD.SHIP_UID_ITEM_SEQ       AS shipUidItemSeq
 			 , TOSH.WAREHOUSE_KEY 			AS warehouseKey
 			 , TOSD.WORK_BATCH_NO 			AS workBatchNo
+			 , TOSH.DOC_DATE                AS documentDate
 			 , 0                            AS cellNo
 			 , TOSH.ORDER_NO 				AS orderNo
 			 , TOSH.SHIP_TYPE 				AS orderType
