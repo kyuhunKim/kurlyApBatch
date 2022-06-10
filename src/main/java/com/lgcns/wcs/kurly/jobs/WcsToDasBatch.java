@@ -838,11 +838,11 @@ public class WcsToDasBatch {
 
                     if( (i > 2 && i % 50 == 0 ) || ( i == updateMapList.size()-1 ) ) {
 
-                        Map<String, Object> upListMap = new HashMap<String, Object>();
-                        upListMap.put("updateList",u_updateMapList);
+                        //Map<String, Object> upListMap = new HashMap<String, Object>();
+                        //upListMap.put("updateList",u_updateMapList);
 
                         //update
-                        wcsToDasService.updatePickingCnclList(upListMap, u_logApiStatusList);
+                        wcsToDasService.updatePickingCnclList(u_updateMapList, u_logApiStatusList);
 
                         //초기화
                         u_updateMapList = new ArrayList<Map<String, Object>>();

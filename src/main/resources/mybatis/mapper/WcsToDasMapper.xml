@@ -333,25 +333,15 @@
 
 	<update id="updatePickingCnclList" parameterType="map">
 		/* [WcsToDasMapper.xml] updatePickingCnclList */
-		MERGE INTO O_WCS.TB_WIF_PICK_TOTE_HDR HDR
-		USING (
-		<foreach collection="updateList" item="item" index="index" separator="UNION">
-			SELECT WIF_PICK_TOTE_HDR_SEQ
-				 , #{item.dasIntfYn}     AS DAS_INTF_YN
-			  FROM O_WCS.TB_WIF_PICK_TOTE_DTL
-		     WHERE TOTE_ID 			= #{item.toteId}
-			   AND WORK_BATCH_NO 	= #{item.workBatchNo}
-		</foreach>
-		) TB
-		ON(
-			HDR.WIF_PICK_TOTE_HDR_SEQ = TB.WIF_PICK_TOTE_HDR_SEQ
-		)
-		WHEN MATCHED THEN
-		UPDATE
-		<set>
-			HDR.DAS_CNCL_INTF_YN =  TB.DAS_INTF_YN,
-			HDR.DAS_CNCL_INTF_DT =  SYSDATE
-		</set>
+		UPDATE O_WCS.TB_WIF_PICK_TOTE_HDR
+		   SET DAS_CNCL_INTF_YN =  #{dasIntfYn}
+		     , DAS_CNCL_INTF_DT =  SYSDATE
+	     WHERE WIF_PICK_TOTE_HDR_SEQ IN ( SELECT DISTINCT WIF_PICK_TOTE_HDR_SEQ
+										    FROM O_WCS.TB_WIF_PICK_TOTE_DTL
+										   WHERE TOTE_ID		= #{toteId}
+										     AND WORK_BATCH_NO 	= #{workBatchNo})
+		   AND TOTE_CNCL_YN = 'Y'
+		   AND ALLOC_TYPE   = 'DAS'
 	</update>
 
 	<select id="selectWorkBatchOrderUpdate" resultType="com.lgcns.wcs.kurly.dto.WorkBatchOrderData">
