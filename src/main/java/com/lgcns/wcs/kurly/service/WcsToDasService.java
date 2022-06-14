@@ -32,7 +32,7 @@ public interface WcsToDasService {
 
     List<PickingInfoData> selectPickingCnclToteInfo();
 
-    void updatePickingCnclList(Map<String, Object> upListMap, List<LogApiStatus> u_logApiStatusList);
+    void updatePickingCnclList(List<Map<String, Object>> upList, List<LogApiStatus> u_logApiStatusList);
 
     void createDocInfo(List<OrderData> docList) throws Exception;
 
