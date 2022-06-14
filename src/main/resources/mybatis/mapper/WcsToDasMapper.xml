@@ -309,8 +309,8 @@
 		WHEN MATCHED THEN
 		UPDATE
 		<set>
-			HDR.DAS_INTF_YN =  TB.DAS_INTF_YN,
-			HDR.DAS_INTF_DT =  SYSDATE
+			  HDR.DAS_INTF_YN =  TB.DAS_INTF_YN
+			, HDR.DAS_INTF_DT =  SYSDATE
 		</set>
 	</update>
 
