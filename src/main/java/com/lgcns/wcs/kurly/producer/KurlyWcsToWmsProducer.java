@@ -602,8 +602,7 @@ public class KurlyWcsToWmsProducer {
 		DeferredResult<ResponseEntity<?>> deferredResult = new DeferredResult<>();
 
 		try {
-
-			SendResult<String, PickingInfoData> result =  pickingInfoKafkaTemplate.send(PICKING_INFO,  sendData).get();
+			SendResult<String, PickingInfoData> result =  pickingInfoKafkaTemplate.send(PICKING_INFO, sendData.getWorkBatchNo() + ":" + sendData.getToteId(), sendData).get();
 
 			ResponseMesssage resMessage = new ResponseMesssage();
 			resMessage.setStatus("SUCCESS");
