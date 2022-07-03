@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lgcns.wcs.kurly.repository.WcsToDasRepository">
+   
+  	<select id="selectWorkBatchOrder" resultType="com.lgcns.wcs.kurly.dto.WorkBatchOrderData">
+		/* [WcsToDasMapper.xml] selectWorkBatchOrder */
+		  SELECT TOSD.SHIP_UID_KEY                                      AS shipUidKey
+			   , TOSD.SHIP_UID_ITEM_SEQ                                 AS shipUidItemSeq
+			   , TOSH.WAREHOUSE_KEY                                     AS warehouseKey
+			   , TOSD.WORK_BATCH_NO                                     AS workBatchNo
+			   , TOSH.DOC_DATE                                          AS documentDate
+			   , 0                                                      AS cellNo
+			   , TOSH.ORDER_NO                                          AS orderNo
+			   , TOSH.SHIP_TYPE                                         AS orderType
+			   , TOSH.ORDER_TYPE_ALL                                    AS orderTypeAll
+			   , TOSH.INVOICE_NO                                        AS invoiceNo
+			   , TOSH.CUSTOMER_NAME                                     AS customerName
+			   , TOSH.RECIPIENT_NAME                                    AS recipientName
+			   , TOSH.JIBUN_BASIC_ADDR || ' ' || TOSH.JIBUN_DETAIL_ADDR AS receiverAddress
+			   , TOSH.ROAD_ADDR || ' ' || TOSH.ROAD_ADDR_DETAIL         AS receiverRoadAddress
+			   , TOSH.REGION_GROUP_CODE                                 AS regionGroupCode
+			   , TOSH.REGION_CODE                                       AS regionCode
+			   , TOSH.ORDER_ADDR_GUGUN                                  AS regionGu
+			   , TOSH.ORDER_ADDR_DONG                                   AS regionDong
+			   , TOSH.ALLOC_SEQ                                         AS allcateSeq
+			   , TOSH.DELIVERY_ROUND                                    AS deliveryRound
+			   , TOSH.REUSABLE_PACKAGE_YN                               AS reusablePackageYn
+			   , TOSH.SPECIAL_MGNT_CUST_YN                              AS specialMgntCustYn
+			   , TOSD.SKU_CODE                                          AS skuCode
+			   , TOSD.SKU_NAME                                          AS skuName
+			   , (SELECT O_WCS.FC_GET_SKU_ALTER_CODE('TF', TOSD.SKU_CODE, NULL, 'SKU_ALTER_CODE')
+				  FROM DUAL)                                            AS skuAlterCode
+			   , (SELECT PRODUCT_CODE
+				  FROM O_WCS.TB_COM_SKU_MST
+				  WHERE OWNER = 'TF'
+					AND SKU_CODE = TOSD.SKU_CODE)                       AS productCode
+			   , TOSD.QTY_SHIP_ORDER                                    AS quantity
+		  FROM O_WCS.TB_ORD_SHIPMENT_HDR TOSH
+			 , O_WCS.TB_ORD_SHIPMENT_DTL TOSD
+		  WHERE TOSH.SHIP_UID_KEY 		= TOSD.SHIP_UID_KEY
+			AND TOSH.DOC_DATE 			= TO_CHAR(SYSDATE - 7 / 24, 'YYYYMMDD')
+			AND TOSH.ALLOC_TYPE 		= 'DAS'
+			AND TOSH.SHIPMENT_CNCL_YN 	= 'N'
+			AND TOSD.DAS_INTF_YN 		= 'N'
+			AND TOSD.WORK_BATCH_NO IS NOT NULL
+		  ORDER BY TOSD.WORK_BATCH_NO, TOSD.SHIP_UID_KEY, TOSD.SHIP_UID_ITEM_SEQ
+	</select>
+
+	<update id="updateWorkBatchOrderList" parameterType="map">
+		/* [WcsToDasMapper.xml] updateWorkBatchOrderList */
+		MERGE INTO O_WCS.TB_ORD_SHIPMENT_DTL DTL
+		USING (
+		<foreach collection="updateList" item="item" index="index" separator="UNION ALL">
+			SELECT #{item.shipUidKey}  		AS SHIP_UID_KEY
+			     , #{item.shipUidItemSeq}  	AS SHIP_UID_ITEM_SEQ
+			     , #{item.dasIntfYn}  		AS DAS_INTF_YN
+			     , #{item.modifiedUser}  	AS MODIFIED_USER
+			  FROM DUAL
+		</foreach>
+		) TB
+		ON(
+				DTL.SHIP_UID_KEY = TB.SHIP_UID_KEY
+		    AND DTL.SHIP_UID_ITEM_SEQ = TB.SHIP_UID_ITEM_SEQ
+		)
+		WHEN MATCHED THEN
+		UPDATE
+		<set>
+			DTL.DAS_INTF_YN =  TB.DAS_INTF_YN,
+			DTL.DAS_INTF_DT =  SYSDATE,
+			DTL.MODIFIED_DATE = TO_CHAR(SYSDATE, 'YYYYMMDD') ,
+			DTL.MODIFIED_TIME = TO_CHAR(SYSDATE, 'HH24MISS') ,
+			DTL.MODIFIED_USER = TB.MODIFIED_USER
+		</set>
+	</update>
+
+	<update id="createDocInfo" parameterType="map">
+		/* [WcsToDasMapper.xml] createDocInfo */
+		{
+		CALL
+		DECLARE
+		BEGIN
+
+		MERGE INTO O_WCS.TB_DOC_INVOICE_HDR IH
+		USING (
+		<foreach collection="updateList" item="item" index="index" separator="UNION ALL">
+			SELECT INVOICE_NO
+				 , WAREHOUSE_KEY
+				 , SHIP_UID_KEY
+				 , SHIP_ORDER_KEY
+				 , DOC_DATE
+				 , 'DAS' 					AS INVOICE_PRINT_SYSTEM
+				 , ALLOC_TYPE
+				 , CELL_ID
+				 , STATION_ID
+				 , ORIGIN_INVOICE_NO
+				 , PACK_BOX_SPLIT_YN
+				 , PACK_BOX_TYPE_RECOM
+				 , SPECIAL_MGNT_CUST_YN
+				 , '20' 					AS INVOICE_STATUS
+				 , 'Y'  					AS INVOICE_NO_PRT_YN
+				 , 0                        AS SPLIT_INVOICE_CNT
+				 , REGION_GROUP_CODE
+				 , REGION_CODE
+				 , DELIVERY_ROUND
+				 , ORDER_NO
+				 , REUSABLE_PACKAGE_YN
+				 , SHIPMENT_CNCL_YN			AS INVOICE_CNCL_YN
+			     , SHIPMENT_CNCL_DATE || SHIPMENT_CNCL_TIME  AS INVOICE_CNCL_YMD
+			  FROM O_WCS.TB_ORD_SHIPMENT_HDR
+			 WHERE DOC_DATE   = TO_CHAR(SYSDATE-7/24, 'YYYYMMDD')
+			   AND ORDER_NO   = #{item.orderNo}
+			   AND INVOICE_NO = #{item.invoiceNo}
+		</foreach>
+		) T2
+		ON(
+			IH.INVOICE_NO 		= T2.INVOICE_NO
+		AND IH.WAREHOUSE_KEY 	= T2.WAREHOUSE_KEY
+		)
+		WHEN MATCHED THEN
+		UPDATE
+		<set>
+			  SHIP_UID_KEY              = T2.SHIP_UID_KEY
+			, SHIP_ORDER_KEY            = T2.SHIP_ORDER_KEY
+			, DOC_DATE                  = T2.DOC_DATE
+			, INVOICE_PRINT_SYSTEM      = T2.INVOICE_PRINT_SYSTEM
+			, CELL_ID                   = T2.CELL_ID
+			, STATION_ID                = T2.STATION_ID
+			, ORIGIN_INVOICE_NO         = T2.ORIGIN_INVOICE_NO
+			, PACK_BOX_SPLIT_YN         = T2.PACK_BOX_SPLIT_YN
+			, PACK_BOX_TYPE_RECOM       = T2.PACK_BOX_TYPE_RECOM
+			, SPECIAL_MGNT_CUST_YN      = T2.SPECIAL_MGNT_CUST_YN
+			, INVOICE_STATUS            = T2.INVOICE_STATUS
+			, INVOICE_NO_PRT_YN         = T2.INVOICE_NO_PRT_YN
+			, INVOICE_NO_PRT_YMD        = TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS')
+            , SPLIT_INVOICE_CNT         = T2.SPLIT_INVOICE_CNT
+			, REGION_GROUP_CODE         = T2.REGION_GROUP_CODE
+			, REGION_CODE               = T2.REGION_CODE
+			, DELIVERY_ROUND            = T2.DELIVERY_ROUND
+			, ORDER_NO                  = T2.ORDER_NO
+			, REUSABLE_PACKAGE_YN       = T2.REUSABLE_PACKAGE_YN
+			, INVOICE_CNCL_YN           = T2.INVOICE_CNCL_YN
+			, INVOICE_CNCL_YMD          = T2.INVOICE_CNCL_YMD
+            , MODIFIED_DATE             = TO_CHAR(SYSDATE, 'YYYYMMDD')
+			, MODIFIED_TIME				= TO_CHAR(SYSDATE, 'HH24MISS')
+            , MODIFIED_USER             = 'DAS_BATCH'
+		</set>
+		WHEN NOT MATCHED THEN
+		INSERT (
+			  INVOICE_UID_KEY
+		    , INVOICE_NO
+		    , WAREHOUSE_KEY
+		    , SHIP_UID_KEY
+		    , SHIP_ORDER_KEY
+		    , DOC_DATE
+		    , INVOICE_PRINT_SYSTEM
+		    , CELL_ID
+		    , STATION_ID
+		    , ORIGIN_INVOICE_NO
+		    , PACK_BOX_SPLIT_YN
+		    , PACK_BOX_TYPE_RECOM
+		    , SPECIAL_MGNT_CUST_YN
+		    , INVOICE_STATUS
+		    , INVOICE_NO_PRT_YN
+		    , INVOICE_NO_PRT_YMD
+		    , SPLIT_INVOICE_CNT
+		    , REGION_GROUP_CODE
+		    , REGION_CODE
+		    , DELIVERY_ROUND
+		    , ORDER_NO
+		    , REUSABLE_PACKAGE_YN
+		    , ALLOC_TYPE
+		    , INVOICE_CNCL_YN
+		    , INVOICE_CNCL_YMD
+		    , CREATED_DATE
+		    , CREATED_TIME
+		    , CREATED_USER
+		    , MODIFIED_DATE
+		    , MODIFIED_TIME
+		    , MODIFIED_USER
+		)VALUES(
+		      'WI' || LPAD(( O_WCS.SEQ_DOC_INVOICE_UID.NEXTVAL), 10, '0')
+		    , T2.INVOICE_NO
+		    , T2.WAREHOUSE_KEY
+		    , T2.SHIP_UID_KEY
+			, T2.SHIP_ORDER_KEY
+			, T2.DOC_DATE
+			, T2.INVOICE_PRINT_SYSTEM
+			, T2.CELL_ID
+			, T2.STATION_ID
+			, T2.ORIGIN_INVOICE_NO
+			, T2.PACK_BOX_SPLIT_YN
+			, T2.PACK_BOX_TYPE_RECOM
+			, T2.SPECIAL_MGNT_CUST_YN
+			, T2.INVOICE_STATUS
+			, T2.INVOICE_NO_PRT_YN
+			, TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS')
+			, T2.SPLIT_INVOICE_CNT
+			, T2.REGION_GROUP_CODE
+			, T2.REGION_CODE
+			, T2.DELIVERY_ROUND
+			, T2.ORDER_NO
+			, T2.REUSABLE_PACKAGE_YN
+			, T2.ALLOC_TYPE
+			, T2.INVOICE_CNCL_YN
+			, T2.INVOICE_CNCL_YMD
+		    , TO_CHAR(SYSDATE, 'YYYYMMDD')
+		    , TO_CHAR(SYSDATE, 'HH24MISS')
+		    , 'DAS_BATCH'
+			, TO_CHAR(SYSDATE, 'YYYYMMDD')
+			, TO_CHAR(SYSDATE, 'HH24MISS')
+			, 'DAS_BATCH'
+		);
+
+		<foreach collection="updateList" item="item" index="index" separator="">
+			DELETE
+			  FROM O_WCS.TB_DOC_INVOICE_DTL
+			 WHERE INVOICE_NO = #{item.invoiceNo};
+		</foreach>
+
+		INSERT INTO O_WCS.TB_DOC_INVOICE_DTL
+			( INVOICE_UID_KEY
+			, INVOICE_SEQ
+			, INVOICE_NO
+			, WAREHOUSE_KEY
+			, SHIP_UID_KEY
+			, SHIP_UID_ITEM_SEQ
+			, SHIP_ORDER_KEY
+			, SHIP_ORDER_ITEM_SEQ
+			, GROUP_NO
+			, WORK_BATCH_NO
+			, SKU_CODE
+			, SKU_NAME
+			, SKU_SUB_NAME
+			, QTY_SHIP_ORDER
+			, CREATED_DATE
+			, CREATED_TIME
+			, CREATED_USER
+			, MODIFIED_DATE
+			, MODIFIED_TIME
+			, MODIFIED_USER )
+		<foreach collection="updateList" item="item" index="index" separator="UNION ALL">
+			SELECT (SELECT INVOICE_UID_KEY FROM O_WCS.TB_DOC_INVOICE_HDR WHERE INVOICE_NO = #{item.invoiceNo})
+			  	 , DTL.SHIP_UID_ITEM_SEQ
+				 , HDR.INVOICE_NO
+				 , HDR.WAREHOUSE_KEY
+				 , DTL.SHIP_UID_KEY
+				 , DTL.SHIP_UID_ITEM_SEQ
+				 , DTL.SHIP_ORDER_KEY
+				 , DTL.SHIP_ORDER_ITEM_SEQ
+				 , DTL.GROUP_NO
+				 , DTL.WORK_BATCH_NO
+				 , DTL.SKU_CODE
+				 , DTL.SKU_NAME
+				 , DTL.SKU_SUB_NAME
+				 , DTL.QTY_SHIP_ORDER
+				 , TO_CHAR(SYSDATE, 'YYYYMMDD')
+				 , TO_CHAR(SYSDATE, 'HH24MISS')
+				 , 'DAS_BATCH'
+				 , TO_CHAR(SYSDATE, 'YYYYMMDD')
+				 , TO_CHAR(SYSDATE, 'HH24MISS')
+				 , 'DAS_BATCH'
+			  FROM O_WCS.TB_ORD_SHIPMENT_HDR HDR
+			     , O_WCS.TB_ORD_SHIPMENT_DTL DTL
+			 WHERE HDR.SHIP_UID_KEY = DTL.SHIP_UID_KEY
+			   AND ORDER_NO   		= #{item.orderNo}
+			   AND HDR.INVOICE_NO   = #{item.invoiceNo}
+		</foreach>
+		;
+
+		END
+		}
+	</update>
+
+	<select id="selectPickingEndToteInfo" resultType="com.lgcns.wcs.kurly.dto.PickingInfoData">
+		/* [WcsToDasMapper.xml] selectPickingEndToteInfo */
+		SELECT TD.WORK_BATCH_NO
+			 , TH.TOTE_ID
+			 , 'COMPLETE' AS STATUS
+		  FROM O_WCS.TB_WIF_PICK_TOTE_HDR TH
+		     , O_WCS.TB_WIF_PICK_TOTE_DTL TD
+		 WHERE TH.WIF_PICK_TOTE_HDR_SEQ = TD.WIF_PICK_TOTE_HDR_SEQ
+		   AND TH.ALLOC_TYPE 			= 'DAS'
+		   AND TH.TOTE_CNCL_YN 			= 'N'
+		   AND TH.DAS_INTF_YN 			= 'N'
+		   AND TH.CREATED_DATE 			= TO_CHAR(SYSDATE-7/24, 'YYYYMMDD')
+		 GROUP BY TD.WORK_BATCH_NO
+		        , TH.TOTE_ID
+	</select>
+
+	<update id="updatePickingCompletList" parameterType="map">
+		/* [WcsToDasMapper.xml] updatePickingCompletList */
+		MERGE INTO O_WCS.TB_WIF_PICK_TOTE_HDR HDR
+		USING (
+		<foreach collection="updateList" item="item" index="index" separator="UNION">
+			SELECT WIF_PICK_TOTE_HDR_SEQ
+			     , #{item.dasIntfYn}     AS DAS_INTF_YN
+			  FROM O_WCS.TB_WIF_PICK_TOTE_DTL
+			 WHERE TOTE_ID 			= #{item.toteId}
+               AND WORK_BATCH_NO 	= #{item.workBatchNo}
+			 GROUP BY WIF_PICK_TOTE_HDR_SEQ
+		</foreach>
+		) TB
+		ON(
+		    HDR.WIF_PICK_TOTE_HDR_SEQ = TB.WIF_PICK_TOTE_HDR_SEQ
+		)
+		WHEN MATCHED THEN
+		UPDATE
+		<set>
+			  HDR.DAS_INTF_YN =  TB.DAS_INTF_YN
+			, HDR.DAS_INTF_DT =  SYSDATE
+		</set>
+	</update>
+
+	<select id="selectPickingCnclToteInfo" resultType="com.lgcns.wcs.kurly.dto.PickingInfoData">
+		/* [WcsToDasMapper.xml] selectPickingCnclToteInfo */
+		SELECT TD.WORK_BATCH_NO
+			 , TH.TOTE_ID
+		     , 'CANCEL' AS STATUS
+		  FROM O_WCS.TB_WIF_PICK_TOTE_HDR TH
+		     , O_WCS.TB_WIF_PICK_TOTE_DTL TD
+		 WHERE TH.WIF_PICK_TOTE_HDR_SEQ = TD.WIF_PICK_TOTE_HDR_SEQ
+		   AND TH.ALLOC_TYPE 			= 'DAS'
+		   AND TH.TOTE_CNCL_YN 			= 'Y'
+		   AND TH.DAS_INTF_YN 			= 'Y'
+		   AND TH.DAS_CNCL_INTF_YN      = 'N'
+		   AND TH.CREATED_DATE 			= TO_CHAR(SYSDATE-7/24, 'YYYYMMDD')
+		 GROUP BY TD.WORK_BATCH_NO
+			    , TH.TOTE_ID
+	</select>
+
+	<update id="updatePickingCnclList" parameterType="map">
+		/* [WcsToDasMapper.xml] updatePickingCnclList */
+		UPDATE O_WCS.TB_WIF_PICK_TOTE_HDR
+		   SET DAS_CNCL_INTF_YN =  #{dasIntfYn}
+		     , DAS_CNCL_INTF_DT =  SYSDATE
+	     WHERE WIF_PICK_TOTE_HDR_SEQ IN ( SELECT DISTINCT WIF_PICK_TOTE_HDR_SEQ
+										    FROM O_WCS.TB_WIF_PICK_TOTE_DTL
+										   WHERE TOTE_ID		= #{toteId}
+										     AND WORK_BATCH_NO 	= #{workBatchNo})
+		   AND TOTE_CNCL_YN = 'Y'
+		   AND ALLOC_TYPE   = 'DAS'
+	</update>
+
+	<select id="selectWorkBatchOrderUpdate" resultType="com.lgcns.wcs.kurly.dto.WorkBatchOrderData">
+		<![CDATA[
+		/* [WcsToDasMapper.xml] selectWorkBatchOrderUpdate */
+		SELECT TOSD.SHIP_UID_KEY 			AS shipUidKey
+			 , TOSD.SHIP_UID_ITEM_SEQ       AS shipUidItemSeq
+			 , TOSH.WAREHOUSE_KEY 			AS warehouseKey
+			 , TOSD.WORK_BATCH_NO 			AS workBatchNo
+			 , 0                            AS cellNo
+			 , TOSH.ORDER_NO 				AS orderNo
+			 , TOSH.SHIP_TYPE 				AS orderType
+			 , TOSH.ORDER_TYPE_ALL 			AS orderTypeAll
+			 , TOSH.INVOICE_NO 				AS invoiceNo
+			 , TOSH.CUSTOMER_NAME 			AS customerName
+			 , TOSH.RECIPIENT_NAME 			AS recipientName
+			 , TOSH.JIBUN_BASIC_ADDR || ' ' || TOSH.JIBUN_DETAIL_ADDR AS receiverAddress
+			 , TOSH.ROAD_ADDR || ' ' || TOSH.ROAD_ADDR_DETAIL   	  AS receiverRoadAddress
+			 , TOSH.REGION_GROUP_CODE 		AS regionGroupCode
+			 , TOSH.REGION_CODE 			AS regionCode
+			 , TOSH.ORDER_ADDR_GUGUN		AS regionGu
+			 , TOSH.ORDER_ADDR_DONG         AS regionDong
+			 , TOSH.ALLOC_SEQ 				AS allcateSeq
+			 , TOSH.DELIVERY_ROUND 			AS deliveryRound
+			 , TOSH.REUSABLE_PACKAGE_YN	 	AS reusablePackageYn
+			 , TOSH.SPECIAL_MGNT_CUST_YN	AS specialMgntCustYn
+			 , TOSD.SKU_CODE 				AS skuCode
+			 , TOSD.SKU_NAME 				AS skuName
+			 , (SELECT O_WCS.FC_GET_SKU_ALTER_CODE(TOSD.OWNER, TOSD.SKU_CODE, NULL, 'SKU_ALTER_CODE')
+				  FROM DUAL)                AS skuAlterCode
+			 , (SELECT PRODUCT_CODE
+				  FROM O_WCS.TB_COM_SKU_MST
+				 WHERE OWNER = TOSD.OWNER
+				   AND SKU_CODE = TOSD.SKU_CODE) AS productCode
+			 , TOSD.QTY_SHIP_ORDER 			AS quantity
+		FROM O_WCS.TB_ORD_SHIPMENT_HDR TOSH
+		   , O_WCS.TB_ORD_SHIPMENT_DTL TOSD
+		WHERE TOSH.SHIP_UID_KEY 		= TOSD.SHIP_UID_KEY
+		  AND TOSH.DOC_DATE 			= TO_CHAR(SYSDATE-7/24, 'YYYYMMDD')
+		  AND TOSH.ALLOC_TYPE 			= 'DAS'
+		  AND TOSH.SHIPMENT_CNCL_YN	    = 'N'
+		  AND TOSD.DAS_INTF_YN 		    = 'Y'
+		  AND TOSH.SHIPMENT_CHANGE_YN   = 'Y'
+		  AND TOSD.DAS_INTF_DT          < TOSH.SHIPMENT_CHANGE_DT
+		ORDER BY TOSD.WORK_BATCH_NO, TOSD.SHIP_UID_KEY, TOSD.SHIP_UID_ITEM_SEQ
+		]]>
+	</select>
+</mapper>
