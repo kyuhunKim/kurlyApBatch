@@ -62,27 +62,10 @@ public class WcsToDasServiceImpl implements WcsToDasService {
 
     @Override
     @Transactional(propagation=Propagation.REQUIRES_NEW, rollbackFor=SQLException.class)
-    public void updatePickingCompletList(Map<String, Object> upListMap, List<LogApiStatus> logApiStatusList) {
-        wcsToDasRepository.updatePickingCompletList(upListMap);
-
-        Map<String, Object> logList = new HashMap<String, Object>();
-        logList.put("logApiStatusList", logApiStatusList);
-        logApiStatusRepository.createLogApiStatusList(logList);
-    }
-
-    @Override
-    @Transactional(propagation=Propagation.REQUIRES_NEW, rollbackFor=SQLException.class)
-    public List<PickingInfoData> selectPickingCnclToteInfo() {
-        return wcsToDasRepository.selectPickingCnclToteInfo();
-    }
-
-    @Override
-    @Transactional(propagation=Propagation.REQUIRES_NEW, rollbackFor=SQLException.class)
-    public void updatePickingCnclList(List<Map<String, Object>> upList, List<LogApiStatus> logApiStatusList) {
+    public void updatePickingCompletList(List<Map<String, Object>> upList, List<LogApiStatus> logApiStatusList) {
         for(Map<String, Object> param : upList) {
-            wcsToDasRepository.updatePickingCnclList(param);
+            wcsToDasRepository.updatePickingCompletList(param);
         }
-
         Map<String, Object> logList = new HashMap<String, Object>();
         logList.put("logApiStatusList", logApiStatusList);
         logApiStatusRepository.createLogApiStatusList(logList);
