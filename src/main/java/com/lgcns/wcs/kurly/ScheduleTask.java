@@ -168,6 +168,6 @@ public class ScheduleTask {
 	//피킹완료, 취소 토트정보 WCS-DAS_API로 전송 - 40초
 	@Scheduled(fixedDelay = 45000)
 	public void pickingCompleteToteToDas(){
-		wcsToDasBatch.pickingCompleteToteInfoTask();
+//		wcsToDasBatch.pickingCompleteToteInfoTask();
 	}
 }
