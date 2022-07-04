@@ -284,8 +284,7 @@
 		     , O_WCS.TB_WIF_PICK_TOTE_DTL TD
 		 WHERE TH.WIF_PICK_TOTE_HDR_SEQ = TD.WIF_PICK_TOTE_HDR_SEQ
 		   AND TH.ALLOC_TYPE 			= 'DAS'
-		   AND TH.DAS_INTF_YN 			= 'N'
-		   AND TH.DAS_CNCL_INTF_YN      = 'N'
+		   AND (TH.DAS_INTF_YN 			= 'N' OR (TH.TOTE_CNCL_YN = 'Y' AND TH.DAS_CNCL_INTF_YN  = 'N'))
 		   AND TH.CREATED_DATE 			= TO_CHAR(SYSDATE-7/24, 'YYYYMMDD')
 		 GROUP BY TH.WIF_PICK_TOTE_HDR_SEQ
 			    , TD.WORK_BATCH_NO
@@ -297,47 +296,18 @@
 	<update id="updatePickingCompletList" parameterType="map">
 		/* [WcsToDasMapper.xml] updatePickingCompletList */
 		UPDATE O_WCS.TB_WIF_PICK_TOTE_HDR HDR
-		<set>
-		    <if test="status='COMPLETE'">
-			  	HDR.DAS_INTF_YN = #{dasIntfYn}
+		SET
+		<choose>
+			<when test='"COMPLETE".equals(status)'>
+				HDR.DAS_INTF_YN = #{dasIntfYn}
 			  , HDR.DAS_INTF_DT = SYSDATE
-			</if>
-			<if test="status='CANCEL'">
+			</when>
+			<when test='"CANCEL".equals(status)'>
 				HDR.DAS_CNCL_INTF_YN = #{dasIntfYn}
-			  , HDR.DAS_CNCL_INTF_DT =  SYSDATE
-			</if>
-		</set>
+			  , HDR.DAS_CNCL_INTF_DT = SYSDATE
+			</when>
+		</choose>
          WHERE HDR.WIF_PICK_TOTE_HDR_SEQ = #{wifPickToteHdrSeq}
-	</update>
-
-	<select id="selectPickingCnclToteInfo" resultType="com.lgcns.wcs.kurly.dto.PickingInfoData">
-		/* [WcsToDasMapper.xml] selectPickingCnclToteInfo */
-		SELECT TD.WORK_BATCH_NO
-			 , TH.TOTE_ID
-		     , 'CANCEL' AS STATUS
-		  FROM O_WCS.TB_WIF_PICK_TOTE_HDR TH
-		     , O_WCS.TB_WIF_PICK_TOTE_DTL TD
-		 WHERE TH.WIF_PICK_TOTE_HDR_SEQ = TD.WIF_PICK_TOTE_HDR_SEQ
-		   AND TH.ALLOC_TYPE 			= 'DAS'
-		   AND TH.TOTE_CNCL_YN 			= 'Y'
-		   AND TH.DAS_INTF_YN 			= 'Y'
-		   AND TH.DAS_CNCL_INTF_YN      = 'N'
-		   AND TH.CREATED_DATE 			= TO_CHAR(SYSDATE-7/24, 'YYYYMMDD')
-		 GROUP BY TD.WORK_BATCH_NO
-			    , TH.TOTE_ID
-	</select>
-
-	<update id="updatePickingCnclList" parameterType="map">
-		/* [WcsToDasMapper.xml] updatePickingCnclList */
-		UPDATE O_WCS.TB_WIF_PICK_TOTE_HDR
-		   SET DAS_CNCL_INTF_YN =  #{dasIntfYn}
-		     , DAS_CNCL_INTF_DT =  SYSDATE
-	     WHERE WIF_PICK_TOTE_HDR_SEQ IN ( SELECT DISTINCT WIF_PICK_TOTE_HDR_SEQ
-										    FROM O_WCS.TB_WIF_PICK_TOTE_DTL
-										   WHERE TOTE_ID		= #{toteId}
-										     AND WORK_BATCH_NO 	= #{workBatchNo})
-		   AND TOTE_CNCL_YN = 'Y'
-		   AND ALLOC_TYPE   = 'DAS'
 	</update>
 
 	<select id="selectWorkBatchOrderUpdate" resultType="com.lgcns.wcs.kurly.dto.WorkBatchOrderData">

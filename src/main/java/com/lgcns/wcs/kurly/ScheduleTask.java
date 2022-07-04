@@ -55,7 +55,7 @@ public class ScheduleTask {
 
 	@Autowired
 	WcsToDasBatch wcsToDasBatch;
-	
+
 //	//TEST
 	@Scheduled(fixedDelay = 600000)
 	public void testTask() {
@@ -101,7 +101,7 @@ public class ScheduleTask {
 //		System.out.println("The current date (7) ToteRelease : " + LocalDateTime.now());
 		ordmadeNotfully.OrdmadeNotfullyTask();
 	}
-	
+
 	//WCS 미출오더 상품보충용 추가피킹정보 연계 - 10초
 	@Scheduled(fixedDelay = 10000)
 	public void OrdmadeNotfullyReplay() {
@@ -120,7 +120,7 @@ public class ScheduleTask {
 //		System.out.println("The current date (10) PackQpsComplet : " + LocalDateTime.now());
 		 packQpsComplet.PackQpsCompletTask();
 	}
-	
+
 	//WCS 운송장 발행 정보 - 1분
 	@Scheduled(fixedDelay = 60000)
 	public void InvoicePrintComplet() {
@@ -128,26 +128,26 @@ public class ScheduleTask {
 		invoicePrintComplet.InvoicePrintCompletTask();
 	}
 	//WCS 방면 분류 완료 정보 - 1분
-	@Scheduled(fixedDelay = 60000) 
+	@Scheduled(fixedDelay = 60000)
 	public void InvoiceSortComplet() {
 //		System.out.println("The current date (12) InvoiceSortComplet : " + LocalDateTime.now());
 		invoiceSortComplet.InvoiceSortCompletTask();
 	}
 	//QPS 호기별 가용셀 정보 - 10초
-	@Scheduled(fixedDelay = 10000) 
+	@Scheduled(fixedDelay = 10000)
 	public void QpsNumUseCell() {
 //		System.out.println("The current date (13) QpsNumUseCell : " + LocalDateTime.now());
 		qpsNumUseCell.QpsNumUseCellTask();
 	}
 	//DAS 그룹번호별 가용셀 정보 - 10초
-	@Scheduled(fixedDelay = 10000) 
+	@Scheduled(fixedDelay = 10000)
 	public void DasNumUseCell() {
 //		System.out.println("The current date (14) DasNumUseCell : " + LocalDateTime.now());
 		dasNumUseCell.DasNumUseCellTask();
 	}
 
 	//최적화 배치 미처리분 재작업 - 3분
-	@Scheduled(fixedDelay = 180000) 
+	@Scheduled(fixedDelay = 180000)
 	public void ReplayOptimizBatch() {
 //		System.out.println("The current date (15) InvoiceSortComplet : " + LocalDateTime.now());
 		replayOptimizBatch.ReplayOptimizBatchTask();
@@ -168,6 +168,6 @@ public class ScheduleTask {
 	//피킹완료, 취소 토트정보 WCS-DAS_API로 전송 - 40초
 	@Scheduled(fixedDelay = 45000)
 	public void pickingCompleteToteToDas(){
-//		wcsToDasBatch.pickingCompleteToteInfoTask();
+		wcsToDasBatch.pickingCompleteToteInfoTask();
 	}
 }
