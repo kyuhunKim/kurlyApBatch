@@ -30,10 +30,6 @@ public interface WcsToDasService {
 
     void updatePickingCompletList(List<Map<String, Object>> upList, List<LogApiStatus> u_logApiStatusList);
 
-    List<PickingInfoData> selectPickingCnclToteInfo();
-
-    void updatePickingCnclList(List<Map<String, Object>> upList, List<LogApiStatus> u_logApiStatusList);
-
     void createDocInfo(List<OrderData> docList) throws Exception;
 
     List<WorkBatchOrderData> selectWorkBatchOrderUpdate();
