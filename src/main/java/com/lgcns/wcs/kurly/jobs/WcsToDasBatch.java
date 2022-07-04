@@ -607,6 +607,8 @@ public class WcsToDasBatch {
                     updateMap.put("modifiedUser", KurlyConstants.DEFAULT_USERID);
                     updateMap.put("toteId", sendData.getToteId());
                     updateMap.put("workBatchNo", sendData.getWorkBatchNo());
+                    updateMap.put("wifPickToteHdrSeq", sendData.getWifPickToteHdrSeq());
+                    updateMap.put("status", sendData.getStatus());
 
                     apiRunTimeEnd = System.currentTimeMillis();
                     apiRunTime = StringUtil.formatInterval(apiRunTimeStartFor, apiRunTimeEnd) ;
@@ -640,11 +642,11 @@ public class WcsToDasBatch {
 
                     if( (i>2 && i%50 == 0 ) || ( i == updateMapList.size()-1 ) ) {
 
-                        Map<String, Object> upListMap = new HashMap<String, Object>();
-                        upListMap.put("updateList",u_updateMapList);
+                        //Map<String, Object> upListMap = new HashMap<String, Object>();
+                        //upListMap.put("updateList",u_updateMapList);
 
                         //update
-                        wcsToDasService.updatePickingCompletList(upListMap, u_logApiStatusList);
+                        wcsToDasService.updatePickingCompletList(u_updateMapList, u_logApiStatusList);
 
                         //초기화
                         u_updateMapList = new ArrayList<Map<String, Object>>();
@@ -655,7 +657,7 @@ public class WcsToDasBatch {
 
             } catch (Exception e1) {
                 result = "error";
-                log.error( " === PackQpsCompletBatch  error e1" +e1 );
+                log.error( " === WcsToDasBatch  error e1" +e1 );
                 e1.printStackTrace();
                 resultMessage = e1.toString();
             }

@@ -28,7 +28,7 @@ public interface WcsToDasService {
 
     List<PickingInfoData> selectPickingEndToteInfo();
 
-    void updatePickingCompletList(Map<String, Object> upListMap, List<LogApiStatus> u_logApiStatusList);
+    void updatePickingCompletList(List<Map<String, Object>> upList, List<LogApiStatus> u_logApiStatusList);
 
     List<PickingInfoData> selectPickingCnclToteInfo();
 
