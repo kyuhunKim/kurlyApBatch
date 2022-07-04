@@ -276,42 +276,38 @@
 
 	<select id="selectPickingEndToteInfo" resultType="com.lgcns.wcs.kurly.dto.PickingInfoData">
 		/* [WcsToDasMapper.xml] selectPickingEndToteInfo */
-		SELECT TD.WORK_BATCH_NO
+		SELECT TH.WIF_PICK_TOTE_HDR_SEQ
+			 , TD.WORK_BATCH_NO
 			 , TH.TOTE_ID
-			 , 'COMPLETE' AS STATUS
+			 , DECODE(TH.TOTE_CNCL_YN, 'Y', 'CANCEL', 'COMPLETE')  AS STATUS
 		  FROM O_WCS.TB_WIF_PICK_TOTE_HDR TH
 		     , O_WCS.TB_WIF_PICK_TOTE_DTL TD
 		 WHERE TH.WIF_PICK_TOTE_HDR_SEQ = TD.WIF_PICK_TOTE_HDR_SEQ
 		   AND TH.ALLOC_TYPE 			= 'DAS'
-		   AND TH.TOTE_CNCL_YN 			= 'N'
 		   AND TH.DAS_INTF_YN 			= 'N'
+		   AND TH.DAS_CNCL_INTF_YN      = 'N'
 		   AND TH.CREATED_DATE 			= TO_CHAR(SYSDATE-7/24, 'YYYYMMDD')
-		 GROUP BY TD.WORK_BATCH_NO
-		        , TH.TOTE_ID
+		 GROUP BY TH.WIF_PICK_TOTE_HDR_SEQ
+			    , TD.WORK_BATCH_NO
+			    , TH.TOTE_ID
+			    , TH.TOTE_CNCL_YN
+		 ORDER BY TH.WIF_PICK_TOTE_HDR_SEQ, TH.TOTE_CNCL_YN DESC
 	</select>
 
 	<update id="updatePickingCompletList" parameterType="map">
 		/* [WcsToDasMapper.xml] updatePickingCompletList */
-		MERGE INTO O_WCS.TB_WIF_PICK_TOTE_HDR HDR
-		USING (
-		<foreach collection="updateList" item="item" index="index" separator="UNION">
-			SELECT WIF_PICK_TOTE_HDR_SEQ
-			     , #{item.dasIntfYn}     AS DAS_INTF_YN
-			  FROM O_WCS.TB_WIF_PICK_TOTE_DTL
-			 WHERE TOTE_ID 			= #{item.toteId}
-               AND WORK_BATCH_NO 	= #{item.workBatchNo}
-			 GROUP BY WIF_PICK_TOTE_HDR_SEQ
-		</foreach>
-		) TB
-		ON(
-		    HDR.WIF_PICK_TOTE_HDR_SEQ = TB.WIF_PICK_TOTE_HDR_SEQ
-		)
-		WHEN MATCHED THEN
-		UPDATE
+		UPDATE O_WCS.TB_WIF_PICK_TOTE_HDR HDR
 		<set>
-			  HDR.DAS_INTF_YN =  TB.DAS_INTF_YN
-			, HDR.DAS_INTF_DT =  SYSDATE
+		    <if test="status='COMPLETE'">
+			  	HDR.DAS_INTF_YN = #{dasIntfYn}
+			  , HDR.DAS_INTF_DT = SYSDATE
+			</if>
+			<if test="status='CANCEL'">
+				HDR.DAS_CNCL_INTF_YN = #{dasIntfYn}
+			  , HDR.DAS_CNCL_INTF_DT =  SYSDATE
+			</if>
 		</set>
+         WHERE HDR.WIF_PICK_TOTE_HDR_SEQ = #{wifPickToteHdrSeq}
 	</update>
 
 	<select id="selectPickingCnclToteInfo" resultType="com.lgcns.wcs.kurly.dto.PickingInfoData">
