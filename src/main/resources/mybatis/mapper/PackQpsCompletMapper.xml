@@ -8,27 +8,30 @@
   <select id="selectPackQpsComplet" resultType="com.lgcns.wcs.kurly.dto.PackQpsCompletData">
   	/* [PackQpsCompletMapper.xml] selectPackQpsComplet */
     SELECT   DISTINCT
-		OH.INVOICE_UID_KEY   AS invoiceUidKey,
-		OH.SHIP_ORDER_KEY    AS shipOrderKey,
-		OH.INVOICE_NO           AS invoiceNo,
-		OH.WAREHOUSE_KEY        AS warehouseKey,
-		OH.SHIP_UID_KEY     AS shipUidKey,
-		OH.CELL_ID              AS cellId,
-		CASE WHEN LENGTH(OH.ORIGIN_INVOICE_NO) > 21 THEN SUBSTR(OH.ORIGIN_INVOICE_NO,0,20) 
-			ELSE OH.ORIGIN_INVOICE_NO END       AS originInvoiceNo,
-		OH.ORDMADE_SPLIT_YN     AS ordmadeSplitYn,
-		OH.PACK_BOX_SPLIT_YN    AS packBoxSplitYn,
-		OH.PACK_BOX_TYPE_RECOM  AS packBoxTypeRecom,
+		OH.INVOICE_UID_KEY   			AS invoiceUidKey,
+		OH.SHIP_ORDER_KEY    			AS shipOrderKey,
+		OH.INVOICE_NO           		AS invoiceNo,
+		OH.WAREHOUSE_KEY        		AS warehouseKey,
+		OH.SHIP_UID_KEY     			AS shipUidKey,
+		OH.CELL_ID              		AS cellId,
+		CASE
+		    WHEN LENGTH(OH.ORIGIN_INVOICE_NO) > 21
+		        THEN SUBSTR(OH.ORIGIN_INVOICE_NO,0,20)
+			ELSE OH.ORIGIN_INVOICE_NO
+		 END       						AS originInvoiceNo,
+		OH.ORDMADE_SPLIT_YN     		AS ordmadeSplitYn,
+		OH.PACK_BOX_SPLIT_YN    		AS packBoxSplitYn,
+		OH.PACK_BOX_TYPE_RECOM  		AS packBoxTypeRecom,
 		O_WCS.FC_GET_SHIP_ORDER_LASTYN(OH.WAREHOUSE_KEY
 			  , OH.SHIP_ORDER_KEY
 			  , OH.SHIP_UID_KEY
 			  , OH.ALLOC_TYPE
 			  , 'PACK'
 			  , ''
-			  , '')  AS shipOrderLastYn,
-		TO_CHAR(SYSDATE, 'YYYYMMDD') AS insertedDate,
-		TO_CHAR(SYSDATE, 'HH24MISS') AS insertedTime,
-		OH.MODIFIED_USER AS insertedUser
+			  , '')  					AS shipOrderLastYn,
+		TO_CHAR(SYSDATE, 'YYYYMMDD') 	AS insertedDate,
+		TO_CHAR(SYSDATE, 'HH24MISS') 	AS insertedTime,
+		OH.MODIFIED_USER 				AS insertedUser
 	FROM o_wcs.TB_DOC_INVOICE_HDR OH
      	LEFT OUTER JOIN o_wcs.TB_QPS_ORDER_HDR QH 
           	ON ( OH.INVOICE_UID_KEY = QH.INVOICE_UID_KEY )
@@ -36,28 +39,29 @@
 	  AND OH.PACK_CMPT_INTF_YN = 'N' 
 	  AND OH.PICK_CMPT_INTF_YN = 'Y'
       AND OH.INVOICE_PRINT_SYSTEM IN ( 'WCS', 'WCS_URG', 'DAS')
-	ORDER BY OH.SHIP_ORDER_KEY ASC, OH.INVOICE_NO ASC
+	ORDER BY OH.SHIP_ORDER_KEY ASC
+	       , OH.INVOICE_NO ASC
   </select>
   
   <select id="selectPackQpsCompletDetail"  parameterType="com.lgcns.wcs.kurly.dto.PackQpsCompletData" resultType="com.lgcns.wcs.kurly.dto.PackQpsCompletDetailData">
   	/* [PackQpsCompletMapper.xml] selectPackQpsCompletDetail */
     SELECT 
-		OD.SHIP_ORDER_ITEM_SEQ  AS shipOrderItemSeq,
-		OD.GROUP_NO    AS groupNo,
-		OD.WORK_BATCH_NO     AS workBatchNo,
-		OD.SHIP_UID_KEY  AS shipUidKey,
-		OD.SHIP_UID_ITEM_SEQ  AS shipUidItemSeq,
-		OD.SKU_CODE          AS skuCode,
-		OD.SKU_NAME          AS skuName,
-		OD.SKU_SUB_NAME      AS skuSubName,
+		OD.SHIP_ORDER_ITEM_SEQ  			AS shipOrderItemSeq,
+		OD.GROUP_NO    						AS groupNo,
+		OD.WORK_BATCH_NO     				AS workBatchNo,
+		OD.SHIP_UID_KEY  					AS shipUidKey,
+		OD.SHIP_UID_ITEM_SEQ  				AS shipUidItemSeq,
+		OD.SKU_CODE          				AS skuCode,
+		OD.SKU_NAME          				AS skuName,
+		OD.SKU_SUB_NAME      				AS skuSubName,
 		CASE
 			WHEN OH.ALLOC_TYPE = 'DAS'
 				THEN SD.QTY_SHIP_ORDER
 			ELSE OD.QTY_QPS_PACKED
 		 END AS qtyQpsPacked,
-		SUBSTR(OH.PACK_QPS_CMPT_YMD,1,8)  AS qpsPackingDate,
-		SUBSTR(OH.PACK_QPS_CMPT_YMD,9,6)  AS qpsPackingTime,
-		QD.QPS_WORKER_NAME   AS qpsWorkerName
+		SUBSTR(OH.PACK_QPS_CMPT_YMD,1,8)	AS qpsPackingDate,
+		SUBSTR(OH.PACK_QPS_CMPT_YMD,9,6)  	AS qpsPackingTime,
+		QD.QPS_WORKER_NAME   				AS qpsWorkerName
 	FROM o_wcs.TB_DOC_INVOICE_HDR OH
 	JOIN o_wcs.TB_DOC_INVOICE_DTL OD
 	  ON ( OH.INVOICE_UID_KEY = OD.INVOICE_UID_KEY )
@@ -74,15 +78,14 @@
   <update id="updatePackQpsComplet" parameterType="Map">
   /* [PackQpsCompletMapper.xml] updatePackQpsComplet */
   	UPDATE o_wcs.TB_DOC_INVOICE_HDR
-		SET
-			PACK_CMPT_INTF_YN =  #{packCmptIntfYn},
-			PACK_CMPT_INTF_DT =  SYSDATE,
-			PACK_CMPT_INTF_CODE =  #{packCmptIntfCode},
-			PACK_CMPT_INTF_MEMO = #{packCmptIntfMemo} ,
-			MODIFIED_DATE = TO_CHAR(SYSDATE, 'YYYYMMDD') ,
-			MODIFIED_TIME = TO_CHAR(SYSDATE, 'HH24MISS') ,
-			MODIFIED_USER = #{modifiedUser}
-	WHERE INVOICE_UID_KEY = #{invoiceUidKey}
+	   SET PACK_CMPT_INTF_YN 	=  #{packCmptIntfYn},
+		   PACK_CMPT_INTF_DT 	=  SYSDATE,
+		   PACK_CMPT_INTF_CODE	=  #{packCmptIntfCode},
+		   PACK_CMPT_INTF_MEMO 	= #{packCmptIntfMemo} ,
+		   MODIFIED_DATE 		= TO_CHAR(SYSDATE, 'YYYYMMDD') ,
+		   MODIFIED_TIME 		= TO_CHAR(SYSDATE, 'HH24MISS') ,
+		   MODIFIED_USER 		= #{modifiedUser}
+	 WHERE INVOICE_UID_KEY 		= #{invoiceUidKey}
   </update>
   
   <update id="updatePackQpsCompletList" parameterType="map">
@@ -107,7 +110,7 @@
 		UPDATE
 		<set>
 			HDR.PACK_CMPT_INTF_YN =  TB.PACK_CMPT_INTF_YN,
-			HDR.PICK_CMPT_INTF_DT =  SYSDATE,
+			HDR.PACK_CMPT_INTF_DT =  SYSDATE,
 			HDR.PACK_CMPT_INTF_CODE =  TB.PACK_CMPT_INTF_CODE,
 			HDR.PACK_CMPT_INTF_MEMO = TB.PACK_CMPT_INTF_MEMO ,
 			HDR.MODIFIED_DATE = TO_CHAR(SYSDATE, 'YYYYMMDD') ,
