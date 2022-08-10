@@ -217,8 +217,8 @@
 	    HD.MANUAL_PROC_YN         AS manualProcYn,
 	    HD.BOX_SPLIT_CHECK_YN     AS boxSplitCheckYn,
 	    HD.INVOICE_NO             AS invoiceNo ,
-	    HD.SPECIAL_MGNT_CUST_YN    AS specialMgntCustYn,
-	    HD.REUSABLE_PACKAGE_YN     AS reusablePackageYn,
+	    HD.SPECIAL_MGNT_CUST_YN   AS specialMgntCustYn,
+	    HD.REUSABLE_PACKAGE_YN    AS reusablePackageYn,
 	    HD.ORDER_TYPE_ALL         AS orderTypeAll,
 	    DT.SHIP_ORDER_ITEM_SEQ    AS shipOrderItemSeq,
 	    DT.ITEM_STATUS            AS itemStatus,
@@ -262,20 +262,19 @@
 	    (CASE WHEN MIN(DT.WMS_BATCH_YMD) IS NULL THEN ( SELECT MIN(TT.CREATED_DATE || TT.CREATED_TIME) FROM O_WCS.TB_WIF_OPTIMIZE_BATCH TT
 	    			WHERE TT.SHIP_ORDER_KEY = HD.SHIP_ORDER_KEY AND TT.APPLY_YN = 'Y' ) ELSE  MIN(DT.WMS_BATCH_YMD) END )   as hdWmsBatchYmd,
 	    SUM(DT.QTY_SHIP_ORDER)    AS ordQty ,
-	    WOB.DAS_CELL_GROUP_ID   AS dasCellGroupId
+	    WOB.DAS_CELL_GROUP_ID     AS dasCellGroupId
 	  FROM o_wcs.TB_WIF_SHIPMENT_HDR HD,
-	     o_wcs.TB_WIF_SHIPMENT_DTL DT
-	     LEFT OUTER JOIN o_wcs.TB_COM_SKU_MST SM
+	       o_wcs.TB_WIF_SHIPMENT_DTL DT
+	  LEFT OUTER JOIN o_wcs.TB_COM_SKU_MST SM
 	       ON ( DT.SKU_CODE = SM.SKU_CODE
-	          AND SM.OWNER = 'TF' )
-	     LEFT OUTER JOIN o_wcs.TB_WIF_OPTIMIZE_BATCH WOB
+	      AND SM.OWNER = 'TF' )
+	  LEFT OUTER JOIN o_wcs.TB_WIF_OPTIMIZE_BATCH WOB
 	       ON ( DT.SHIP_ORDER_KEY = WOB.SHIP_ORDER_KEY
-	       AND DT.SHIP_ORDER_ITEM_SEQ = WOB.SHIP_ORDER_ITEM_SEQ 
-       AND WOB.APPLY_YN = 'Y')
-	  WHERE HD.SHIP_ORDER_KEY = DT.SHIP_ORDER_KEY 
-	  AND HD.RECEIVE_INTF_YN = 'N'
-	
-	  GROUP BY HD.SHIP_ORDER_KEY        ,
+	      AND DT.SHIP_ORDER_ITEM_SEQ = WOB.SHIP_ORDER_ITEM_SEQ
+          AND WOB.APPLY_YN = 'Y')
+	 WHERE HD.SHIP_ORDER_KEY = DT.SHIP_ORDER_KEY
+	   AND HD.RECEIVE_INTF_YN = 'N'
+	 GROUP BY HD.SHIP_ORDER_KEY        ,
 	    HD.WAREHOUSE_KEY         ,
 	    HD.SHIP_TYPE             ,
 	    HD.DOC_STATUS            ,
@@ -357,12 +356,12 @@
 	    (CASE WHEN DT.GROUP_NO IS NULL AND WOB.GROUP_NO IS NULL THEN DT.WMS_BATCH_YMD ELSE WOB.CREATED_DATE || WOB.CREATED_TIME END) ,
 	    DT.SKU_CODE,
 	    (CASE WHEN NVL(SM.LENGTH,0) = 0 THEN DT.LENGTH ELSE SM.LENGTH END) ,
-	      (CASE WHEN NVL(SM.WIDTH,0)  = 0 THEN DT.WIDTH  ELSE SM.WIDTH END)  ,
-	      (CASE WHEN NVL(SM.HEIGHT,0) = 0 THEN DT.HEIGHT ELSE SM.HEIGHT END) ,
-	    (CASE WHEN SM.LENGTH IS NULL  THEN 'Y' ELSE 'N' END)
-	    , WOB.DAS_CELL_GROUP_ID
-	  ORDER BY HD.SHIP_ORDER_KEY ASC,
-	    DT.SHIP_ORDER_ITEM_SEQ ASC
+	    (CASE WHEN NVL(SM.WIDTH,0)  = 0 THEN DT.WIDTH  ELSE SM.WIDTH END)  ,
+	    (CASE WHEN NVL(SM.HEIGHT,0) = 0 THEN DT.HEIGHT ELSE SM.HEIGHT END) ,
+	    (CASE WHEN SM.LENGTH IS NULL  THEN 'Y' ELSE 'N' END),
+	    WOB.DAS_CELL_GROUP_ID
+	 ORDER BY HD.SHIP_ORDER_KEY ASC,
+	          DT.SHIP_ORDER_ITEM_SEQ ASC
      ]]> 
   </select>
   
@@ -978,15 +977,17 @@
 		MODIFIED_DATE         ,
 		MODIFIED_TIME         ,
 		MODIFIED_USER         ,
-		OWNER               ,
-		GROUP_NO            ,
-		WORK_BATCH_NO       ,
-		PICKING_WAVE_NO     ,
-		QPS_NUM             ,
-		WMS_BATCH_YMD  ,
+		OWNER                 ,
+		GROUP_NO              ,
+		WORK_BATCH_NO         ,
+		PICKING_WAVE_NO       ,
+		QPS_NUM               ,
+		WMS_BATCH_YMD         ,
 		DAS_CELL_GROUP_ID
 	)
-		SELECT /*+ordered*/ B.SHIP_UID_KEY, A.SHIP_UID_ITEM_SEQ     ,
+		SELECT /*+ordered*/
+		    B.SHIP_UID_KEY			 ,
+		    A.SHIP_UID_ITEM_SEQ      ,
 		    A.SHIP_ORDER_KEY         ,
 		    A.SHIP_ORDER_ITEM_SEQ    ,
 		    A.ITEM_STATUS            ,
@@ -1029,72 +1030,72 @@
 		    A.MODIFIED_DATE          ,
 		    A.MODIFIED_TIME          ,
 		    A.MODIFIED_USER          ,
-		    A.OWNER               ,
-		    A.GROUP_NO            ,
-		    A.WORK_BATCH_NO       ,
-		    A.PICKING_WAVE_NO     ,
-		    A.QPS_NUM             ,
-		    A.WMS_BATCH_YMD  ,
+		    A.OWNER               	 ,
+		    A.GROUP_NO            	 ,
+		    A.WORK_BATCH_NO       	 ,
+		    A.PICKING_WAVE_NO     	 ,
+		    A.QPS_NUM             	 ,
+		    A.WMS_BATCH_YMD  		 ,
 		    A.DAS_CELL_GROUP_ID
-           from (
+          FROM (
          <foreach collection="dtList" item="item" index="index" separator="union all">
 		SELECT 
-		      LPAD(#{item.shipUidItemSeq, jdbcType=VARCHAR}, 6, '0')  AS  SHIP_UID_ITEM_SEQ, 
-		      #{item.shipOrderKey, jdbcType=VARCHAR}      AS  SHIP_ORDER_KEY         ,
-		      LPAD(#{item.shipOrderItemSeq, jdbcType=VARCHAR}, 6, '0')  AS  SHIP_ORDER_ITEM_SEQ    ,
-		      #{item.itemStatus, jdbcType=VARCHAR}        AS  ITEM_STATUS        ,
-		      #{item.skuCode, jdbcType=VARCHAR}           AS  SKU_CODE           ,
-		      #{item.qtyOriginOrder}    AS  QTY_ORIGIN_ORDER   ,
-		      #{item.qtyShipOrder}      AS  QTY_SHIP_ORDER     ,
-		      #{item.qtyQpsOrder}       AS  QTY_QPS_ORDER      ,
-		      #{item.qtyPicking}        AS  QTY_QPS_PICKED     ,
-		      #{item.qtyAllocated}      AS  QTY_QPS_ALLOCATED  ,
-		      #{item.qtyPacking}        AS  QTY_QPS_PACKED     ,
-		      #{item.qtyShipCompleted}  AS  QTY_SHIP_COMPLETED ,
-		      #{item.qtyShipCancelled}  AS  QTY_SHIP_CANCELLED ,
-		      #{item.qtyByUom}          AS  QTY_BY_UOM         ,
-		      #{item.measureKey, jdbcType=VARCHAR}        AS  MEASURE_KEY        ,
-		      #{item.uomKey, jdbcType=VARCHAR}            AS  UOM_KEY            ,
-		      #{item.uomQty}            AS  UOM_QTY            ,
-		      #{item.defaultUomKey, jdbcType=VARCHAR}     AS  DEFAULT_UOM_KEY    ,
-		      #{item.defaultUomQty}     AS  DEFAULT_UOM_QTY    ,
-		      #{item.skuName, jdbcType=VARCHAR}           AS  SKU_NAME           ,
-		      #{item.skuSubName, jdbcType=VARCHAR}        AS  SKU_SUB_NAME       ,
-		      #{item.skuAlterCode, jdbcType=VARCHAR}      AS  SKU_ALTER_CODE     ,
-		      #{item.skuGroup01, jdbcType=VARCHAR}        AS  SKU_GROUP_01       ,
-		      #{item.skuGroup02, jdbcType=VARCHAR}        AS  SKU_GROUP_02       ,
-		      #{item.skuGroup03, jdbcType=VARCHAR}        AS  SKU_GROUP_03       ,
-		      #{item.skuGroup04, jdbcType=VARCHAR}        AS  SKU_GROUP_04       ,
-		      #{item.sellingType, jdbcType=VARCHAR}       AS  SELLING_TYPE       ,
-		      #{item.grossWeight}       AS  GROSS_WEIGHT       ,
-		      #{item.netWeight}         AS  NET_WEIGHT         ,
-		      #{item.weightUnit, jdbcType=VARCHAR}        AS  WEIGHT_UNIT        ,
-		      #{item.length}            AS  LENGTH             ,
-		      #{item.width}             AS  WIDTH              ,
-		      #{item.height}            AS  HEIGHT             ,
-		      #{item.cbm}               AS  CBM                ,
-		      #{item.skuOptionName, jdbcType=VARCHAR}     AS  SKU_OPTION_NAME    ,
-		      #{item.skuShopmallName, jdbcType=VARCHAR}   AS  SKU_SHOPMALL_NAME  ,
-		      #{item.remark, jdbcType=VARCHAR}            AS  REMARK             ,
-		      TO_CHAR(SYSDATE, 'YYYYMMDD') AS CREATED_DATE ,
-		      TO_CHAR(SYSDATE, 'HH24MISS') AS CREATED_TIME ,
-		      'REC_BATCH'             AS CREATED_USER    ,
-		      TO_CHAR(SYSDATE, 'YYYYMMDD') AS MODIFIED_DATE,
-		      TO_CHAR(SYSDATE, 'HH24MISS') AS MODIFIED_TIME,
-		      'REC_BATCH'               AS MODIFIED_USER   ,
-		      #{item.owner, jdbcType=VARCHAR}             AS  OWNER          ,
-			  #{item.groupNo, jdbcType=VARCHAR}           AS  GROUP_NO       ,
-			  #{item.workBatchNo, jdbcType=VARCHAR}       AS  WORK_BATCH_NO  ,
-			  #{item.workBatchNo, jdbcType=VARCHAR}       AS  PICKING_WAVE_NO  ,
-			  #{item.qpsNum, jdbcType=VARCHAR}            AS  QPS_NUM        ,
-			  #{item.wmsBatchYmd, jdbcType=VARCHAR}       AS  WMS_BATCH_YMD  ,
-			  #{item.invoiceNo, jdbcType=VARCHAR}         AS INVOICE_NO ,
-			  #{item.dasCellGroupId, jdbcType=VARCHAR}         AS DAS_CELL_GROUP_ID
+		      LPAD(#{item.shipUidItemSeq, jdbcType=VARCHAR}, 6, '0')  	AS SHIP_UID_ITEM_SEQ,
+		      #{item.shipOrderKey, jdbcType=VARCHAR}      				AS SHIP_ORDER_KEY,
+		      LPAD(#{item.shipOrderItemSeq, jdbcType=VARCHAR}, 6, '0')  AS SHIP_ORDER_ITEM_SEQ,
+		      #{item.itemStatus, jdbcType=VARCHAR}        				AS ITEM_STATUS,
+		      #{item.skuCode, jdbcType=VARCHAR}           				AS SKU_CODE,
+		      #{item.qtyOriginOrder}    								AS QTY_ORIGIN_ORDER,
+		      #{item.qtyShipOrder}      								AS QTY_SHIP_ORDER,
+		      #{item.qtyQpsOrder}       								AS QTY_QPS_ORDER,
+		      #{item.qtyPicking}        								AS QTY_QPS_PICKED,
+		      #{item.qtyAllocated}      								AS QTY_QPS_ALLOCATED,
+		      #{item.qtyPacking}        								AS QTY_QPS_PACKED,
+		      #{item.qtyShipCompleted}  								AS QTY_SHIP_COMPLETED,
+		      #{item.qtyShipCancelled}  								AS QTY_SHIP_CANCELLED,
+		      #{item.qtyByUom}          								AS QTY_BY_UOM,
+		      #{item.measureKey, jdbcType=VARCHAR}        				AS MEASURE_KEY,
+		      #{item.uomKey, jdbcType=VARCHAR}            				AS UOM_KEY,
+		      #{item.uomQty}            								AS UOM_QTY,
+		      #{item.defaultUomKey, jdbcType=VARCHAR}     				AS DEFAULT_UOM_KEY,
+		      #{item.defaultUomQty}     								AS DEFAULT_UOM_QTY,
+		      #{item.skuName, jdbcType=VARCHAR}           				AS SKU_NAME,
+		      #{item.skuSubName, jdbcType=VARCHAR}        				AS SKU_SUB_NAME,
+		      #{item.skuAlterCode, jdbcType=VARCHAR}      				AS SKU_ALTER_CODE,
+		      #{item.skuGroup01, jdbcType=VARCHAR}        				AS SKU_GROUP_01,
+		      #{item.skuGroup02, jdbcType=VARCHAR}        				AS SKU_GROUP_02,
+		      #{item.skuGroup03, jdbcType=VARCHAR}        				AS SKU_GROUP_03,
+		      #{item.skuGroup04, jdbcType=VARCHAR}        				AS SKU_GROUP_04,
+		      #{item.sellingType, jdbcType=VARCHAR}       				AS SELLING_TYPE,
+		      #{item.grossWeight}       								AS GROSS_WEIGHT,
+		      #{item.netWeight}         								AS NET_WEIGHT,
+		      #{item.weightUnit, jdbcType=VARCHAR}        				AS WEIGHT_UNIT,
+		      #{item.length}            								AS LENGTH,
+		      #{item.width}             								AS WIDTH,
+		      #{item.height}            								AS HEIGHT,
+		      #{item.cbm}               								AS CBM,
+		      #{item.skuOptionName, jdbcType=VARCHAR}     				AS SKU_OPTION_NAME,
+		      #{item.skuShopmallName, jdbcType=VARCHAR}   				AS SKU_SHOPMALL_NAME,
+		      #{item.remark, jdbcType=VARCHAR}            				AS REMARK,
+		      TO_CHAR(SYSDATE, 'YYYYMMDD') 								AS CREATED_DATE,
+		      TO_CHAR(SYSDATE, 'HH24MISS') 								AS CREATED_TIME,
+		      'REC_BATCH'             									AS CREATED_USER,
+		      TO_CHAR(SYSDATE, 'YYYYMMDD') 								AS MODIFIED_DATE,
+		      TO_CHAR(SYSDATE, 'HH24MISS') 								AS MODIFIED_TIME,
+		      'REC_BATCH'               								AS MODIFIED_USER,
+		      #{item.owner, jdbcType=VARCHAR}             				AS OWNER,
+			  #{item.groupNo, jdbcType=VARCHAR}           				AS GROUP_NO,
+			  #{item.workBatchNo, jdbcType=VARCHAR}       				AS WORK_BATCH_NO,
+			  #{item.workBatchNo, jdbcType=VARCHAR}       				AS PICKING_WAVE_NO,
+			  #{item.qpsNum, jdbcType=VARCHAR}            				AS QPS_NUM,
+			  #{item.wmsBatchYmd, jdbcType=VARCHAR}       				AS WMS_BATCH_YMD,
+			  #{item.invoiceNo, jdbcType=VARCHAR}         				AS INVOICE_NO,
+			  #{item.dasCellGroupId, jdbcType=VARCHAR}         			AS DAS_CELL_GROUP_ID
 		  FROM DUAL
 		  </foreach> ) A,
-		  o_wcs.TB_ORD_SHIPMENT_HDR B
-		WHERE A.SHIP_ORDER_KEY = B.SHIP_ORDER_KEY
-		AND A.INVOICE_NO = B.INVOICE_NO
+		       o_wcs.TB_ORD_SHIPMENT_HDR B
+		 WHERE A.SHIP_ORDER_KEY = B.SHIP_ORDER_KEY
+		   AND A.INVOICE_NO = B.INVOICE_NO
   </insert>
   
   <update id="updateWifShipmentHdrList" parameterType="Map">

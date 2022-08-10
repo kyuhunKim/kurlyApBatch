@@ -15,5 +15,6 @@
     <mapper resource="ToteCellExceptTxnMapper.xml"/>
     <mapper resource="ToteReleaseMapper.xml"/>
     <mapper resource="ToteScanMapper.xml"/>
+    <mapper resource="WcsToDasMapper.xml"/>
   </mappers>
 </configuration>

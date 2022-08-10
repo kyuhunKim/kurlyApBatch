@@ -105,7 +105,7 @@ public class RegionMasterBatch  {
 		    		}
     	    	} catch (Exception e1) {
             		result = "error";
-//        			log.error( " === RegionMaster insert  error e1" +e1 );
+        			log.error( " === RegionMaster insert  error e1" +e1 );
         			resultMessage = e1.toString();
         			r_ifYn = KurlyConstants.STATUS_N;
             	}
