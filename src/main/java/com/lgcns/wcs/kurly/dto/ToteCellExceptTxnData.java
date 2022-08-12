@@ -71,7 +71,7 @@ public class ToteCellExceptTxnData {
 	private String fromSkuSubName;
 	/*WMS피킹지시그룹
 	 * */
-	private String pickBatchGroup;
+	private String pickingBatchNo;
 
 	/*데이터생성일자
 	 * */
@@ -83,6 +83,11 @@ public class ToteCellExceptTxnData {
 	 * */
 	private String insertedUser	;
 	
-	
+
+	private String shipOrderKey	;
+	private String shipOrderItemSeq	;
+	private String qpsNum	;
+	private String shipUidKey	;
+	private String shipUidItemSeq	;
 
 }

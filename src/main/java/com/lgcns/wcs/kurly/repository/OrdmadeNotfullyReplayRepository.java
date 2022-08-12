@@ -21,4 +21,6 @@ public interface OrdmadeNotfullyReplayRepository  {
 	List<OrdmadeNotfullyReplayData> selectOrdmadeNotfullyReplay();
 	
 	void updateOrdmadeNotfullyReplay(Map<String, String> data);
+	
+	void updateOrdmadeNotfullyReplayList(Map<String, Object> data);
 }

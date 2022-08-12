@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.lgcns.wcs.kurly.dto.KurlyConstants;
+import com.lgcns.wcs.kurly.dto.LogApiStatus;
 import com.lgcns.wcs.kurly.dto.ToteReleaseParamData;
 import com.lgcns.wcs.kurly.repository.LogApiStatusRepository;
 import com.lgcns.wcs.kurly.repository.ToteReleaseRepository;
@@ -32,6 +32,9 @@ public class ToteReleaseServiceImpl implements ToteReleaseService {
 
 	@Autowired
 	ToteReleaseRepository toteReleaseRepository;
+
+	@Autowired
+	LogApiStatusRepository logApiStatusRepository;
 	
 	/**
 	 * 
@@ -57,6 +60,26 @@ public class ToteReleaseServiceImpl implements ToteReleaseService {
 	@Transactional(propagation=Propagation.REQUIRES_NEW, rollbackFor=SQLException.class)
 	public void updateToteRelease(Map<String, String> data) {
 		toteReleaseRepository.updateToteRelease(data);
+	}
+
+	/**
+	 * 
+	 * @Method Name : updateToteReleaseList
+	 * @작성일 : 2020. 12. 22.
+	 * @작성자 : jooni
+	 * @변경이력 : 2020. 12. 22. 최초작성
+	 * @Method 설명 : tote 처리 와 로그  update
+	 */
+	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=SQLException.class)
+	public void updateToteReleaseList(Map<String, Object> upListMap, List<LogApiStatus> logApiStatusList)   {
+				
+		toteReleaseRepository.updateToteReleaseList(upListMap);
+
+		Map<String, Object> logList = new HashMap<String, Object>();
+		logList.put("logApiStatusList",logApiStatusList);
+		
+    	//logApi insert
+		logApiStatusRepository.createLogApiStatusList(logList);
 	}
 	
 }

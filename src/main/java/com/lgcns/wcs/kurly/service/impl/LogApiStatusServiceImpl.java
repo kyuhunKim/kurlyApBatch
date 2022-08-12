@@ -1,6 +1,8 @@
 package com.lgcns.wcs.kurly.service.impl;
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,7 +43,6 @@ public class LogApiStatusServiceImpl implements LogApiStatusService {
 	@Transactional(propagation=Propagation.REQUIRES_NEW, rollbackFor=SQLException.class)
 	public int createLogApiStatus(LogApiStatus logApiStatus) {
 		
-		log.info("=================createLogApiStatus end========");
 		if(logApiStatus.getApiYyyymmdd() ==null ||
 				"".equals(logApiStatus.getApiYyyymmdd())) {
 	        String sYyyymmdd = DateUtil.getToday("yyyyMMdd");
@@ -51,18 +52,55 @@ public class LogApiStatusServiceImpl implements LogApiStatusService {
 				"".equals(logApiStatus.getWarehouseKey())) {
 			logApiStatus.setWarehouseKey(KurlyConstants.DEFAULT_WAREHOUSEKEY);
 		}
+		
+    	if( StringUtil.isEmpty(logApiStatus.getToteId()) ) {
+			logApiStatus.setToteId("");  
+		}
+    	if( StringUtil.isEmpty(logApiStatus.getGroupNo()) ) {
+			logApiStatus.setGroupNo("");  
+		}
+    	if( StringUtil.isEmpty(logApiStatus.getWorkBatchNo()) ) {
+			logApiStatus.setWorkBatchNo("");  
+		}
+		if( StringUtil.isEmpty(logApiStatus.getShipUidWcs()) ) {
+			logApiStatus.setShipUidWcs("");  //출고오더UID(WCS)
+		}
+		if( StringUtil.isEmpty(logApiStatus.getShipUidSeq()) ) {
+			logApiStatus.setShipUidSeq("");  //출고오더UID(WCS)
+		}
+		if( StringUtil.isEmpty(logApiStatus.getShipOrderKey()) ) {
+			logApiStatus.setShipOrderKey("");  //출하문서번호(WMS)
+		}
+    	if( StringUtil.isEmpty(logApiStatus.getWcsStatus()) ) {
+    		logApiStatus.setWcsStatus("");  //WCS 작업상태
+		}
+    	if( StringUtil.isEmpty(logApiStatus.getInvoiceNo()) ) {
+    		logApiStatus.setInvoiceNo("");  //송장번호
+		}
+    	if( StringUtil.isEmpty(logApiStatus.getSkuCode()) ) {
+    		logApiStatus.setSkuCode("");  
+		}
+    	
 		String v_ApiInfo = logApiStatus.getApiInfo();
-		String c_ApiInfo = StringUtil.cutString(v_ApiInfo, 3500, "");
-		logApiStatus.setApiInfo(c_ApiInfo);
+//		String c_ApiInfo = StringUtil.cutString(v_ApiInfo, 3500, "");
+		logApiStatus.setApiInfo(v_ApiInfo);
 		
 		String v_intfMemo = logApiStatus.getIntfMemo();
 		String c_intfMemo = StringUtil.cutString(v_intfMemo, 3500, "");
     	logApiStatus.setIntfMemo(c_intfMemo);
     	
 		int seqId = logApiStatusRepository.createLogApiStatus(logApiStatus);
-		
-    	log.info("=================createLogApiStatus end========"+ "["+seqId+"]");
+    	
 		return seqId;
 	}
 
+	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=SQLException.class)
+	public void createLogApiStatusList(List<LogApiStatus> logApiStatus) {
+		
+		HashMap<String, Object> hdMap = new HashMap<String, Object>();
+		hdMap.put("logApiStatusList",logApiStatus);
+		
+		logApiStatusRepository.createLogApiStatusList(hdMap);
+		
+	}
 }

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.lgcns.wcs.kurly.dto.LogApiStatus;
 import com.lgcns.wcs.kurly.dto.PickQpsCompletData;
 import com.lgcns.wcs.kurly.dto.PickQpsCompletDetailData;
 
@@ -21,4 +22,6 @@ public interface PickQpsCompletService {
 	public List<PickQpsCompletData> selectPickQpsComplet() ;
 	public List<PickQpsCompletDetailData> selectPickQpsCompletDetail(PickQpsCompletData data) ;
 	public void updatePickQpsComplet(Map<String, String> data) ;
+	
+	public void updatePickQpsCompletList(Map<String, Object> data, List<LogApiStatus> logApiStatusList)  ;
 }

@@ -8,13 +8,13 @@
   <select id="selectToteScan" resultType="com.lgcns.wcs.kurly.dto.ToteScanData">
   	/* [ToteScanMapper.xml] selectToteScan */
     SELECT 
-    	TOTE_ID         AS toteId,
+		TOTE_ID         AS toteId,
 		WAREHOUSE_KEY   AS warehouseKey,
 		PICKING_TYPE    AS pickingType,
-		ALLOC_TYPE    AS processType,
-		QPS_NUM     AS qpsUnitNo,
+		ALLOC_TYPE      AS allocType,
+		QPS_NUM         AS qpsNum,
 		FAC_EQP_ID      AS facEqpId,
-		FAC_EQP_NM      AS facEqpName,
+		FAC_EQP_NM      AS facEqpNm,
 		SUBSTR(TOTE_INITIAL_SCAN_YMD,1,8) AS toteScanDate,
 		SUBSTR(TOTE_INITIAL_SCAN_YMD,9,6) AS toteScanTime,
 		WIF_PICK_TOTE_HDR_SEQ   AS toteUniqueNo,
@@ -24,7 +24,6 @@
 	FROM o_wcs.TB_WIF_PICK_TOTE_HDR
 	WHERE TOTE_INITIAL_SCAN_YN = 'Y'
 	  AND TOTE_SCAN_IF_YN = 'N'
-	ORDER BY WIF_PICK_TOTE_HDR_SEQ ASC
   </select>
   
   <update id="updateToteScan" parameterType="Map">
@@ -37,4 +36,33 @@
 			TOTE_SCAN_IF_RET_MESSAGE = #{toteScanIfRetMessage} 
 	WHERE WIF_PICK_TOTE_HDR_SEQ = #{toteUniqueNo}
   </update>
+  
+  <update id="updateToteScanList" parameterType="map">
+  /* [ToteScanMapper.xml] updateToteScanList */
+    MERGE INTO o_wcs.TB_WIF_PICK_TOTE_HDR  HDR
+    	USING (
+    		<foreach collection="updateList" item="item" index="index" separator="UNION ALL">
+    		SELECT
+				#{item.toteUniqueNo}  AS TOTE_UNIQUE_NO,
+				#{item.toteScanIfYn}  AS TOTE_SCAN_IF_YN ,  
+				#{item.toteScanIfRetCode}  AS TOTE_SCAN_IF_RET_CODE ,
+				#{item.toteScanIfRetMessage}  AS TOTE_SCAN_IF_RET_MESSAGE
+    		FROM DUAL
+   		   </foreach>
+	) TB
+	ON 
+	(
+		HDR.WIF_PICK_TOTE_HDR_SEQ = TB.TOTE_UNIQUE_NO
+	)
+	WHEN MATCHED THEN
+		UPDATE
+		<set>
+			HDR.TOTE_SCAN_IF_YN =  TB.TOTE_SCAN_IF_YN,
+			HDR.TOTE_SCAN_IF_DT =  SYSDATE,
+			HDR.TOTE_SCAN_IF_RET_CODE =  TB.TOTE_SCAN_IF_RET_CODE,
+			HDR.TOTE_SCAN_IF_RET_MESSAGE = TB.TOTE_SCAN_IF_RET_MESSAGE 
+		</set>
+  </update>
+  
+  
 </mapper>

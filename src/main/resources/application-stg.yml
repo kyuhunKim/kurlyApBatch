@@ -2,36 +2,58 @@ server:
   port: 8081
 
 spring:
+  application:
+    name: WCS-AP-BATCH
+
   kafka:
     brokers:
-      producer: b-2.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-1.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092
-      consumer: b-2.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-1.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092
+#      producer: b-1.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-2.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-3.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-4.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092
+#      consumer: b-1.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-2.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-3.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-4.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092
+      producer: logistics.kafka.stage.kurly.services:9092
+      consumer: logistics.kafka.stage.kurly.services:9092
     topics:
       wcs-out:
         destination:
-          tote-release:  MSG-WCS_AP_TOTE_RELEASE
-          tote-scan:  MSG-WCS_AP_TOTE_SCAN
-          tote-cellExceptTxn:  MSG-WCS_AP_TOTE_CELLEXCEPTTXN
-          ordmadeNotfullyReplay:  MSG-WCS_AP_ORDMADE_NOTFULLY_REPL_REQ
-          ordmadeNotfully:  MSG-WCS_AP_ORDMADE_NOTFULLY
-          pickQpsComplet:  MSG-WCS_AP_PICKING_QPS_COMP
-          packQpsComplet:  MSG-WCS_AP_PACKING_QPS_COMP
-          invoicePrintComplet:  MSG-WCS_AP_INVOICE_PRINT_COMP
-          invoiceSortComplet:  MSG-WCS_AP_SHIP_SORT_COMP
-          qpsNumUseCell:  MSG-WCS_AP_QPS_NUM_USECELL
+          tote-scan:  STG-MSG-OUTBOUND-WMS-WCS_AP_TOTE_SCAN
+          tote-release:  STG-MSG-OUTBOUND-WMS-WCS_AP_TOTE_RELEASE
+          tote-cellExceptTxn:  STG-MSG-OUTBOUND-WMS-WCS_AP_TOTE_CELL_EXCEPTION
+          packQpsComplet:  STG-MSG-OUTBOUND-WMS-WCS_AP_PACKING_QPS_COMPLETE
+          pickQpsComplet:  STG-MSG-OUTBOUND-WMS-WCS_AP_PICKING_QPS_COMPLETE
+          invoiceSortComplet:  STG-MSG-OUTBOUND-WMS-WCS_AP_SHIP_SORT_COMPLETE
+          ordmadeNotfullyReplay:  STG-MSG-OUTBOUND-WMS-WCS_AP_ADDITIONAL_ITEM_PICKING
+          invoicePrintComplet:  STG-MSG-OUTBOUND-WMS-WCS_AP_INVOICE_PRINT_COMPLETE
+          ordmadeNotfully:  STG-MSG-OUTBOUND-WMS-WCS_AP_INCOMPLETE_ORDER_PICKING_STOP
+          qpsNumUseCell:  STG-MSG-OUTBOUND-WMS-WCS_AP_QPS_CELL_AVAILABLE
+          dasNumUseCell:  STG-MSG-OUTBOUND-WMS-WCS_AP_DAS_CELL_AVAILABLE
+          workBatchOrder: MSG-OUTBOUND-WCS-WCS_DAS_API-WORKBATCH_ORDER
+          pickingInfo: MSG-OUTBOUND-WCS-WCS_DAS_API-PICKING_TOTE_INFO
   
   datasource:
-#   dev
+    #    driver-class-name: oracle.jdbc.driver.OracleDriver
+    #    url: jdbc:oracle:thin:@10.12.43.101:1521:wcsqa
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-    url: jdbc:log4jdbc:oracle:thin:@15.15.21.220:1521/wcsdev
+    url: jdbc:log4jdbc:oracle:thin:@10.12.43.101:1521:wcsqa
     username : s_wcs
-    password : smartAPP9
-#   real
-#    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-#    url: jdbc:log4jdbc:oracle:thin:@10.12.43.111:1521:wcsprod
-#    username : s_wcs
-#    password : s_wcs
+    password : s_wcs
     
+    hikari:
+      minimum-idle: 15
+      maximum-pool-size: 100
+      idle-timeout:  10000
+      connection-timeout: 10000
+      validation-timeout: 10000
+      maxLifetime: 580000
+      data-source-properties:
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        useServerPrepStmts: true
+        useLocalTransactionState: true
+        rewriteBatchedStatements: true
+        cacheResultSetMetadata: true
+        cacheServerConfiguration: true
+        maintainTimeStats: false
+        
   batch:
     job: 
       enabled: false
@@ -43,10 +65,12 @@ spring:
         
 spring.main.allow-bean-definition-overriding: true
 
+wms.regionMasterUrl: https://tam.api.dev.kurly.com/v1/fs/regions/simple?clusterCenter=CC02
 
 # mybatis 설정.
 mybatis:
   mapper-locations: classpath:/mybatis/mapper/*.xml
+  config-location: classpath:/mybatis-config.xml
 
 logging:
   level:

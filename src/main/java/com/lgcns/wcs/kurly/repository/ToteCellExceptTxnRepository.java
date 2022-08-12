@@ -21,4 +21,6 @@ public interface ToteCellExceptTxnRepository  {
 	List<ToteCellExceptTxnSelectData> selectToteCellExceptTxn();
 	
 	void updateToteCellExceptTxn(Map<String, String> data);
+	
+	void updateToteCellExceptTxnList(Map<String, Object> data);
 }

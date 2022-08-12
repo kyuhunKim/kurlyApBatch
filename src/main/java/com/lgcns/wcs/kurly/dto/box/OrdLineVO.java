@@ -20,7 +20,6 @@ public class OrdLineVO {
 	private double ordLineLengthThird; //세번째로 큰 길이
 	private double skuCBM;
 	private double lengthTotal;
-	private SkuTypeMap skuMaster;
 	
 	private double skuDepth = 0; //상품 깊이
 	private double skuHeight = 0; //상품 높이
@@ -81,7 +80,6 @@ public class OrdLineVO {
 		ordLineLengthSecond = 0;
 		ordLineLengthThird = 0;
 		
-		this.skuMaster = skuMaster;
 	}
 	
 	public int setOrdLine(SkuTypeMap skuMaster, String inSkuCd, int inOrdQty)
