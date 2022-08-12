@@ -2,6 +2,9 @@ server:
   port: 8081
 
 spring:
+  application:
+    name: WCS-AP-BATCH
+
   kafka:
     brokers:
 #      producer: localhost:9092
@@ -24,24 +27,17 @@ spring:
           ordmadeNotfully: DEV-MSG-OUTBOUND-WMS-WCS_AP_INCOMPLETE_ORDER_PICKING_STOP
           qpsNumUseCell: DEV-MSG-OUTBOUND-WMS-WCS_AP_QPS_CELL_AVAILABLE
           dasNumUseCell: DEV-MSG-OUTBOUND-WMS-WCS_AP_DAS_CELL_AVAILABLE
-  
+          workBatchOrder: MSG-OUTBOUND-WCS-WCS_DAS_API-WORKBATCH_ORDER
+          pickingInfo: MSG-OUTBOUND-WCS-WCS_DAS_API-PICKING_TOTE_INFO
+
   datasource:
-#   dev
-#    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-#    url: jdbc:log4jdbc:oracle:thin:@15.15.21.220:1521/wcsdev
-##    driver-class-name: oracle.jdbc.driver.OracleDriver
-##    url: jdbc:oracle:thin:@15.15.21.220:1521/wcsdev
-#    username : s_wcs
-#    password : smartAPP9
-#   real
-#    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-#    url: jdbc:log4jdbc:oracle:thin:@10.12.43.111:1521:wcsprod
-    driver-class-name: oracle.jdbc.driver.OracleDriver
-#    url: jdbc:oracle:thin:@10.12.43.111:1521:wcsprod
-    url: jdbc:oracle:thin:@15.15.21.220:1521:wcsdev
-    username : s_wcs
-    password : smartAPP9
-    
+#    driver-class-name: oracle.jdbc.driver.OracleDriver
+#    url: jdbc:oracle:thin:@10.12.43.101:1521:wcsqa
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    url: jdbc:log4jdbc:oracle:thin:@10.12.43.101:1521:wcsqa
+    username: s_wcs
+    password: s_wcs
+
     hikari:
       minimum-idle: 15
       maximum-pool-size: 100
@@ -59,27 +55,19 @@ spring:
         cacheResultSetMetadata: true
         cacheServerConfiguration: true
         maintainTimeStats: false
-        
+
   batch:
-    job: 
+    job:
       enabled: false
 
   task:
     scheduling:
       pool:
         size: 13
-        
+
 spring.main.allow-bean-definition-overriding: true
 
-#wms.regionMasterUrl: https://tms.api.dev.kurly.com/tms/v1/common/wms/region/items
-#dev : 
-#wms.regionMasterUrl: http://tms.api.dev.kurly.com/tms/v1/common/wms/region/zipmasters
-#2cc:
-#wms.regionMasterUrl: http://tam-api.2cc.kurly.services/region/zipmasters
-#2021.08.10 url 변경
 wms.regionMasterUrl: https://tam.api.dev.kurly.com/v1/fs/regions/simple?clusterCenter=CC02
-#real: 
-#wms.regionMasterUrl: https://tam.api.kurly.services/v1/fs/regions/simple?clusterCenter=CC02
 
 # mybatis 설정.
 mybatis:

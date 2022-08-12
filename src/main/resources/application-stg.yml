@@ -2,6 +2,9 @@ server:
   port: 8081
 
 spring:
+  application:
+    name: WCS-AP-BATCH
+
   kafka:
     brokers:
 #      producer: b-1.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-2.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-3.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-4.dev-msk-wms-01.gxxq3w.c2.kafka.ap-northeast-2.amazonaws.com:9092
@@ -22,11 +25,14 @@ spring:
           ordmadeNotfully:  STG-MSG-OUTBOUND-WMS-WCS_AP_INCOMPLETE_ORDER_PICKING_STOP
           qpsNumUseCell:  STG-MSG-OUTBOUND-WMS-WCS_AP_QPS_CELL_AVAILABLE
           dasNumUseCell:  STG-MSG-OUTBOUND-WMS-WCS_AP_DAS_CELL_AVAILABLE
+          workBatchOrder: MSG-OUTBOUND-WCS-WCS_DAS_API-WORKBATCH_ORDER
+          pickingInfo: MSG-OUTBOUND-WCS-WCS_DAS_API-PICKING_TOTE_INFO
   
   datasource:
-    driver-class-name: oracle.jdbc.driver.OracleDriver
-#    url: jdbc:oracle:thin:@10.12.43.111:1521:wcsprod
-    url: jdbc:oracle:thin:@10.12.43.101:1521:wcsqa
+    #    driver-class-name: oracle.jdbc.driver.OracleDriver
+    #    url: jdbc:oracle:thin:@10.12.43.101:1521:wcsqa
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    url: jdbc:log4jdbc:oracle:thin:@10.12.43.101:1521:wcsqa
     username : s_wcs
     password : s_wcs
     
@@ -59,11 +65,7 @@ spring:
         
 spring.main.allow-bean-definition-overriding: true
 
-#2cc: 
 wms.regionMasterUrl: https://tam.api.dev.kurly.com/v1/fs/regions/simple?clusterCenter=CC02
-#real: 
-#wms.regionMasterUrl: https://tam.api.kurly.services/v1/fs/regions/simple?clusterCenter=CC02
-
 
 # mybatis 설정.
 mybatis:

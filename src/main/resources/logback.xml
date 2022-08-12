@@ -4,12 +4,14 @@
 <configuration debug="true" scan="true">
     <include resource="org/springframework/boot/logging/logback/defaults.xml" />
     <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
-    
+
+    <springProperty name="spring.application.name" source="spring.application.name"/>
+
     <!-- <property name="LOG_DIR" value="D://logs/spring-boot-log/kruly_gradle_test" />
     <property name="FILE_NAME" value="gimpoWcsApBatch" /> -->
     <property name="LOG_DIR" value="/logs/wcs/gimpoWcsApBatch" />
     <property name="FILE_NAME" value="gimpoWcsApBatch" />
- 
+
     <!--파일에 로그를 남깁니다.-->
     <appender name="File" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_DIR}/${FILE_NAME}.log</file>
@@ -68,11 +70,44 @@
             <charset>UTF-8</charset>
 		</encoder>
 	</appender>
-  
+
+    <appender name="json" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <version />
+                <timestamp />
+                <logLevel />
+                <sequence />
+                <ThreadName />
+                <Arguments />
+                <mdc />
+                <ContextMap />
+                <CallerData />
+                <ThrowableClassName />
+                <ThrowableRootCauseClassName />
+                <rootStackTraceElement />
+                <pattern>
+                    <omitEmptyFields>true</omitEmptyFields>
+                    <pattern>
+                        {
+                        "timestamp": "%d{yyyy-MM-dd HH:mm:ss.SSS}",
+                        "message": "%message",
+                        "exception": "%ex{full}",
+                        "dd.service": "${spring.application.name}",
+                        "data.keyword": "${spring.application.name}",
+                        "traceId": "%X{dd.trace_id}",
+                        "spanId": "%X{dd.span_id}"
+                        }
+                    </pattern>
+                </pattern>
+            </providers>
+        </encoder>
+    </appender>
+
 	<logger name="jdbc" level="OFF"/>
   
 	<logger name="jdbc.sqlonly" level="OFF"/>
-	<logger name="jdbc.sqltiming" level="DEBUG"/>
+	<logger name="jdbc.sqltiming" level="INFO"/>
 	<logger name="jdbc.audit" level="OFF"/>
 	<logger name="jdbc.resultset" level="OFF"/>
 	<logger name="jdbc.resultsettable" level="OFF"/>
@@ -80,17 +115,20 @@
 	  
     <logger name="org.springframework.web" level="INFO" additivity="false">
         <appender-ref ref="Console"/>
+        <appender-ref ref="json" />
         <appender-ref ref="File"/>
         <appender-ref ref="Error"/>
     </logger>
     
     <logger name="org.mybatis" level="DEBUG" additivity="false">
         <appender-ref ref="Console"/>
+        <appender-ref ref="json" />
         <appender-ref ref="File"/>
         <appender-ref ref="Error"/>
     </logger>
 	<root level="INFO">
 		<appender-ref ref="Console" />
+        <appender-ref ref="json" />
         <appender-ref ref="File"/>
         <appender-ref ref="Error"/>
 	</root>
