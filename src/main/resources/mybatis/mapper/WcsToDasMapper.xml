@@ -20,7 +20,7 @@
 			   , TOSH.CUSTOMER_NAME                                     AS customerName
 			   , TOSH.RECIPIENT_NAME                                    AS recipientName
 			   , TOSH.JIBUN_BASIC_ADDR || ' ' || TOSH.JIBUN_DETAIL_ADDR AS receiverAddress
-			   , TOSH.ROAD_ADDR || ' ' || TOSH.ROAD_ADDR_DETAIL         AS receiverRoadAddress
+			   , TOSH.ROAD_ADDR || ' | ' || TOSH.ROAD_ADDR_DETAIL         AS receiverRoadAddress
 			   , TOSH.REGION_GROUP_CODE                                 AS regionGroupCode
 			   , TOSH.REGION_CODE                                       AS regionCode
 			   , TOSH.ORDER_ADDR_GUGUN                                  AS regionGu
