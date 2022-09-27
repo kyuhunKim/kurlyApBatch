@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: WCS-AP-BATCH
+    name: gimpo-wcs-ap-batch
 
   kafka:
     brokers:
