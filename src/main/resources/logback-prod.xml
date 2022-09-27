@@ -117,7 +117,7 @@
         <appender-ref ref="Error"/>
     </logger>
     
-    <logger name="org.mybatis" level="DEBUG" additivity="false">
+    <logger name="org.mybatis" level="INFO" additivity="false">
         <appender-ref ref="Console"/>
         <appender-ref ref="json" />
         <appender-ref ref="File"/>
