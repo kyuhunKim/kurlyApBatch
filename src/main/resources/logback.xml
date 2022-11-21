@@ -7,11 +7,11 @@
 
     <springProperty name="spring.application.name" source="spring.application.name"/>
 
-    <!-- <property name="LOG_DIR" value="D://logs/spring-boot-log/kruly_gradle_test" />
-    <property name="FILE_NAME" value="gimpoWcsApBatch" /> -->
-    <property name="LOG_DIR" value="/logs/wcs/gimpoWcsApBatch" />
+    <property name="LOG_DIR" value="../logs" />
     <property name="FILE_NAME" value="gimpoWcsApBatch" />
-
+    <!-- <property name="LOG_DIR" value="/logs/wcs/gimpoWcsApBatch" />
+    <property name="FILE_NAME" value="gimpoWcsApBatch" /> -->
+ 
     <!--파일에 로그를 남깁니다.-->
     <appender name="File" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_DIR}/${FILE_NAME}.log</file>
@@ -122,7 +122,6 @@
     
     <logger name="org.mybatis" level="INFO" additivity="false">
         <appender-ref ref="Console"/>
-        <appender-ref ref="json" />
         <appender-ref ref="File"/>
         <appender-ref ref="Error"/>
     </logger>
